@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="es" data-rv-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Migaja — Galletas de obrador, abiertas a mano</title>
+<meta name="description" content="Galletas de obrador en tres ediciones: frambuesa, matcha y limón. Masa reposada 72 horas y relleno que se estira al partirlas.">
+<meta name="theme-color" content="#0d0709">
+<!-- Tip de rendimiento: precargar el póster del capítulo 0.
+<link rel="preload" as="image" href="assets/frambuesa-poster.jpg" fetchpriority="high"> -->
+
+<script>
+  /* Modo anclado (pin + scrub) solo si el usuario no pidió menos movimiento.
+     Sin JS o con reduced-motion queda el modo estático: cada capítulo es una sección normal. */
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('rv-on');
+</script>
+
+<style>
+/* =========================================================
+   1. TOKENS
+   ========================================================= */
+:root{
+  /* Paleta viva: el JS la reescribe durante el handoff (en .rv-stage y en <html>).
+     Los valores iniciales deben coincidir con el capítulo 0 de REVEAL.chapters. */
+  --rv-bg:#0d0709;
+  --rv-glow:#8a1738;
+  --rv-accent:#ff5c7a;
+
+  --rv-ink:#f6efe9;
+  --rv-ink-dim:rgb(246 239 233 / .68);
+  --rv-line:rgb(246 239 233 / .16);
+  --rv-ghost:rgb(255 255 255 / .055);      /* palabra fantasma: casi invisible a propósito */
+  --rv-vignette:rgb(0 0 0 / .55);
+
+  --rv-ar:1.7778;                           /* relación de aspecto del video (ancho/alto) */
+  --rv-vh:1vh;                              /* se cambia a svh si el navegador lo soporta */
+  --rv-media-top:50%;                       /* posición vertical del objeto en el stage */
+  /* --rv-portrait-width: 190vw;  (opcional) ancho del objeto en pantallas verticales */
+
+  /* >>> FUENTES: para usar tipografías propias agregar un @font-face (o un <link> de Google Fonts)
+         y reemplazar estas dos variables. Todo el diseño depende solo de ellas. <<< */
+  --rv-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --rv-sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@supports (height:1svh){ :root{ --rv-vh:1svh } }
+@supports (color:color-mix(in srgb,red,blue)){
+  :root{ --rv-ghost:color-mix(in srgb,var(--rv-accent) 9%,transparent) }
+}
+:root[data-rv-theme="light"]{
+  --rv-ink:#17120f;
+  --rv-ink-dim:rgb(23 18 15 / .66);
+  --rv-line:rgb(23 18 15 / .16);
+  --rv-ghost:rgb(0 0 0 / .05);
+  --rv-vignette:rgb(255 255 255 / .55);
+}
+
+/* =========================================================
+   2. BASE
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--rv-bg)}
+body{margin:0;background:var(--rv-bg);color:var(--rv-ink);font:400 1rem/1.55 var(--rv-sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,video,canvas{display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--rv-accent);outline-offset:3px;border-radius:6px}
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:fixed;left:12px;top:-60px;z-index:100;padding:.6rem 1rem;border-radius:999px;background:var(--rv-accent);color:var(--rv-bg);font:600 .8rem var(--rv-sans);text-decoration:none}
+.skip:focus{top:12px}
+
+/* Nav (fija, discreta) */
+.nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
+  padding:calc(18px + env(safe-area-inset-top)) clamp(20px,5vw,72px) 22px;pointer-events:none;
+  background:linear-gradient(to bottom,var(--rv-bg) 0%,transparent 100%)}
+.nav a{pointer-events:auto;text-decoration:none}
+.nav__brand{font:400 1.5rem/1 var(--rv-serif);letter-spacing:-.015em}
+.nav__brand span{color:var(--rv-accent)}
+.nav ul{display:flex;gap:clamp(18px,3vw,44px);margin:0;padding:0;list-style:none}
+.nav__links a,.nav__cart{font:600 .68rem/1 var(--rv-sans);letter-spacing:.22em;text-transform:uppercase;color:var(--rv-ink-dim)}
+.nav__links a:hover,.nav__cart:hover{color:var(--rv-ink)}
+
+/* =========================================================
+   3. REVEAL — modo estático por defecto (sin JS / reduced-motion)
+   ========================================================= */
+.rv-glow,.rv-ghosts,.rv-scrim,.rv-side,.rv-foot{display:none}
+.rv-media{display:none}
+
+.rv-copy{padding:clamp(84px,12vw,150px) clamp(20px,6vw,96px) clamp(40px,6vw,80px);background:var(--c-bg,var(--rv-bg))}
+html:not(.rv-on) .rv-copy{ --rv-bg:var(--c-bg,#0d0709); --rv-accent:var(--c-accent,#ff5c7a) }
+.rv-copy__in{max-width:40rem;margin:0 auto}
+.rv-static-img{width:min(100%,640px);aspect-ratio:var(--rv-ar);object-fit:cover;margin:0 auto 2.2rem;mix-blend-mode:lighten}
+
+/* Tipografía de copy (compartida por ambos modos) */
+.rv-eyebrow{display:flex;align-items:center;gap:.9em;margin:0;font:600 .7rem/1 var(--rv-sans);letter-spacing:.3em;text-transform:uppercase;color:var(--rv-accent)}
+.rv-eyebrow::before{content:"";width:2.6em;height:1px;background:currentColor;opacity:.7}
+.rv-title{margin:1rem 0 1.15rem;font:400 clamp(2.6rem,4.7vw,5.4rem)/.96 var(--rv-serif);letter-spacing:-.03em;text-wrap:balance}
+.rv-title em{font-style:italic;color:var(--rv-accent);padding-right:.04em}
+.rv-lede{margin:0 0 2.1rem;max-width:27rem;color:var(--rv-ink-dim);font-size:clamp(.95rem,1.15vw,1.08rem);line-height:1.62;text-wrap:pretty}
+.rv-cta{display:inline-flex;align-items:center;gap:.9em;padding:1.05em 1.5em 1.05em 1.8em;border-radius:999px;background:var(--rv-accent);color:var(--rv-bg);
+  font:700 .72rem/1 var(--rv-sans);letter-spacing:.18em;text-transform:uppercase;text-decoration:none;transition:transform .25s ease,filter .25s ease}
+.rv-cta:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.rv-cta svg{width:16px;height:10px;transition:transform .25s ease}
+.rv-cta:hover svg{transform:translateX(3px)}
+
+/* =========================================================
+   4. REVEAL — modo anclado (html.rv-on)
+   ========================================================= */
+.rv{position:relative}
+.rv-stage{position:relative;background:var(--rv-bg);color:var(--rv-ink)}
+
+.rv-on .rv{height:calc(var(--rv-n,3) * var(--rv-spc,2.6) * 100 * var(--rv-vh) + 100 * var(--rv-vh))}
+.rv-on .rv-stage{position:sticky;top:0;height:calc(100 * var(--rv-vh));overflow:hidden;isolation:isolate}
+
+/* Capas, de abajo hacia arriba: bg → glow (0) → ghost (1) → media (2) → scrim (3) → UI (4) → nav (50).
+   OJO: .rv-media NO debe crear stacking context (sin z-index/opacity/transform): si lo creara,
+   el mix-blend-mode de los items no vería el glow ni la palabra fantasma que tiene debajo. */
+
+/* Glow radial detrás del objeto */
+.rv-on .rv-glow{display:block;position:absolute;inset:0;z-index:0;pointer-events:none}
+.rv-glow::before{content:"";position:absolute;left:50%;top:var(--rv-media-top);width:max(64vw,96 * var(--rv-vh));aspect-ratio:1;
+  transform:translate(-50%,-50%) scale(var(--gs,.9));
+  background:radial-gradient(closest-side,var(--rv-glow) 0%,transparent 100%);opacity:.9}
+@supports (color:color-mix(in srgb,red,blue)){
+  .rv-glow::before{background:radial-gradient(closest-side,var(--rv-glow) 0%,
+    color-mix(in srgb,var(--rv-glow) 62%,transparent) 28%,
+    color-mix(in srgb,var(--rv-glow) 22%,transparent) 58%,
+    color-mix(in srgb,var(--rv-glow) 5%,transparent) 82%,transparent 100%)}
+}
+.rv-glow::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 80% 75% at 50% 50%,transparent 42%,var(--rv-vignette) 100%)}
+
+/* Palabra fantasma gigante */
+.rv-on .rv-ghosts{display:block;position:absolute;inset:0;z-index:1;pointer-events:none;user-select:none}
+.rv-ghost{position:absolute;left:50%;top:var(--rv-media-top);margin:0;white-space:nowrap;
+  font:400 clamp(5rem,min(19vw,42 * var(--rv-vh)),24rem)/1 var(--rv-serif);letter-spacing:-.045em;color:var(--rv-ghost);
+  transform:translate(-50%,calc(-50% + var(--gy,0px)));opacity:0;visibility:hidden}
+.rv-on .rv-ghosts>:first-child{opacity:1;visibility:visible}
+
+/* Media: un item por capítulo, apilados y centrados (cover). Los bordes de la caja no se ven por el blend. */
+.rv-on .rv-media{display:contents}
+.rv-item{position:absolute;z-index:2;left:50%;top:var(--rv-media-top);aspect-ratio:var(--rv-ar);
+  width:max(100vw,calc(var(--rv-ar) * 100 * var(--rv-vh)));
+  transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:50% 50%;
+  mix-blend-mode:lighten;opacity:0;pointer-events:none;will-change:transform,opacity}
+:root[data-rv-theme="light"] .rv-item{mix-blend-mode:darken}
+@media (orientation:portrait){ .rv-item{width:var(--rv-portrait-width,190vw)} }
+.rv-item>*{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rv-item video,.rv-item canvas{opacity:0}
+.rv-item.is-ready video,.rv-item.is-ready canvas{opacity:1}
+.rv-item.is-ready .rv-poster{visibility:hidden}
+.rv-on .rv-media .rv-item:first-child{opacity:1}
+
+/* Scrim (solo en layout compacto) */
+.rv-scrim{position:absolute;left:0;right:0;bottom:0;height:58%;z-index:3;pointer-events:none;
+  background:linear-gradient(to top,var(--rv-bg) 0%,var(--rv-bg) 24%,transparent 100%)}
+
+/* Copy por capítulo: capas absolutas superpuestas, centradas verticalmente a la izquierda */
+.rv-on .rv-copy{position:absolute;inset:0;z-index:4;display:flex;align-items:center;padding:0 clamp(20px,6vw,96px);background:none;pointer-events:none}
+.rv-on .rv-static-img{display:none}
+.rv-on .rv-copy__in{max-width:min(30rem,28vw);margin:0;opacity:0;visibility:hidden;pointer-events:auto;will-change:transform,opacity}
+.rv-on .rv-copies>:first-child .rv-copy__in{opacity:1;visibility:visible}
+
+/* Bloque derecho compartido: tagline + selector de variantes */
+.rv-on .rv-side{display:flex;flex-direction:column;align-items:flex-end;gap:1.7rem;position:absolute;z-index:4;
+  right:clamp(20px,5vw,72px);top:50%;transform:translateY(-50%);max-width:14rem;text-align:right}
+.rv-side__tag{margin:0;font:italic 400 clamp(1.05rem,1.5vw,1.35rem)/1.3 var(--rv-serif);color:var(--rv-ink-dim);text-wrap:balance}
+.rv-side__group{display:flex;flex-direction:column;gap:.85rem}
+.rv-var{appearance:none;-webkit-appearance:none;background:none;border:0;margin:0;padding:0;color:inherit;font:inherit;cursor:pointer;
+  display:flex;flex-direction:row-reverse;align-items:center;justify-content:flex-start;gap:.95rem;-webkit-tap-highlight-color:transparent}
+.rv-var__thumb{position:relative;flex:none;width:56px;height:56px;border-radius:50%;background:#000;box-shadow:0 0 0 1px var(--rv-line);transition:transform .3s ease}
+.rv-var__thumb img{width:100%;height:100%;object-fit:cover;transform:scale(1.4);border-radius:50%}
+.rv-var__thumb::after{content:"";position:absolute;inset:-5px;border-radius:50%;box-shadow:0 0 0 1.5px var(--rv-accent),0 0 26px -2px var(--rv-accent);opacity:0;transition:opacity .3s ease}
+.rv-var__label{font:600 .66rem/1 var(--rv-sans);letter-spacing:.24em;text-transform:uppercase;color:var(--rv-ink-dim)}
+.rv-var:hover .rv-var__thumb{transform:scale(1.07)}
+.rv-var.is-active .rv-var__thumb::after{opacity:1}
+.rv-var.is-active .rv-var__label{color:var(--rv-accent)}
+
+/* Franja inferior: pista de scroll + medidor */
+.rv-on .rv-foot{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;position:absolute;z-index:4;pointer-events:none;
+  left:clamp(20px,5vw,72px);right:clamp(20px,5vw,72px);bottom:calc(24px + env(safe-area-inset-bottom));
+  font:600 .66rem/1 var(--rv-sans);letter-spacing:.26em;text-transform:uppercase;color:var(--rv-ink-dim)}
+.rv-hint{display:flex;align-items:center;gap:.95rem}
+.rv-hint i{display:block;width:1px;height:36px;background:linear-gradient(var(--rv-accent),transparent);transform-origin:top;animation:rv-drip 2.2s cubic-bezier(.65,0,.25,1) infinite}
+@keyframes rv-drip{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.rv-meter{display:flex;align-items:center;gap:1rem}
+.rv-meter__bar{position:relative;width:clamp(72px,12vw,160px);height:1px;background:var(--rv-line);overflow:hidden}
+.rv-meter__bar i{position:absolute;inset:0;background:var(--rv-accent);transform:scaleX(0);transform-origin:left}
+.rv-meter output{font-variant-numeric:tabular-nums;color:var(--rv-ink)}
+
+/* =========================================================
+   5. Layout compacto (móvil / vertical)
+   ========================================================= */
+@media (max-width:820px),(orientation:portrait){
+  :root{--rv-media-top:40%}
+  .nav__links{display:none}
+  .rv-title{font-size:clamp(2.4rem,12.5vw,3.7rem);margin:.8rem 0 .85rem}
+  .rv-lede{font-size:.93rem;line-height:1.5;margin-bottom:1.3rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .rv-on .rv-scrim{display:block}
+  .rv-on .rv-copy{align-items:flex-end;padding:0 20px calc(74px + env(safe-area-inset-bottom))}
+  .rv-on .rv-copy__in{max-width:none;width:100%}
+  .rv-on .rv-side{top:calc(66px + env(safe-area-inset-top));left:0;right:0;transform:none;max-width:none;flex-direction:row;justify-content:center;gap:0}
+  .rv-side__tag{display:none}
+  .rv-side__group{flex-direction:row;gap:1.1rem}
+  .rv-var{flex-direction:column}
+  .rv-var__label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .rv-var__thumb{width:46px;height:46px}
+  .rv-ghost{font-size:clamp(4.5rem,23vw,12rem)}
+  .rv-hint span{display:none}
+}
+@media (max-height:480px) and (orientation:landscape){
+  .rv-lede,.rv-side__tag{display:none}
+  .rv-title{font-size:clamp(2rem,9vh,3.2rem)}
+  .rv-on .rv-copy{padding-bottom:56px}
+}
+
+/* =========================================================
+   6. Secciones posteriores (heredan la paleta del último capítulo vía <html>)
+   ========================================================= */
+.band{position:relative;padding:clamp(72px,12vw,168px) clamp(20px,6vw,96px);background:var(--rv-bg);color:var(--rv-ink)}
+.band__in{max-width:72rem;margin:0 auto}
+.band h2{margin:1.1rem 0 clamp(2rem,5vw,3.6rem);max-width:17ch;font:400 clamp(2.3rem,5.2vw,4.8rem)/1 var(--rv-serif);letter-spacing:-.028em;text-wrap:balance}
+.band h2 em{font-style:italic;color:var(--rv-accent)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1.5rem,4vw,4rem);margin:0;padding:2rem 0 0;list-style:none;border-top:1px solid var(--rv-line)}
+.facts b{display:block;font:400 clamp(2.8rem,5.4vw,4.8rem)/1 var(--rv-serif);letter-spacing:-.03em;color:var(--rv-accent)}
+.facts span{display:block;margin-top:.9rem;max-width:17rem;color:var(--rv-ink-dim)}
+.band--cta{text-align:center;border-top:1px solid var(--rv-line)}
+.band--cta h2{margin-left:auto;margin-right:auto}
+.band--cta p{margin:0 auto 2.2rem;max-width:30rem;color:var(--rv-ink-dim)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem 2rem;margin-top:clamp(3rem,8vw,6rem);padding-top:1.6rem;border-top:1px solid var(--rv-line);
+  font:600 .66rem/1.4 var(--rv-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--rv-ink-dim);text-align:left}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--rv-accent)}
+@media (max-width:700px){ .facts{grid-template-columns:1fr} }
+</style>
+</head>
+
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header class="nav">
+  <a class="nav__brand" href="#" aria-label="Migaja, inicio">Migaja<span>.</span></a>
+  <nav aria-label="Principal" class="nav__links">
+    <ul>
+      <li><a href="#sabores">Sabores</a></li>
+      <li><a href="#obrador">Obrador</a></li>
+      <li><a href="#caja">Regalos</a></li>
+    </ul>
+  </nav>
+  <a class="nav__cart" href="#caja">Cesta (0)</a>
+</header>
+
+<main id="contenido">
+
+  <!-- ======================= REVEAL ======================= -->
+  <section class="rv" id="sabores" aria-label="Las tres ediciones de Migaja">
+    <div class="rv-stage">
+
+      <!-- Capas decorativas (aria-hidden) -->
+      <div class="rv-glow" aria-hidden="true"></div>
+
+      <!-- Palabra fantasma: una por capítulo, enlazada por data-chapter con REVEAL.chapters[].id -->
+      <div class="rv-ghosts" aria-hidden="true">
+        <span class="rv-ghost" data-chapter="frambuesa">frambuesa</span>
+        <span class="rv-ghost" data-chapter="matcha">matcha</span>
+        <span class="rv-ghost" data-chapter="limon">limón</span>
+      </div>
+
+      <!-- El JS inserta aquí un .rv-item por capítulo (póster + video o canvas) -->
+      <div class="rv-media"></div>
+
+      <div class="rv-scrim" aria-hidden="true"></div>
+
+      <!-- Copy por capítulo. El texto real vive en el DOM (SEO); el JS solo cambia opacidad/posición.
+           La <img class="rv-static-img"> solo se ve en modo estático (sin JS / reduced-motion). -->
+      <div class="rv-copies">
+
+        <article class="rv-copy" data-chapter="frambuesa" aria-labelledby="t-frambuesa">
+          <div class="rv-copy__in">
+            <img class="rv-static-img" src="assets/frambuesa-poster.jpg" alt="Galleta de frambuesa abierta por la mitad, con el relleno rojo estirándose" decoding="async">
+            <p class="rv-eyebrow">Edición 01 · Frambuesa</p>
+            <h1 class="rv-title" id="t-frambuesa">Corazón de <em>frambuesa</em></h1>
+            <p class="rv-lede">Masa de mantequilla tostada, trozos de chocolate blanco y un centro de frambuesa fresca que se estira al partirla.</p>
+            <a class="rv-cta" href="#caja">Quiero la de frambuesa <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
+          </div>
+        </article>
+
+        <article class="rv-copy" data-chapter="matcha" aria-labelledby="t-matcha">
+          <div class="rv-copy__in">
+            <img class="rv-static-img" src="assets/matcha-poster.jpg" alt="Galleta de matcha abierta por la mitad, con la ganache verde cediendo despacio" loading="lazy" decoding="async">
+            <p class="rv-eyebrow">Edición 02 · Matcha</p>
+            <h2 class="rv-title" id="t-matcha">Té verde, <em>sin prisa</em></h2>
+            <p class="rv-lede">Matcha ceremonial molido en piedra, chocolate blanco tostado y una ganache verde que cede con calma al primer bocado.</p>
+            <a class="rv-cta" href="#caja">Quiero la de matcha <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
+          </div>
+        </article>
+
+        <article class="rv-copy" data-chapter="limon" aria-labelledby="t-limon">
+          <div class="rv-copy__in">
+            <img class="rv-static-img" src="assets/limon-poster.jpg" alt="Galleta de limón abierta por la mitad, con el curd amarillo brillando en el centro" loading="lazy" decoding="async">
+            <p class="rv-eyebrow">Edición 03 · Limón</p>
+            <h2 class="rv-title" id="t-limon">Un golpe de <em>limón</em></h2>
+            <p class="rv-lede">Ralladura recién hecha, curd cítrico preparado cada mañana y una pizca de sal en escamas para cerrar el bocado.</p>
+            <a class="rv-cta" href="#caja">Quiero la de limón <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Bloque derecho compartido: tagline + selector (miniaturas = pósters; el JS completa el src) -->
+      <aside class="rv-side" aria-label="Elegir edición">
+        <p class="rv-side__tag">Tres masas, un mismo centro blando.</p>
+        <div class="rv-side__group" role="group" aria-label="Ediciones">
+          <button type="button" class="rv-var is-active" data-chapter="frambuesa" aria-label="Ir a la edición de frambuesa" aria-current="true">
+            <span class="rv-var__thumb"><img alt="" width="56" height="56" decoding="async"></span>
+            <span class="rv-var__label">Frambuesa</span>
+          </button>
+          <button type="button" class="rv-var" data-chapter="matcha" aria-label="Ir a la edición de matcha">
+            <span class="rv-var__thumb"><img alt="" width="56" height="56" decoding="async"></span>
+            <span class="rv-var__label">Matcha</span>
+          </button>
+          <button type="button" class="rv-var" data-chapter="limon" aria-label="Ir a la edición de limón">
+            <span class="rv-var__thumb"><img alt="" width="56" height="56" decoding="async"></span>
+            <span class="rv-var__label">Limón</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Franja inferior -->
+      <div class="rv-foot" aria-hidden="true">
+        <div class="rv-hint"><i></i><span>Desliza para abrir</span></div>
+        <div class="rv-meter"><span class="rv-meter__bar"><i></i></span><output>01 / 03</output></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================= Secciones normales (prueban que la página sigue tras el pin) ======================= -->
+  <section class="band" id="obrador">
+    <div class="band__in">
+      <p class="rv-eyebrow">El obrador</p>
+      <h2>Del horno a la caja, <em>sin atajos</em></h2>
+      <ul class="facts">
+        <li><b>72 h</b><span>de reposo en frío para que la masa desarrolle sabor.</span></li>
+        <li><b>12</b><span>galletas por tanda, ni una más, hechas a mano.</span></li>
+        <li><b>100 %</b><span>mantequilla, huevo de campo y fruta de temporada.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band band--cta" id="caja">
+    <div class="band__in">
+      <p class="rv-eyebrow" style="justify-content:center">Cajas y regalos</p>
+      <h2>Una caja de seis, <em>tres sabores</em></h2>
+      <p>Dos de cada edición, empacadas el mismo día que salen del horno. Envíos en 48 horas.</p>
+      <a class="rv-cta" href="#sabores">Armar mi caja <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M0 5h14M10 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
+      <div class="foot">
+        <span>© Migaja Obrador · Sitio de ejemplo</span>
+        <span><a href="#">Instagram</a> &nbsp;·&nbsp; <a href="#">Contacto</a> &nbsp;·&nbsp; <a href="#">Envíos</a></span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* =========================================================================
+   CONFIGURACIÓN — todo lo ajustable vive aquí
+   Las rutas son relativas al HTML final. El copy de cada capítulo está en el HTML
+   y se enlaza por data-chapter="<id>" (.rv-copy, .rv-ghost, .rv-var).
+   ========================================================================= */
+const REVEAL = {
+  mode: 'video',            // 'video' | 'frames'
+  theme: 'dark',            // 'dark' → mix-blend-mode: lighten ; 'light' → darken
+  scrollPerChapter: 2.6,    // alturas de viewport de scroll por capítulo
+  damping: 0.14,            // factor lerp por frame (60 Hz) del scrub; menor = más suave
+  fps: 24,                  // fps del video/frames (define la tolerancia de seek)
+  timeline: {               // fracciones 0..1 del progreso local p de cada capítulo
+    uiOut:   [0.06, 0.22],  // el copy y la palabra fantasma se desvanecen
+    scrub:   [0.10, 0.86],  // el video/frames avanza de 0 a 1
+    handoff: [0.84, 1.0]    // traspaso al siguiente capítulo (paleta + media)
+  },
+  chapters: [
+    { id: 'frambuesa',
+      video: 'assets/frambuesa-scrub.mp4', videoMobile: 'assets/frambuesa-scrub-m.mp4', // videoMobile es opcional
+      poster: 'assets/frambuesa-poster.jpg',
+      frames: { path: 'assets/frambuesa/f_', ext: 'webp', count: 96, pad: 3 },        // solo si mode === 'frames'
+      bg: '#0d0709', accent: '#ff5c7a', glow: '#8a1738' },
+    { id: 'matcha',
+      video: 'assets/matcha-scrub.mp4', videoMobile: 'assets/matcha-scrub-m.mp4',
+      poster: 'assets/matcha-poster.jpg',
+      frames: { path: 'assets/matcha/f_', ext: 'webp', count: 96, pad: 3 },
+      bg: '#080c07', accent: '#b6e36b', glow: '#37591a' },
+    { id: 'limon',
+      video: 'assets/limon-scrub.mp4', videoMobile: 'assets/limon-scrub-m.mp4',
+      poster: 'assets/limon-poster.jpg',
+      frames: { path: 'assets/limon/f_', ext: 'webp', count: 96, pad: 3 },
+      bg: '#0d0c05', accent: '#f4dc4a', glow: '#7a6a0c' }
+  ]
+};
+
+/* =========================================================================
+   MOTOR — normalmente no hace falta tocar nada de aquí hacia abajo
+   ========================================================================= */
+(() => {
+  'use strict';
+
+  const root = document.documentElement;
+  const track = document.querySelector('.rv');
+  if (!track) return;
+  const stage = track.querySelector('.rv-stage');
+  const CH = REVEAL.chapters;
+  const N = CH.length;
+  const TL = REVEAL.timeline;
+  const FRAMES = REVEAL.mode === 'frames';
+  const FPS = REVEAL.fps || 24;
+  const q = (sel) => stage.querySelector(sel);
+
+  /* ---------- utilidades ---------- */
+  const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+  const seg = (v, r) => clamp01((v - r[0]) / (r[1] - r[0]));      // tramo [a,b] → 0..1
+  const smooth = (t) => t * t * (3 - 2 * t);
+  const easeIO = (t) => t + (smooth(t) - t) * 0.5;                 // ease in-out suave
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const toRGB = (h) => {
+    let s = h.replace('#', '');
+    if (s.length === 3) s = s.replace(/./g, '$&$&');
+    const n = parseInt(s, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  };
+  const mixHex = (a, b, t) => {                                    // mezcla lineal en RGB → '#rrggbb'
+    const A = toRGB(a), B = toRGB(b);
+    return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  };
+  // Escritura con caché: no toca el DOM si el valor no cambió
+  const setS = (el, prop, val) => {
+    const c = el.__rv || (el.__rv = {});
+    if (c[prop] === val) return;
+    c[prop] = val;
+    el.style[prop] = val;
+  };
+  const setV = (el, name, val) => {
+    const c = el.__rv || (el.__rv = {});
+    if (c[name] === val) return;
+    c[name] = val;
+    el.style.setProperty(name, val);
+  };
+
+  root.dataset.rvTheme = REVEAL.theme === 'light' ? 'light' : 'dark';
+  track.style.setProperty('--rv-n', N);
+  track.style.setProperty('--rv-spc', REVEAL.scrollPerChapter);
+
+  /* ---------- referencias por capítulo ---------- */
+  const R = CH.map((ch, k) => {
+    const byId = (cls) => stage.querySelector(`.${cls}[data-chapter="${ch.id}"]`);
+    const copy = byId('rv-copy'), ghost = byId('rv-ghost'), btn = byId('rv-var');
+    if (!copy || !ghost || !btn) console.warn(`[rv] Falta copy/ghost/botón para data-chapter="${ch.id}"`);
+    if (FRAMES && !ch.frames) console.warn(`[rv] mode:'frames' requiere chapters[${k}].frames`);
+    if (copy) {                                                    // paleta propia (la usa el modo estático)
+      copy.style.setProperty('--c-bg', ch.bg);
+      copy.style.setProperty('--c-accent', ch.accent);
+      copy.style.setProperty('--c-glow', ch.glow);
+    }
+    return {
+      k, ch, copy, ghost, btn, copyIn: copy && copy.querySelector('.rv-copy__in'),
+      item: null, video: null, canvas: null, ctx: null,
+      cur: 0, tgt: 0, init: false,                                 // valor amortiguado / objetivo (s o índice de frame)
+      imgs: [], count: FRAMES && ch.frames ? ch.frames.count : 0, drawn: -1
+    };
+  });
+
+  /* ---------- modo estático: sin pin ni scrub ---------- */
+  if (!root.classList.contains('rv-on')) {
+    track.classList.add('rv--static');
+    window.__rv = { state: () => ({ static: true, g: 0, chapter: 0, p: 0, mediaProgress: 0, palette: null, frameOrTime: 0 }) };
+    return;
+  }
+
+  /* ---------- construir la capa de media ---------- */
+  const mediaEl = q('.rv-media');
+  R.forEach((r) => {
+    const item = document.createElement('div');
+    item.className = 'rv-item';
+    item.setAttribute('aria-hidden', 'true');
+    const poster = new Image();                                    // póster detrás: evita el flash negro
+    poster.className = 'rv-poster';
+    poster.alt = '';
+    poster.decoding = 'async';
+    if (r.k === 0) poster.fetchPriority = 'high';
+    poster.src = r.ch.poster;
+    item.appendChild(poster);
+
+    if (FRAMES) {
+      r.canvas = document.createElement('canvas');
+      r.ctx = r.canvas.getContext('2d');
+      item.appendChild(r.canvas);
+    } else {
+      const v = document.createElement('video');
+      v.muted = v.defaultMuted = true;
+      v.playsInline = true;
+      v.preload = 'auto';
+      v.disablePictureInPicture = true;
+      v.controls = false;
+      v.tabIndex = -1;
+      ['muted', 'playsinline', 'webkit-playsinline', 'disablepictureinpicture'].forEach((a) => v.setAttribute(a, ''));
+      v.addEventListener('loadeddata', () => { item.classList.add('is-ready'); if (primed) primeOne(v); });
+      v.addEventListener('error', () => console.warn(`[rv] No se pudo cargar el video de "${r.ch.id}" (${v.currentSrc || v.src})`));
+      r.video = v;
+      item.appendChild(v);
+    }
+    r.item = item;
+    mediaEl.appendChild(item);
+
+    const thumb = r.btn && r.btn.querySelector('img');            // miniaturas del selector = pósters
+    if (thumb && !thumb.getAttribute('src')) thumb.src = r.ch.poster;
+  });
+
+  /* ---------- carga: video (fetch → blob en memoria) ---------- */
+  const mqMobile = matchMedia('(max-width: 820px)');
+  async function loadVideo(r) {
+    const url = mqMobile.matches && r.ch.videoMobile ? r.ch.videoMobile : r.ch.video;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      let blob = await res.blob();
+      if (!/^video\//.test(blob.type)) blob = new Blob([blob], { type: 'video/mp4' });
+      r.video.src = URL.createObjectURL(blob);
+    } catch (err) {
+      r.video.src = url;                                           // plan B: src directo (p. ej. file://)
+    }
+  }
+
+  /* ---------- carga: frames en canvas ---------- */
+  const frameUrl = (ch, n) => ch.frames.path + String(n).padStart(ch.frames.pad, '0') + '.' + ch.frames.ext;
+  function loadFrame(r, n) {                                       // n: 1..count
+    return new Promise((done) => {
+      if (r.imgs[n - 1]) return done();
+      const im = new Image();
+      im.decoding = 'async';
+      im.onload = () => { r.imgs[n - 1] = im; done(); };
+      im.onerror = () => done();
+      im.src = frameUrl(r.ch, n);
+    });
+  }
+  async function loadChapterFrames(r, concurrency = 6) {
+    let n = 2;
+    const worker = async () => { while (n <= r.count) await loadFrame(r, n++); };
+    await Promise.all(Array.from({ length: concurrency }, worker));
+  }
+
+  /* orden: 1.er frame de todos → capítulo 0 completo → resto en secuencia */
+  (async () => {
+    if (FRAMES) {
+      await Promise.all(R.map((r) => r.count && loadFrame(r, 1)));
+      for (const r of R) if (r.count) await loadChapterFrames(r);
+    } else {
+      for (const r of R) await loadVideo(r);
+    }
+  })();
+
+  const nearest = (r, idx) => {                                    // frame cargado más cercano al pedido
+    for (let d = 0; d < r.count; d++) {
+      if (r.imgs[idx - d]) return idx - d;
+      if (r.imgs[idx + d]) return idx + d;
+    }
+    return -1;
+  };
+  function sizeCanvas(r) {                                         // DPR (tope 2); fuerza redibujo
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.round(r.item.clientWidth * dpr), h = Math.round(r.item.clientHeight * dpr);
+    if (!w || (r.canvas.width === w && r.canvas.height === h)) return;
+    r.canvas.width = w;
+    r.canvas.height = h;
+    r.drawn = -1;
+  }
+  function draw(r, idx) {
+    const n = nearest(r, idx);
+    if (n < 0 || n === r.drawn || !r.canvas.width) return;
+    r.ctx.clearRect(0, 0, r.canvas.width, r.canvas.height);
+    r.ctx.drawImage(r.imgs[n], 0, 0, r.canvas.width, r.canvas.height);
+    r.drawn = n;
+    r.item.classList.add('is-ready');
+  }
+
+  /* ---------- iOS: "priming" de los videos en la primera interacción ---------- */
+  let primed = false;
+  function primeOne(v) {
+    const p = v.play();
+    if (p && p.then) p.then(() => v.pause()).catch(() => {});
+  }
+  function prime() {
+    if (primed || FRAMES) return;
+    primed = true;
+    R.forEach((r) => r.video && primeOne(r.video));
+  }
+  ['touchstart', 'pointerdown'].forEach((ev) => addEventListener(ev, prime, { once: true, passive: true }));
+
+  /* ---------- scrub ---------- */
+  function scrubVideo(r, prog, visible, snap, k) {
+    const v = r.video;
+    const d = v.duration;
+    const maxT = Number.isFinite(d) && d > 0 ? Math.max(0, d - 0.05) : 0;
+    if (!maxT) return;                                             // sin metadatos todavía
+    const tgt = prog * maxT;
+    r.tgt = tgt;
+    if (snap || !visible || !r.init) { r.cur = tgt; r.init = true; }   // salto directo (carga, reload, capítulo oculto)
+    else {
+      r.cur += (tgt - r.cur) * k;
+      if (Math.abs(tgt - r.cur) < 0.1 / FPS) r.cur = tgt;
+    }
+    if (v.readyState >= 2 && !v.seeking && Math.abs(v.currentTime - r.cur) > 0.5 / FPS) v.currentTime = r.cur;
+  }
+  function scrubFrames(r, prog, visible, snap, k) {
+    if (!r.count) return;
+    const tgt = prog * (r.count - 1);
+    r.tgt = tgt;
+    if (snap || !visible || !r.init) { r.cur = tgt; r.init = true; }
+    else {
+      r.cur += (tgt - r.cur) * k;
+      if (Math.abs(tgt - r.cur) < 0.01) r.cur = tgt;
+    }
+    draw(r, Math.round(r.cur));
+  }
+
+  /* ---------- UI compartida ---------- */
+  const side = q('.rv-side');
+  const scrim = q('.rv-scrim');
+  const glow = q('.rv-glow');
+  const hint = q('.rv-hint');
+  const meterBar = q('.rv-meter__bar i');
+  const meterTxt = q('.rv-meter output');
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  const pal = { bg: '', glow: '', accent: '' };
+  let activeIdx = -1;
+
+  function setPalette(bg, gl, ac) {
+    if (bg === pal.bg && gl === pal.glow && ac === pal.accent) return;
+    pal.bg = bg; pal.glow = gl; pal.accent = ac;
+    [stage, root].forEach((el) => {                                // en <html> para que las secciones posteriores hereden
+      el.style.setProperty('--rv-bg', bg);
+      el.style.setProperty('--rv-glow', gl);
+      el.style.setProperty('--rv-accent', ac);
+    });
+    if (themeMeta) themeMeta.content = bg;
+  }
+  function setActive(a) {
+    if (a === activeIdx) return;
+    activeIdx = a;
+    R.forEach((r) => {
+      if (!r.btn) return;
+      const on = r.k === a;
+      r.btn.classList.toggle('is-active', on);
+      if (on) r.btn.setAttribute('aria-current', 'true'); else r.btn.removeAttribute('aria-current');
+    });
+    if (meterTxt) meterTxt.textContent = `${pad2(a + 1)} / ${pad2(N)}`;
+  }
+  function applyUi(r, vis, ty, gy) {
+    const o = vis < 0.002 ? 0 : vis;
+    if (r.copyIn) {
+      setS(r.copyIn, 'opacity', o.toFixed(3));
+      setS(r.copyIn, 'visibility', o === 0 ? 'hidden' : 'visible');
+      setS(r.copyIn, 'transform', `translate3d(0,${ty.toFixed(1)}px,0)`);
+      setS(r.copyIn, 'pointerEvents', o > 0.6 ? 'auto' : 'none');
+    }
+    if (r.ghost) {
+      setS(r.ghost, 'opacity', o.toFixed(3));
+      setS(r.ghost, 'visibility', o === 0 ? 'hidden' : 'visible');
+      setV(r.ghost, '--gy', gy.toFixed(1) + 'px');
+    }
+  }
+  function applyShared(vis) {
+    const o = vis < 0.002 ? 0 : vis;
+    if (side) {
+      setS(side, 'opacity', o.toFixed(3));
+      setS(side, 'visibility', o === 0 ? 'hidden' : 'visible');
+      setS(side, 'pointerEvents', o > 0.6 ? 'auto' : 'none');
+    }
+    if (hint) setS(hint, 'opacity', o.toFixed(3));
+    if (scrim) setS(scrim, 'opacity', o.toFixed(3));
+  }
+
+  /* ---------- render: todo se deriva del scroll (idempotente) ---------- */
+  let stageH = 0, lastT = performance.now(), snapUntil = performance.now() + 500, lastState = null;
+
+  function measure() {
+    stageH = stage.offsetHeight || window.innerHeight;
+    if (FRAMES) R.forEach(sizeCanvas);
+  }
+
+  function render(snap) {
+    const now = performance.now();
+    const dtf = Math.min(4, Math.max(0.25, (now - lastT) / 16.667));   // dt en "frames de 60 Hz"
+    lastT = now;
+    const k = 1 - Math.pow(1 - REVEAL.damping, dtf);
+    if (now < snapUntil) snap = true;                                  // al cargar / restaurar scroll: sin inercia
+
+    // 1) lectura (una sola)
+    const rect = track.getBoundingClientRect();
+    const scrollable = Math.max(1, rect.height - stageH);
+    const sc = clamp01(-rect.top / scrollable);
+    const g = sc * N;                                                  // progreso global en capítulos
+    const i = Math.min(N - 1, Math.floor(g));
+    const p = g - i;                                                   // progreso local 0..1
+
+    // 2) timeline → valores derivados
+    const hasNext = i < N - 1;
+    const u = seg(p, TL.uiOut);
+    const th = hasNext ? smooth(seg(p, TL.handoff)) : 0;               // traspaso
+    const hMid = (TL.handoff[0] + TL.handoff[1]) / 2;
+    const nextIn = hasNext ? seg(p, [hMid, TL.handoff[1]]) : 0;        // UI del siguiente: 2.ª mitad del handoff
+    const mediaP = easeIO(seg(p, TL.scrub));
+    const uiNow = 1 - u;
+    const a = th >= 0.5 ? i + 1 : i;
+    const c0 = CH[i], c1 = hasNext ? CH[i + 1] : c0;
+
+    // 3) escritura
+    for (const r of R) {
+      let vis = 0, ty = 0, gy = 0, mo = 0, ms = 1, mp = 0;
+      if (r.k < i) { mp = 1; }                                         // ya pasó: queda abierto, invisible
+      else if (r.k === i) { vis = uiNow; ty = -u * 28; gy = -u * 44; mo = 1 - th; ms = 1 + 0.08 * th; mp = mediaP; }
+      else if (r.k === i + 1) { vis = nextIn; ty = (1 - nextIn) * 22; gy = (1 - nextIn) * 34; mo = th; ms = 0.94 + 0.06 * th; mp = 0; }
+      applyUi(r, vis, ty, gy);
+      setS(r.item, 'opacity', mo < 0.002 ? '0' : mo.toFixed(3));
+      setV(r.item, '--s', ms.toFixed(4));
+      (FRAMES ? scrubFrames : scrubVideo)(r, mp, mo > 0.002, snap, k);
+    }
+
+    applyShared(Math.max(uiNow, nextIn));
+    setPalette(mixHex(c0.bg, c1.bg, th), mixHex(c0.glow, c1.glow, th), mixHex(c0.accent, c1.accent, th));
+    if (glow) setV(glow, '--gs', (0.88 + 0.34 * mediaP * (1 - th)).toFixed(3));   // el glow "respira" al abrirse
+    if (meterBar) setS(meterBar, 'transform', `scaleX(${sc.toFixed(4)})`);
+    setActive(a);
+
+    lastState = {
+      g, chapter: i, p, mediaProgress: mediaP, palette: { bg: pal.bg, glow: pal.glow, accent: pal.accent },
+      frameOrTime: R[i].cur, ui: Math.max(uiNow, nextIn), active: a, handoff: th
+    };
+  }
+
+  /* ---------- selector: scroll suave al inicio del capítulo ---------- */
+  function goTo(k) {
+    const rect = track.getBoundingClientRect();
+    const scrollable = Math.max(1, rect.height - stageH);
+    const y = Math.round(rect.top + window.scrollY + (k * scrollable) / N) + 1;     // g = k → p = 0 (UI completa)
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
+  R.forEach((r) => r.btn && r.btn.addEventListener('click', () => goTo(r.k)));
+
+  /* ---------- bucle rAF: solo corre mientras el track está cerca del viewport ---------- */
+  let raf = 0, near = true;
+  const loop = () => { raf = requestAnimationFrame(loop); render(false); };
+  const start = () => { if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(loop); } };
+  const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      near = entries[entries.length - 1].isIntersecting;
+      if (near) start(); else { stop(); render(true); }                // al salir: estado final exacto
+    }, { rootMargin: '100% 0px 100% 0px' }).observe(track);
+  }
+
+  addEventListener('scroll', () => { prime(); }, { passive: true });
+  let rzQueued = false;
+  addEventListener('resize', () => {
+    if (rzQueued) return;
+    rzQueued = true;
+    requestAnimationFrame(() => { rzQueued = false; measure(); render(true); });
+  });
+  addEventListener('load', () => { snapUntil = performance.now() + 400; measure(); render(true); });
+  addEventListener('pageshow', () => { snapUntil = performance.now() + 400; });
+  const mqRM = matchMedia('(prefers-reduced-motion: reduce)');     // si cambia el ajuste en caliente → recargar
+  if (mqRM.addEventListener) mqRM.addEventListener('change', () => location.reload());
+
+  /* ---------- arranque ---------- */
+  measure();
+  render(true);
+  start();
+
+  window.__rv = {
+    state: () => lastState,
+    render: (snap) => { render(!!snap); return lastState; },   // extra: fuerza un render (útil en tests)
+    goTo,
+    config: REVEAL
+  };
+})();
+</script>
+</body>
+</html>

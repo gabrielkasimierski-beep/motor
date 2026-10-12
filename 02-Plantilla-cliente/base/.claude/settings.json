@@ -1,0 +1,19 @@
+{
+  "extraKnownMarketplaces": {
+    "motor-estudio": {
+      "source": {
+        "source": "directory",
+        "path": "C:/Claude/Motor"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "motor@motor-estudio": true
+  },
+  "permissions": {
+    "additionalDirectories": [
+      "C:\\Claude\\Motor"
+    ],
+    "deny": []
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "motor-estudio",
+  "description": "Marketplace local del estudio de Gaby. Contiene el plugin del Motor Cliente nuevo.",
+  "owner": {
+    "name": "Gabriel Kasimierski"
+  },
+  "plugins": [
+    {
+      "name": "motor",
+      "source": "./plugin",
+      "description": "Motor Cliente nuevo: el método, las skills y el agente para arrancar y llevar a un cliente de cualquier rubro (web, app, 3D/animación, diseño gráfico)."
+    }
+  ]
+}

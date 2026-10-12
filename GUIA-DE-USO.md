@@ -1,0 +1,91 @@
+# Guía de uso del Motor
+
+Para Gaby y Juanma. Qué es cada carpeta, cuándo abrirla y qué decirle a Claude. Si todavía no lo instalaste, los
+pasos están en el [`README.md`](README.md).
+
+## La regla de oro
+
+**Claude trabaja en la carpeta donde abrís la sesión.** Elegir la carpeta correcta es el 90 % del uso.
+
+| Quiero… | Abro la sesión en… |
+|---|---|
+| Trabajar en un cliente | `C:\Claude\Clientes\<cliente>` |
+| Arrancar un cliente nuevo | Primero lo creo (ver abajo), después abro `C:\Claude\Clientes\<cliente>` |
+| Buscar prospectos o hacer un diagnóstico | Tu **Estudio** (por convención, `C:\Claude\Estudio`) |
+| Cambiar el método, los precios o una skill | `C:\Claude\Motor`, **por rama y PR** (ver `CONTRIBUTING.md`) |
+
+## Las carpetas
+
+### `C:\Claude\Motor` — la caja de herramientas (compartida)
+Es el manual y las herramientas del negocio de clientes, y vive en un **repo privado de GitHub** que usan Gaby y
+Juanma. **No se trabaja a ningún cliente acá:** solo se abre para cambiar el sistema.
+- Qué tiene: `MOTOR.md` (el cerebro) · `plugin\` (las skills y el agente) · `00-Motor\` (método) · `01-Capacidades\`
+  (qué ofrecemos) · `02-Plantilla-cliente\` (crea clientes) · `03-Comercial\` (precios) · `04-Accesos\` (política de tokens).
+- No hace falta abrirla para **usar** las skills: los clientes ya las toman solos.
+- Para recibir las novedades del otro: `git -C C:\Claude\Motor pull`.
+
+### `C:\Claude\Clientes\<cliente>` — la oficina de cada cliente (privada de cada persona)
+Un proyecto por cliente, con su marca, sus archivos, su `.env` y su memoria. **Acá se trabaja el 90 % del tiempo.**
+Claude sabe quién es el cliente apenas abrís, y **no puede ver a los otros**. Estos proyectos no viajan con el
+Motor: cada uno tiene los suyos (y los que comparten, como Ginotto, tienen su propio repo).
+
+### Tu Estudio — prospección y productos (opcional, de cada uno)
+Por convención, `C:\Claude\Estudio`. Ahí van los prospectos (`04-Prospectos\`) y los productos propios. No es un
+cliente. Las skills `buscar-clientes` y `diagnostico-digital` se usan desde ahí. Cuando un prospecto dice que sí, se
+muda a `Clientes`.
+
+## Flujos habituales
+
+**Trabajar un cliente existente:** abrir `C:\Claude\Clientes\<cliente>` → aceptar los avisos de la primera vez
+(confiar en la carpeta, importar el `MOTOR.md`) → hablarle normal: *"retomemos X"*, *"cambiá el precio de Y"*.
+Para publicar, pedirlo: nada sale sin tu OK.
+
+**Salir a buscar clientes:** abrir tu Estudio → *"buscame clientes de X en Y"* (`motor:buscar-clientes`) →
+*"hacé el diagnóstico de X"* (`motor:diagnostico-digital`). Los mensajes los mandás vos.
+
+**Cliente nuevo:**
+1. Crearlo (PowerShell, desde cualquier carpeta):
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File C:\Claude\Motor\02-Plantilla-cliente\nuevo-cliente.ps1 -Nombre "Casa Rossi" -Rubro "Gastronomía"
+   ```
+   Si viene de un prospecto, sumá `-DesdeProspecto "C:\Claude\Estudio\04-Prospectos\<empresa>"`.
+2. Abrir sesión en `C:\Claude\Clientes\casa-rossi`.
+3. Decir *"tengo un cliente nuevo"*: arma el mapa de oportunidades y propone el **primer prototipo para mostrar**.
+   Si hay interés: brief → propuesta → construcción → publicación.
+
+**Cambiar el Motor:** una rama y un PR que mira el otro. Los pasos (y cómo no romper tus clientes mientras
+tanto) están en [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+## Skills (aparecen al escribir `/motor`)
+
+| Decís… | Skill | Dónde usarla |
+|---|---|---|
+| *"tengo un cliente nuevo"* | `motor:cliente-nuevo` | Cliente |
+| *"armá el brief"* | `motor:brief-cliente` | Cliente |
+| *"armá la propuesta"* | `motor:propuesta-comercial` | Cliente |
+| *"construí la web"* | `motor:construir-web` | Cliente |
+| *"publicá"* | `motor:publicar-web` | Cliente |
+| *"skill cookie"*, *"que el producto se abra / gire con el scroll"* | `motor:skill-cookie` | Cliente |
+| *"buscame clientes"* | `motor:buscar-clientes` | **Estudio** |
+| *"hacé el diagnóstico de X"* | `motor:diagnostico-digital` | **Estudio** |
+
+Las dos del Estudio guardan en `04-Prospectos\`, que los clientes no pueden ver.
+
+## Reglas
+
+- **Un proyecto, un cliente:** los permisos impiden mezclar datos entre clientes.
+- **Los tokens los carga cada persona** (en el `.env` del cliente o como variables de Windows). Claude no los lee
+  ni los escribe. Política y plantilla: `04-Accesos\`.
+- **Nada se manda ni se publica sin tu OK**; ningún precio sale sin que lo veas.
+- Lo que falta de un cliente queda como `{completar}`, nunca inventado.
+- Lo que aprendés de un cliente y sirve a otros va al Motor, **sin datos del cliente**.
+
+## Si algo no anda
+
+| Pasa | Probá |
+|---|---|
+| No aparecen las skills `motor:` | Estás en una carpeta sin plugin. Abrí un cliente o tu Estudio, aceptá el aviso de confianza y `/reload-plugins` |
+| "No puede leer" algo de otro cliente | Es el aislamiento funcionando. Pasale el dato por el chat |
+| El script no pudo conectar el plugin | En la carpeta del cliente: `claude plugin install motor@motor-estudio --scope project` |
+| Agregué un cliente y los otros no lo bloquean | `nuevo-cliente.ps1 -SoloAislamiento` |
+| Cambié de rama en `C:\Claude\Motor` y los clientes se comportan raro | Volvé a `main`: esa carpeta es la que leen todos. Usá un `git worktree` para trabajar ramas |

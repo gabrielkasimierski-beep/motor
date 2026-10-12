@@ -1,0 +1,8 @@
+# Copiá este archivo como bloqueos-locales.txt y listá las carpetas PRIVADAS de tu máquina que los clientes
+# no deben poder leer ni editar (tu espacio de prospección, tus otros proyectos, cosas personales).
+# Una ruta por línea, con barras "/". Las líneas que empiezan con # se ignoran.
+# Los otros clientes se bloquean solos: no hace falta listarlos.
+#
+# Ejemplo:
+# C:/Claude/Estudio
+# C:/Claude/OtroProyecto

@@ -1,0 +1,18 @@
+# Secretos: nunca se suben
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Lo propio de cada máquina (cada persona arma el suyo; hay un .ejemplo de cada uno)
+04-Accesos/inventario.md
+02-Plantilla-cliente/bloqueos-locales.txt
+.claude/settings.local.json
+
+# Sistema y herramientas
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,8 @@
+{
+  "name": "motor",
+  "description": "Motor Cliente nuevo: el método, las skills y el agente para arrancar y llevar a un cliente de cualquier rubro (web, app, 3D/animación, diseño gráfico).",
+  "version": "1.0.0",
+  "author": {
+    "name": "Gabriel Kasimierski"
+  }
+}
