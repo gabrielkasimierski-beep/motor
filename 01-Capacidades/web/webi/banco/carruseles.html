@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carruseles y tarjetas · Banco del Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<link rel="stylesheet" href="../kit/componentes/marquesina/marquesina.css">
+<link rel="stylesheet" href="../kit/componentes/tarjeta-video/tarjeta-video.css">
+<link rel="stylesheet" href="../kit/componentes/carrusel-anillo/carrusel-anillo.css">
+<link rel="stylesheet" href="../kit/componentes/carrusel-arco/carrusel-arco.css">
+<link rel="stylesheet" href="../kit/componentes/tarjetas-expandibles/tarjetas-expandibles.css">
+<style>
+  /* Solo lo de esta página de demostración: las piezas traen sus propios estilos */
+  body { padding-top: 3.25rem; }
+
+  .cabecera {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    height: 3.25rem; padding-inline: var(--margen);
+    background: color-mix(in srgb, var(--tinta) 80%, transparent);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--linea);
+    font: 500 var(--t-nota)/1 var(--f-mono);
+  }
+  .cabecera__atras { color: var(--bruma); padding: 0.75rem 0.25rem; transition: color var(--d-corta); }
+  .cabecera__atras:hover { color: var(--hueso); }
+  .cabecera__titulo { color: var(--hueso); letter-spacing: 0.04em; }
+
+  .banda + .banda { border-top: 1px solid var(--linea); }
+  .banda__cabeza { display: grid; gap: 0.7rem; margin-bottom: clamp(1.75rem, 5vw, 3rem); }
+  .banda__cabeza .bajada { max-width: 44rem; }
+  .banda__cabeza .nota { margin: 0; max-width: 44rem; }
+  .banda__pie { margin-top: 1.25rem; }
+
+  /* ---- 1 · marquesina ---- */
+  .palabra {
+    font: 800 clamp(2rem, 7vw, 4.25rem)/1 var(--f-titulo);
+    letter-spacing: -0.03em; white-space: nowrap;
+  }
+  .palabra--contorno { color: transparent; -webkit-text-stroke: 1px var(--hueso); }
+  .adorno { width: 0.7rem; height: 0.7rem; border-radius: var(--r-pastilla); background: var(--acento); }
+  .marquesina--palabras { --hueco: clamp(1.25rem, 4vw, 2.5rem); }
+  .banda > .marquesina + .marquesina { margin-top: clamp(1.5rem, 4vw, 2.5rem); }
+
+  .miniatura { margin: 0; position: relative; width: clamp(11rem, 38vw, 15rem); aspect-ratio: 16 / 10; border-radius: var(--r-medio); overflow: hidden; border: 1px solid var(--linea); background: var(--superficie); }
+  .miniatura img { width: 100%; height: 100%; object-fit: cover; }
+  .miniatura figcaption {
+    position: absolute; inset: auto 0 0 0; padding: 1.75rem 0.75rem 0.6rem;
+    background: linear-gradient(to top, color-mix(in srgb, var(--tinta) 85%, transparent), transparent);
+    font: 700 var(--t-nota)/1.1 var(--f-titulo);
+  }
+
+  .pared { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(0.5rem, 2vw, 1rem); }
+  .pared .marquesina { --alto: clamp(24rem, 70vh, 34rem); --hueco: clamp(0.5rem, 2vw, 1rem); }
+  .pared__item { margin: 0; aspect-ratio: 4 / 5; border-radius: var(--r-medio); overflow: hidden; border: 1px solid var(--linea); background: var(--superficie); }
+  .pared__item img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ---- 2 · tarjeta-video ---- */
+  .rejilla-tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16.5rem), 1fr)); gap: 1.25rem; }
+
+  /* ---- 3 y 4 · carruseles a sangre ---- */
+  .sangre { margin-inline: auto; max-width: 90rem; padding-inline: 0; }
+
+  .banda--ultima { padding-bottom: calc(var(--banda) + 2rem); }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <a class="cabecera__atras" href="index.html">← Banco</a>
+  <span class="cabecera__titulo">Carruseles y tarjetas</span>
+</header>
+
+<main>
+
+<!-- ======================= 1 · MARQUESINA ======================= -->
+<section class="banda" id="marquesina">
+  <div class="contenedor">
+    <div class="banda__cabeza" data-aparecer>
+      <span class="etiqueta">01 · marquesina</span>
+      <h2 class="titulo-m">Una cinta que no se corta nunca</h2>
+      <p class="bajada">El truco: CSS traslada la pista −50 % en bucle y el JS solo duplica el contenido hasta llenar el visor, marcando los clones como aria-hidden.</p>
+      <p class="nota">Se frena al pasar el puntero o al enfocar. Arriba va normal; en el medio, <code>data-sentido="reversa"</code>; abajo, tres columnas con <code>data-eje="y"</code>.</p>
+    </div>
+  </div>
+
+  <div class="marquesina marquesina--palabras" data-velocidad="26" aria-label="Lo que hace el estudio">
+    <span class="palabra">Sitios con movimiento</span><span class="adorno" aria-hidden="true"></span>
+    <span class="palabra palabra--contorno">Identidad</span><span class="adorno" aria-hidden="true"></span>
+    <span class="palabra">Cartas digitales</span><span class="adorno" aria-hidden="true"></span>
+    <span class="palabra palabra--contorno">Tiendas online</span><span class="adorno" aria-hidden="true"></span>
+    <span class="palabra">Reservas y turnos</span><span class="adorno" aria-hidden="true"></span>
+  </div>
+
+  <div class="marquesina" data-sentido="reversa" data-velocidad="60" aria-label="Trabajos recientes">
+    <figure class="miniatura"><img src="medios/cuadros/muestra-0001.webp" alt="Casa Pampa" width="960" height="540" loading="lazy" draggable="false"><figcaption>Casa Pampa</figcaption></figure>
+    <figure class="miniatura"><img src="medios/cuadros/muestra-0013.webp" alt="Mordisco" width="960" height="540" loading="lazy" draggable="false"><figcaption>Mordisco</figcaption></figure>
+    <figure class="miniatura"><img src="medios/cuadros/muestra-0025.webp" alt="Atelier Norte" width="960" height="540" loading="lazy" draggable="false"><figcaption>Atelier Norte</figcaption></figure>
+    <figure class="miniatura"><img src="medios/cuadros/muestra-0037.webp" alt="Kiné" width="960" height="540" loading="lazy" draggable="false"><figcaption>Kiné</figcaption></figure>
+    <figure class="miniatura"><img src="medios/cuadros/muestra-0049.webp" alt="Fuego Lento" width="960" height="540" loading="lazy" draggable="false"><figcaption>Fuego Lento</figcaption></figure>
+    <figure class="miniatura"><img src="medios/cuadros/muestra-0061.webp" alt="Nube Café" width="960" height="540" loading="lazy" draggable="false"><figcaption>Nube Café</figcaption></figure>
+  </div>
+
+  <div class="contenedor" style="margin-top: clamp(1.5rem, 4vw, 2.5rem)">
+    <div class="pared">
+      <div class="marquesina" data-eje="y" data-velocidad="34" aria-label="Pared de trabajos, columna 1">
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0073.webp" alt="Tallo" width="960" height="540" loading="lazy" draggable="false"></figure>
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0085.webp" alt="Estación Sur" width="960" height="540" loading="lazy" draggable="false"></figure>
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0097.webp" alt="Pulso" width="960" height="540" loading="lazy" draggable="false"></figure>
+      </div>
+      <div class="marquesina" data-eje="y" data-sentido="reversa" data-velocidad="42" aria-label="Pared de trabajos, columna 2">
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0109.webp" alt="Rayuela" width="960" height="540" loading="lazy" draggable="false"></figure>
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0120.webp" alt="Vértice" width="960" height="540" loading="lazy" draggable="false"></figure>
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0007.webp" alt="Casa Pampa, detalle" width="960" height="540" loading="lazy" draggable="false"></figure>
+      </div>
+      <div class="marquesina" data-eje="y" data-velocidad="30" aria-label="Pared de trabajos, columna 3">
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0055.webp" alt="Fuego Lento, detalle" width="960" height="540" loading="lazy" draggable="false"></figure>
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0067.webp" alt="Nube Café, detalle" width="960" height="540" loading="lazy" draggable="false"></figure>
+        <figure class="pared__item"><img src="medios/cuadros/muestra-0031.webp" alt="Atelier Norte, detalle" width="960" height="540" loading="lazy" draggable="false"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 2 · TARJETA-VIDEO ======================= -->
+<section class="banda" id="tarjeta-video">
+  <div class="contenedor">
+    <div class="banda__cabeza" data-aparecer>
+      <span class="etiqueta">02 · tarjeta-video</span>
+      <h2 class="titulo-m">El video llega solo cuando lo mirás</h2>
+      <p class="bajada">El truco: nada se baja hasta que la tarjeta se activa, y el borde de luz es un conic-gradient cuyo ángulo es una @property animada, recortada con una máscara para dejar solo el borde.</p>
+      <p class="nota">En escritorio reproduce al pasar el puntero o enfocar con Tab. En el celu, la que queda más centrada al hacer scroll. Lejos de la pantalla se descarga. (En la muestra todas reproducen el mismo clip.)</p>
+    </div>
+
+    <div class="rejilla-tarjetas">
+      <a class="tarjeta-video" href="#tarjeta-video">
+        <div class="tarjeta-video__medio">
+          <img class="tarjeta-video__poster" src="medios/cuadros/muestra-0001.webp" alt="" width="960" height="540" loading="lazy">
+          <video class="tarjeta-video__video" data-src="medios/muestra.mp4" poster="medios/cuadros/muestra-0001.webp" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+          <span class="tarjeta-video__ver" aria-hidden="true">Ver →</span>
+        </div>
+        <div class="tarjeta-video__info">
+          <span class="tarjeta-video__tipo">Identidad y sitio</span>
+          <h3 class="tarjeta-video__titulo">Casa Pampa</h3>
+          <p class="tarjeta-video__linea">Una bodega mendocina que se cuenta sola.</p>
+        </div>
+      </a>
+
+      <a class="tarjeta-video" href="#tarjeta-video">
+        <div class="tarjeta-video__medio">
+          <img class="tarjeta-video__poster" src="medios/cuadros/muestra-0030.webp" alt="" width="960" height="540" loading="lazy">
+          <video class="tarjeta-video__video" data-src="medios/muestra.mp4" poster="medios/cuadros/muestra-0030.webp" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+          <span class="tarjeta-video__ver" aria-hidden="true">Ver →</span>
+        </div>
+        <div class="tarjeta-video__info">
+          <span class="tarjeta-video__tipo">Carta digital 3D</span>
+          <h3 class="tarjeta-video__titulo">Mordisco</h3>
+          <p class="tarjeta-video__linea">Cada hamburguesa gira antes de pedirla.</p>
+        </div>
+      </a>
+
+      <a class="tarjeta-video" href="#tarjeta-video">
+        <div class="tarjeta-video__medio">
+          <img class="tarjeta-video__poster" src="medios/cuadros/muestra-0060.webp" alt="" width="960" height="540" loading="lazy">
+          <video class="tarjeta-video__video" data-src="medios/muestra.mp4" poster="medios/cuadros/muestra-0060.webp" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+          <span class="tarjeta-video__ver" aria-hidden="true">Ver →</span>
+        </div>
+        <div class="tarjeta-video__info">
+          <span class="tarjeta-video__tipo">Tienda online</span>
+          <h3 class="tarjeta-video__titulo">Atelier Norte</h3>
+          <p class="tarjeta-video__linea">Moda de autor con fichas que se mueven.</p>
+        </div>
+      </a>
+
+      <a class="tarjeta-video" href="#tarjeta-video">
+        <div class="tarjeta-video__medio">
+          <img class="tarjeta-video__poster" src="medios/cuadros/muestra-0090.webp" alt="" width="960" height="540" loading="lazy">
+          <video class="tarjeta-video__video" data-src="medios/muestra.mp4" poster="medios/cuadros/muestra-0090.webp" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+          <span class="tarjeta-video__ver" aria-hidden="true">Ver →</span>
+        </div>
+        <div class="tarjeta-video__info">
+          <span class="tarjeta-video__tipo">Turnos y reservas</span>
+          <h3 class="tarjeta-video__titulo">Kiné</h3>
+          <p class="tarjeta-video__linea">Reservar en tres toques, sin llamar.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 3 · CARRUSEL-ANILLO ======================= -->
+<section class="banda" id="carrusel-anillo">
+  <div class="contenedor">
+    <div class="banda__cabeza" data-aparecer>
+      <span class="etiqueta">03 · carrusel-anillo</span>
+      <h2 class="titulo-m">Un anillo con lugar atrás</h2>
+      <p class="bajada">El truco: cada tarjeta se sienta una vez en el cilindro con CSS (rotateY + translateZ); el JS solo gira el anillo y, por cuadro, reparte z-index y nitidez según el ángulo.</p>
+      <p class="nota">Arrastrá (con inercia y encastre), usá ← → con el carrusel enfocado o los botones. Mirá el lado lejano por los huecos.</p>
+    </div>
+  </div>
+
+  <div class="carrusel-anillo sangre" data-carrusel-anillo aria-label="Trabajos del estudio, en anillo">
+    <div class="carrusel-anillo__escena">
+      <div class="carrusel-anillo__anillo">
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Casa Pampa"><img src="medios/cuadros/muestra-0001.webp" alt="Casa Pampa" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Identidad</span>Casa Pampa</figcaption></figure>
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Mordisco"><img src="medios/cuadros/muestra-0014.webp" alt="Mordisco" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Carta 3D</span>Mordisco</figcaption></figure>
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Atelier Norte"><img src="medios/cuadros/muestra-0027.webp" alt="Atelier Norte" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Tienda</span>Atelier Norte</figcaption></figure>
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Kiné"><img src="medios/cuadros/muestra-0040.webp" alt="Kiné" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Turnos</span>Kiné</figcaption></figure>
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Fuego Lento"><img src="medios/cuadros/muestra-0053.webp" alt="Fuego Lento" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Sitio con video</span>Fuego Lento</figcaption></figure>
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Nube Café"><img src="medios/cuadros/muestra-0066.webp" alt="Nube Café" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Pedidos</span>Nube Café</figcaption></figure>
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Tallo"><img src="medios/cuadros/muestra-0079.webp" alt="Tallo" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Identidad</span>Tallo</figcaption></figure>
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Estación Sur"><img src="medios/cuadros/muestra-0092.webp" alt="Estación Sur" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Evento</span>Estación Sur</figcaption></figure>
+        <figure class="carrusel-anillo__tarjeta" data-titulo="Pulso"><img src="medios/cuadros/muestra-0105.webp" alt="Pulso" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">App</span>Pulso</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 4 · CARRUSEL-ARCO ======================= -->
+<section class="banda" id="carrusel-arco">
+  <div class="contenedor">
+    <div class="banda__cabeza" data-aparecer>
+      <span class="etiqueta">04 · carrusel-arco</span>
+      <h2 class="titulo-m">Un abanico con una sola rotación</h2>
+      <p class="bajada">El truco: todas las tarjetas comparten un centro muy por debajo de la escena; una sola rotación del contenedor las mueve e inclina a la vez, sin trigonometría por tarjeta.</p>
+      <p class="nota">Arrastrá, usá la rueda o el trackpad en horizontal, o las flechas ← →. La enfocada lleva <code>.es-activa</code>; en las puntas el arco hace resistencia.</p>
+    </div>
+  </div>
+
+  <div class="carrusel-arco sangre" data-carrusel-arco aria-label="Casos del estudio, en arco">
+    <div class="carrusel-arco__escena">
+      <div class="carrusel-arco__rueda">
+        <figure class="carrusel-arco__tarjeta" data-titulo="Vértice"><img src="medios/cuadros/muestra-0120.webp" alt="Vértice" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Portfolio</span>Vértice</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Rayuela"><img src="medios/cuadros/muestra-0110.webp" alt="Rayuela" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Librería</span>Rayuela</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Pulso"><img src="medios/cuadros/muestra-0100.webp" alt="Pulso" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">App</span>Pulso</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Estación Sur"><img src="medios/cuadros/muestra-0088.webp" alt="Estación Sur" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Evento</span>Estación Sur</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Tallo"><img src="medios/cuadros/muestra-0076.webp" alt="Tallo" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Identidad</span>Tallo</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Nube Café"><img src="medios/cuadros/muestra-0064.webp" alt="Nube Café" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Pedidos</span>Nube Café</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Fuego Lento"><img src="medios/cuadros/muestra-0052.webp" alt="Fuego Lento" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Sitio con video</span>Fuego Lento</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Kiné"><img src="medios/cuadros/muestra-0041.webp" alt="Kiné" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Turnos</span>Kiné</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Atelier Norte"><img src="medios/cuadros/muestra-0029.webp" alt="Atelier Norte" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Tienda</span>Atelier Norte</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Mordisco"><img src="medios/cuadros/muestra-0017.webp" alt="Mordisco" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Carta 3D</span>Mordisco</figcaption></figure>
+        <figure class="carrusel-arco__tarjeta" data-titulo="Casa Pampa"><img src="medios/cuadros/muestra-0005.webp" alt="Casa Pampa" width="960" height="540" draggable="false"><figcaption><span class="etiqueta">Identidad</span>Casa Pampa</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 5 · TARJETAS-EXPANDIBLES ======================= -->
+<section class="banda banda--ultima" id="tarjetas-expandibles">
+  <div class="contenedor">
+    <div class="banda__cabeza" data-aparecer>
+      <span class="etiqueta">05 · tarjetas-expandibles</span>
+      <h2 class="titulo-m">Astillas que se abren sin reacomodar el texto</h2>
+      <p class="bajada">El truco: el flex reparte el ancho y la abierta solo cambia su flex-grow; el epígrafe se maqueta una sola vez al ancho abierto, así el texto nunca se reacomoda a mitad de la apertura.</p>
+      <p class="nota">Pasá el puntero, enfocá con Tab (← → saltan entre tarjetas) o tocá una. En el celu, el primer toque abre y el segundo sigue el enlace.</p>
+    </div>
+
+    <div class="tarjetas-expandibles" data-crece="5" aria-label="Casos destacados">
+      <article class="tarjeta-expandible">
+        <img class="tarjeta-expandible__imagen" src="medios/cuadros/muestra-0003.webp" alt="" width="960" height="540" loading="lazy">
+        <span class="tarjeta-expandible__rotulo"><span>Casa Pampa</span></span>
+        <div class="tarjeta-expandible__contenido">
+          <span class="tarjeta-expandible__tipo">Identidad y sitio</span>
+          <h3 class="tarjeta-expandible__titulo">Casa Pampa</h3>
+          <p class="tarjeta-expandible__texto">Una bodega mendocina que se cuenta sola, con el vino como protagonista.</p>
+          <a class="tarjeta-expandible__ver" href="#tarjetas-expandibles">Ver el caso →</a>
+        </div>
+      </article>
+      <article class="tarjeta-expandible">
+        <img class="tarjeta-expandible__imagen" src="medios/cuadros/muestra-0035.webp" alt="" width="960" height="540" loading="lazy">
+        <span class="tarjeta-expandible__rotulo"><span>Mordisco</span></span>
+        <div class="tarjeta-expandible__contenido">
+          <span class="tarjeta-expandible__tipo">Carta digital 3D</span>
+          <h3 class="tarjeta-expandible__titulo">Mordisco</h3>
+          <p class="tarjeta-expandible__texto">Cada hamburguesa gira en la mesa antes de pedirla.</p>
+          <a class="tarjeta-expandible__ver" href="#tarjetas-expandibles">Ver el caso →</a>
+        </div>
+      </article>
+      <article class="tarjeta-expandible">
+        <img class="tarjeta-expandible__imagen" src="medios/cuadros/muestra-0068.webp" alt="" width="960" height="540" loading="lazy">
+        <span class="tarjeta-expandible__rotulo"><span>Atelier Norte</span></span>
+        <div class="tarjeta-expandible__contenido">
+          <span class="tarjeta-expandible__tipo">Tienda online</span>
+          <h3 class="tarjeta-expandible__titulo">Atelier Norte</h3>
+          <p class="tarjeta-expandible__texto">Moda de autor con fichas que se mueven al hacer scroll.</p>
+          <a class="tarjeta-expandible__ver" href="#tarjetas-expandibles">Ver el caso →</a>
+        </div>
+      </article>
+      <article class="tarjeta-expandible">
+        <img class="tarjeta-expandible__imagen" src="medios/cuadros/muestra-0095.webp" alt="" width="960" height="540" loading="lazy">
+        <span class="tarjeta-expandible__rotulo"><span>Kiné</span></span>
+        <div class="tarjeta-expandible__contenido">
+          <span class="tarjeta-expandible__tipo">Turnos y reservas</span>
+          <h3 class="tarjeta-expandible__titulo">Kiné</h3>
+          <p class="tarjeta-expandible__texto">Reservar un turno en tres toques, sin llamar.</p>
+          <a class="tarjeta-expandible__ver" href="#tarjetas-expandibles">Ver el caso →</a>
+        </div>
+      </article>
+      <article class="tarjeta-expandible">
+        <img class="tarjeta-expandible__imagen" src="medios/cuadros/muestra-0112.webp" alt="" width="960" height="540" loading="lazy">
+        <span class="tarjeta-expandible__rotulo"><span>Fuego Lento</span></span>
+        <div class="tarjeta-expandible__contenido">
+          <span class="tarjeta-expandible__tipo">Sitio con video</span>
+          <h3 class="tarjeta-expandible__titulo">Fuego Lento</h3>
+          <p class="tarjeta-expandible__texto">Una parrilla que se ve, se escucha y se reserva.</p>
+          <a class="tarjeta-expandible__ver" href="#tarjetas-expandibles">Ver el caso →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script type="module">
+  import { aparecer } from "../kit/motor-scroll.js";
+  import { marquesinas } from "../kit/componentes/marquesina/marquesina.js";
+  import { tarjetasVideo } from "../kit/componentes/tarjeta-video/tarjeta-video.js";
+  import { carruselAnillo } from "../kit/componentes/carrusel-anillo/carrusel-anillo.js";
+  import { carruselArco } from "../kit/componentes/carrusel-arco/carrusel-arco.js";
+  import { tarjetasExpandibles } from "../kit/componentes/tarjetas-expandibles/tarjetas-expandibles.js";
+
+  aparecer();
+  marquesinas();
+  tarjetasVideo();
+  document.querySelectorAll("[data-carrusel-anillo]").forEach((el) => carruselAnillo(el));
+  document.querySelectorAll("[data-carrusel-arco]").forEach((el) => carruselArco(el));
+  document.querySelectorAll(".tarjetas-expandibles").forEach((el) => tarjetasExpandibles(el));
+</script>
+</body>
+</html>

@@ -91,7 +91,9 @@ La fuente es el **menú de capacidades**: [`01-Capacidades/README.md`](01-Capaci
 medida que aprendemos; el detalle y los casos viven en cada carpeta.
 
 - **Web** — landing, institucional, catálogo con filtros, blog y SIEMPRE formulario a mail + WhatsApp.
-  Línea madura: tiene proceso, precios y plantillas.
+  Línea madura: tiene proceso, precios y plantillas. Cuando el sitio lleva **movimiento** (un producto
+  que gira con el scroll, video de portada, fondos vivos, 3D en la página) se usa el **kit webi**:
+  [`01-Capacidades/web/webi/`](01-Capacidades/web/webi/README.md), con sus skills (`dirigir-sitio` es la entrada).
 - **Apps** — turnos y reservas con QR, carta digital con pedidos desde la mesa, clubes de fidelización,
   paneles por rol. Patrón propio: app estática + Supabase, sin Next.js, costo fijo $0.
 - **3D y animación** — platos y productos que giran con el dedo, recortes de foto real, producto en AR
@@ -149,7 +151,7 @@ por defecto, el 80 % de los casos) o **Carril B** (cuando el estático no alcanz
 | 0 | Buscar prospectos (en el Estudio) | `buscar-clientes` | filas en `04-Prospectos/embudo.md` |
 | 0b | Diagnóstico (interno) | `diagnostico-digital` | hallazgos + mensaje de contacto |
 | 1 | **Cliente nuevo: contexto + mapa** | **`cliente-nuevo`** | `analisis.md` en el proyecto del cliente |
-| 2 | Primer prototipo para mostrar | `construir-web` (u otra capacidad) | demo tocable del quick win |
+| 2 | Primer prototipo para mostrar | `construir-web` (u otra capacidad; con movimiento, `dirigir-sitio`) | demo tocable del quick win |
 | 3 | Brief | `brief-cliente` | `brief.md` |
 | 4 | Propuesta + precio | `propuesta-comercial` | `propuesta.md` con precios de la grilla |
 | 5 | Construir | `construir-web` | `sitio/` o `app/` andando |

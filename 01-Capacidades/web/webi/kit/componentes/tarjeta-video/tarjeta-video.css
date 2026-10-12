@@ -1,0 +1,151 @@
+/* tarjeta-video · ver tarjeta-video.js para el truco y el uso.
+   Colores y curvas solo desde kit/tokens.css. */
+
+/* Propiedad registrada: sin esto el navegador no podría animar el ángulo del degradé cónico */
+@property --angulo {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.tarjeta-video {
+  --elevacion: 4px;
+  --grosor-luz: 2px; /* ancho del borde de luz */
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-medio);
+  background: var(--tinta-2);
+  isolation: isolate;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--d-media) var(--curva-salida),
+    box-shadow var(--d-media) var(--curva-salida),
+    border-color var(--d-media) var(--curva-salida);
+}
+
+/* ---------- Borde de luz que orbita ---------- */
+.tarjeta-video::before {
+  content: "";
+  position: absolute;
+  inset: -1px; /* justo sobre el borde de 1 px */
+  z-index: 3;
+  padding: var(--grosor-luz);
+  border-radius: var(--r-medio);
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--angulo),
+    transparent 0deg,
+    transparent 215deg,
+    var(--acento-hondo) 262deg,
+    var(--acento) 310deg,
+    var(--acento-claro) 345deg,
+    transparent 360deg
+  );
+  /* Dos capas: la caja entera menos la caja interior = solo el borde. La máscara mira el alfa:
+     --tinta es un opaco cualquiera del sistema. */
+  -webkit-mask: linear-gradient(var(--tinta) 0 0) content-box, linear-gradient(var(--tinta) 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(var(--tinta) 0 0) content-box, linear-gradient(var(--tinta) 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--d-media) var(--curva-salida);
+}
+
+@keyframes tarjeta-video-orbitar {
+  to { --angulo: 360deg; }
+}
+
+/* ---------- Medio: póster arriba, video abajo ---------- */
+.tarjeta-video__medio {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: calc(var(--r-medio) - 1px) calc(var(--r-medio) - 1px) 0 0;
+  background: var(--superficie);
+}
+.tarjeta-video__poster,
+.tarjeta-video__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--d-larga) var(--curva-salida), opacity var(--d-media) var(--curva-salida);
+}
+.tarjeta-video__poster { z-index: 1; }
+.tarjeta-video.es-reproduciendo .tarjeta-video__poster { opacity: 0; }
+
+/* ---------- Pastilla "Ver →" que asoma ---------- */
+.tarjeta-video__ver {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--r-pastilla);
+  background: var(--acento);
+  color: var(--sobre-acento);
+  font-size: var(--t-nota);
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity var(--d-media) var(--curva-salida), transform var(--d-media) var(--curva-rebote);
+}
+
+/* ---------- Texto ---------- */
+.tarjeta-video__info {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem 1.2rem;
+}
+.tarjeta-video__tipo {
+  font: 500 var(--t-etiqueta)/1.2 var(--f-mono);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--acento-claro);
+}
+.tarjeta-video__titulo {
+  margin: 0;
+  font: 800 var(--t-medio)/1.1 var(--f-titulo);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.tarjeta-video__linea {
+  margin: 0;
+  color: var(--bruma);
+  font-size: var(--t-nota);
+  text-wrap: pretty;
+}
+
+/* ---------- Activa: hover, foco de teclado o la más centrada en táctil ---------- */
+.tarjeta-video.es-activa {
+  transform: translateY(calc(var(--elevacion) * -1));
+  box-shadow: var(--sombra-acento);
+  border-color: transparent;
+}
+.tarjeta-video.es-activa::before {
+  opacity: 1;
+  animation: tarjeta-video-orbitar 3.2s linear infinite;
+}
+.tarjeta-video.es-activa .tarjeta-video__poster,
+.tarjeta-video.es-activa .tarjeta-video__video { transform: scale(1.04); }
+.tarjeta-video.es-activa .tarjeta-video__ver { opacity: 1; transform: none; }
+
+/* El foco de teclado ya tiene su luz: no hace falta el contorno encima */
+.tarjeta-video:focus-visible { outline: none; }
+
+/* ---------- Reducir movimiento: póster quieto, borde fijo, sin elevación ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-video.es-activa { transform: none; }
+  .tarjeta-video.es-activa::before { animation: none; }
+  .tarjeta-video.es-activa .tarjeta-video__poster,
+  .tarjeta-video.es-activa .tarjeta-video__video { transform: none; }
+}

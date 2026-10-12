@@ -5,6 +5,10 @@ description: Skill cookie — crea heros y landings con efecto "3D" de producto 
 
 # Skill Cookie (scroll 3D reveal)
 
+> **Parientes en el Motor:** si hace falta precisión cuadro a cuadro, capítulos de texto o llamadas
+> ancladas a una parte del producto, la skill es `pelicula-con-scroll` (kit webi). Quién elige la pieza
+> de un sitio: `dirigir-sitio`.
+
 ## Qué es en realidad
 
 El efecto parece 3D pero no hay WebGL. Son tres cosas trabajando juntas:

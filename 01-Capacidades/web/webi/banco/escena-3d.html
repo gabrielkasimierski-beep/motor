@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escena 3D · Banco del Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<!-- three.js r170: solo lo pide escena3d.js, cuando la escena está por entrar en pantalla -->
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+</script>
+<style>
+  /* ---------- Marco del banco: cabecera y panel (igual que las demás páginas) ---------- */
+  .cab { position: fixed; inset: 0 0 auto 0; z-index: 60; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.6rem var(--margen); background: color-mix(in srgb, var(--tinta) 72%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--linea);
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; }
+  .cab a { color: var(--acento-claro); }
+  .cab a:hover { color: var(--hueso); }
+  .cab span { color: var(--bruma); text-align: right; }
+  .panel { position: fixed; right: var(--margen); bottom: var(--margen); z-index: 60; width: min(17.5rem, calc(100vw - 2 * var(--margen)));
+    background: color-mix(in srgb, var(--superficie) 90%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid var(--linea-fuerte); border-radius: var(--r-medio); font-size: var(--t-nota); }
+  .panel summary { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0.9rem; cursor: pointer; list-style: none;
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acento-claro); }
+  .panel summary::-webkit-details-marker { display: none; }
+  .panel summary::after { content: "–"; font-size: 1rem; }
+  .panel:not([open]) summary::after { content: "+"; }
+  .panel__cuerpo { display: grid; gap: 0.85rem; padding: 0 0.9rem 0.95rem; }
+  .panel label { display: grid; gap: 0.35rem; color: var(--bruma); }
+  .panel label > span { display: flex; justify-content: space-between; gap: 0.5rem; }
+  .panel output { font-family: var(--f-mono); color: var(--hueso); }
+  .panel input[type="range"] { width: 100%; accent-color: var(--acento); }
+
+  /* ---------- Escenarios ---------- */
+  .escena { background: var(--tinta); isolation: isolate; }
+
+  /* Contenedor del canvas: el canvas lo agrega escena3d.js y entra con un fundido cuando está listo */
+  .lienzo { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .lienzo canvas { opacity: 0; transition: opacity var(--d-larga) var(--curva-salida); }
+  .lienzo.esta-lista canvas { opacity: 1; }
+
+  /* Respaldo: se ve mientras baja three.js y se queda si no hay WebGL (.sin-3d) */
+  .respaldo { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 1.2rem; text-align: center;
+    background: radial-gradient(62% 56% at 50% 58%, color-mix(in srgb, var(--acento-hondo) 40%, var(--tinta-2)) 0%, var(--tinta) 74%);
+    transition: opacity var(--d-larga) var(--curva-salida); }
+  .lienzo.esta-lista .respaldo { opacity: 0; }
+  .respaldo__frasco { width: min(34vw, 11rem); min-width: 7rem; height: auto; filter: drop-shadow(0 24px 40px color-mix(in srgb, var(--acento) 30%, transparent)); }
+  .respaldo__piezas { display: none; margin: 0; padding: 0; list-style: none; gap: 0.5rem; flex-wrap: wrap; justify-content: center; max-width: 24rem; }
+  .sin-3d .respaldo__piezas { display: flex; }
+  .respaldo--w { background:
+      radial-gradient(color-mix(in srgb, var(--hueso) 16%, transparent) 1px, transparent 1.6px) 0 0 / 22px 22px,
+      radial-gradient(62% 56% at 50% 52%, color-mix(in srgb, var(--acento-hondo) 40%, var(--tinta-2)) 0%, var(--tinta) 74%); }
+  .respaldo--w span { font: 800 min(62vw, 26rem)/0.8 var(--f-titulo); letter-spacing: -0.04em; color: color-mix(in srgb, var(--acento) 55%, transparent); }
+
+  /* Textos por capítulos: se apilan en la misma celda y se prende uno por vez */
+  .textos { position: absolute; z-index: 4; inset: 0; margin-inline: auto; max-width: var(--ancho); padding: 4.2rem var(--margen) 2rem;
+    display: flex; align-items: center; pointer-events: none; }
+  .pila { display: grid; width: min(25rem, 100%); }
+  .capitulo { grid-area: 1 / 1; display: grid; gap: 0.7rem; align-content: center; justify-items: start;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity var(--d-media) var(--curva-salida), transform var(--d-media) var(--curva-salida); }
+  .capitulo.es-activa { opacity: 1; transform: none; }
+  .capitulo .bajada { color: var(--bruma); font-size: var(--t-texto); }
+  .capitulo .nota { margin: 0.2rem 0 0; }
+  .velo { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--tinta) 78%, transparent) 0%, transparent 56%); }
+  .dato { position: absolute; z-index: 4; top: 3.6rem; right: var(--margen); margin: 0; pointer-events: none;
+    font: 500 var(--t-etiqueta)/1.4 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--bruma); text-align: right; }
+  .dato b { color: var(--acento-claro); font-weight: 500; }
+
+  /* (a) Nombres de las piezas: HTML posicionado desde el punto 3D proyectado a pantalla */
+  .piezas { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+  .piezas__lineas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .piezas__lineas line { stroke: var(--acento-claro); stroke-width: 1; }
+  .piezas__lineas circle { fill: var(--acento-claro); }
+  .piezas__lineas g { opacity: 0; }
+  .pieza { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; will-change: transform, opacity;
+    padding: 0.28rem 0.55rem; border: 1px solid var(--linea-fuerte); border-radius: var(--r-chico);
+    background: color-mix(in srgb, var(--tinta) 62%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+  /* (c) La tarjeta de producto con su hueco: ahí aterriza el frasco */
+  .lienzo--frente { z-index: 4; }
+  .acople { position: absolute; z-index: 2; inset: 0; margin-inline: auto; max-width: var(--ancho); padding: 4.2rem var(--margen) 2rem;
+    display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2rem; }
+  .acople .pila { width: min(24rem, 100%); }
+  .producto { justify-self: end; width: min(22rem, 100%); padding: 1rem; display: grid; gap: 1rem;
+    opacity: var(--card, 1); transform: translateY(calc((1 - var(--card, 1)) * 28px)); }
+  .hueco { position: relative; aspect-ratio: 5 / 6; border-radius: var(--r-medio); display: grid; place-items: center;
+    border: 1px dashed var(--linea-fuerte);
+    background: radial-gradient(70% 60% at 50% 62%, color-mix(in srgb, var(--acento) 14%, transparent), transparent 72%), var(--superficie);
+    transition: border-color var(--d-media) var(--curva-salida), box-shadow var(--d-media) var(--curva-salida); }
+  .hueco__respaldo { display: none; width: 46%; height: auto; }
+  .es-estatica .hueco__respaldo { display: block; }
+  .producto.es-acoplado .hueco { border-style: solid; border-color: var(--acento); box-shadow: var(--sombra-acento); }
+  .producto__datos { display: grid; gap: 0.5rem; align-content: start; }
+  .producto__datos p { margin: 0; }
+  .producto__pie { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 0.4rem; }
+  .precio { font: 800 var(--t-medio)/1 var(--f-titulo); letter-spacing: -0.02em; }
+
+  /* ---------- Bandas de texto entre escenarios ---------- */
+  .banda--texto { background: var(--tinta); border-block: 1px solid var(--linea); }
+  .banda--texto .contenedor { display: grid; gap: 1.1rem; justify-items: start; }
+  .trio { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); width: 100%; margin-top: 0.8rem; }
+  .trio > div { padding: 1.1rem 1.2rem; border: 1px solid var(--linea); border-radius: var(--r-medio); background: var(--tinta-2); }
+  .trio h3 { margin: 0 0 0.35rem; font: 700 var(--t-chico)/1.2 var(--f-titulo); }
+  .trio p { margin: 0; color: var(--bruma); font-size: var(--t-nota); line-height: 1.55; text-wrap: pretty; }
+  pre { margin: 0.4rem 0 0; width: 100%; padding: 1rem 1.2rem; overflow-x: auto; border: 1px solid var(--linea); border-radius: var(--r-medio);
+    background: var(--superficie); color: var(--bruma); font: 400 var(--t-nota)/1.6 var(--f-mono); }
+  pre b { color: var(--acento-claro); font-weight: 400; }
+
+  code { font-family: var(--f-mono); font-size: 0.92em; color: var(--acento-claro); }
+
+  /* ---------- Celular ---------- */
+  @media (max-width: 760px) {
+    /* el texto baja y deja el objeto arriba */
+    .textos { align-items: flex-end; padding-bottom: 4.6rem; }
+    .velo { background: linear-gradient(0deg, color-mix(in srgb, var(--tinta) 82%, transparent) 0%, transparent 46%); }
+    .pila, .acople .pila { width: 100%; }
+    .capitulo .bajada { font-size: var(--t-chico); }
+    .pieza { font-size: 0.625rem; letter-spacing: 0.1em; padding: 0.22rem 0.4rem; }
+    .acople { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; gap: 0; padding-bottom: 4.6rem; }
+    .acople .pila { grid-row: 1; }
+    .producto { grid-row: 3; justify-self: stretch; width: 100%; grid-template-columns: 7.2rem 1fr; align-items: center; padding: 0.8rem; gap: 0.8rem; }
+    .hueco { aspect-ratio: 3 / 4; }
+    .producto__datos .titulo-m { font-size: 1.15rem; }
+    .dato { top: 3.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- El frasco dibujado en SVG: es el respaldo si no hay WebGL y la imagen que se ve mientras baja three.js -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="fr-vidrio" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" style="stop-color: var(--hueso); stop-opacity: .34"/>
+      <stop offset=".3" style="stop-color: var(--hueso); stop-opacity: .08"/>
+      <stop offset=".78" style="stop-color: var(--hueso); stop-opacity: .1"/>
+      <stop offset="1" style="stop-color: var(--hueso); stop-opacity: .3"/>
+    </linearGradient>
+    <linearGradient id="fr-liquido" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color: var(--acento)"/>
+      <stop offset="1" style="stop-color: var(--acento-hondo)"/>
+    </linearGradient>
+  </defs>
+  <symbol id="frasco" viewBox="0 0 200 320">
+    <rect x="46" y="188" width="108" height="110" rx="14" fill="url(#fr-liquido)"/>
+    <rect x="46" y="214" width="108" height="64" rx="3" style="fill: var(--hueso)"/>
+    <text x="100" y="251" text-anchor="middle" style="fill: var(--tinta); font: 800 27px var(--f-titulo)">ALBA</text>
+    <rect x="46" y="266" width="108" height="12" style="fill: var(--acento-hondo)"/>
+    <path d="M83 98 C83 114 40 118 40 152 V286 Q40 304 58 304 H142 Q160 304 160 286 V152 C160 118 117 114 117 98 Z"
+      fill="url(#fr-vidrio)" style="stroke: var(--hueso)" stroke-opacity=".5" stroke-width="2"/>
+    <rect x="73" y="14" width="54" height="86" rx="9" style="fill: var(--acento-hondo)"/>
+    <rect x="73" y="14" width="54" height="10" rx="5" style="fill: var(--acento)" opacity=".7"/>
+    <path d="M52 160 V282" style="stroke: var(--hueso)" stroke-opacity=".5" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </symbol>
+</svg>
+
+<header class="cab"><a href="index.html">← Banco</a><span>Escena 3D</span></header>
+
+<main>
+
+  <!-- A · Producto procedural que se desarma: el objeto queda en el centro, pasa la página -->
+  <section data-escenario style="--largo: 520vh" id="esc-a" aria-label="Producto procedural que se desarma">
+    <div data-escena class="escena">
+      <div class="lienzo" id="lienzo-a" role="img" aria-label="Frasco de sérum que se separa en cuatro piezas: tapa, vidrio, etiqueta y contenido">
+        <div class="respaldo">
+          <svg class="respaldo__frasco" viewBox="0 0 200 320" aria-hidden="true"><use href="#frasco"/></svg>
+          <ul class="respaldo__piezas">
+            <li class="pastilla">01 · Tapa</li><li class="pastilla">02 · Vidrio</li><li class="pastilla">03 · Etiqueta</li><li class="pastilla">04 · Contenido</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="velo" aria-hidden="true"></div>
+
+      <div class="piezas" id="piezas" aria-hidden="true">
+        <svg class="piezas__lineas" id="piezas-lineas"></svg>
+        <span class="etiqueta pieza" data-pieza="tapa">01 · Tapa</span>
+        <span class="etiqueta pieza" data-pieza="vidrio">02 · Vidrio</span>
+        <span class="etiqueta pieza" data-pieza="etiqueta">03 · Etiqueta</span>
+        <span class="etiqueta pieza" data-pieza="contenido">04 · Contenido</span>
+      </div>
+
+      <div class="textos">
+        <div class="pila">
+          <article class="capitulo es-activa">
+            <p class="etiqueta">01 · Armado</p>
+            <h2 class="titulo-m">Un frasco hecho de código</h2>
+            <p class="bajada">Vidrio, tapa, etiqueta y líquido salen de unas pocas curvas. Sin modelos, sin imágenes: scrolleá y la cámara lo rodea.</p>
+            <p class="nota">↓ Scrolleá para recorrerlo</p>
+          </article>
+          <article class="capitulo">
+            <p class="etiqueta">02 · Por dentro</p>
+            <h2 class="titulo-m">Cuatro piezas, cada una con su nombre</h2>
+            <p class="bajada">El scroll separa el producto en vista explotada. Las líneas y los nombres son HTML anclado a un punto 3D.</p>
+          </article>
+          <article class="capitulo">
+            <p class="etiqueta">03 · Vuelta a armar</p>
+            <h2 class="titulo-m">Se cierra y queda listo</h2>
+            <p class="bajada">Tres poses de cámara cuentan el producto sin cortar a otra imagen.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--texto">
+    <div class="contenedor">
+      <p class="etiqueta" data-aparecer>Qué es y cuándo conviene</p>
+      <h2 class="titulo-l" data-aparecer>Un objeto que se arma solo con código</h2>
+      <p class="bajada" data-aparecer>Sirve para productos simples, objetos de marca o un detalle que el cliente no tiene en foto. Si ya existe un modelo 3D real o un video del producto, ese recurso manda: esto es para cuando no lo hay.</p>
+      <div class="trio">
+        <div data-aparecer><h3>Llega tarde</h3><p>three.js se baja recién cuando la escena está por entrar en pantalla. Antes, la página solo carga el respaldo.</p></div>
+        <div data-aparecer><h3>Responde al scroll</h3><p>El progreso del escenario manda la cámara, el giro y la separación. Con “reducir movimiento” sigue al scroll, pero sin animación propia.</p></div>
+        <div data-aparecer><h3>Se cae con gracia</h3><p>Sin WebGL queda la imagen de respaldo y los capítulos siguen cambiando. En el celu: vidrio más liviano, menos partículas, dpr 1.5.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B · Partículas que arman una figura -->
+  <section data-escenario style="--largo: 380vh" id="esc-b" aria-label="Partículas que arman una figura">
+    <div data-escena class="escena">
+      <div class="lienzo" id="lienzo-b" role="img" aria-label="Una nube de puntos sueltos que se reúne y forma la letra W">
+        <div class="respaldo respaldo--w"><span aria-hidden="true">W</span></div>
+      </div>
+
+      <div class="velo" aria-hidden="true"></div>
+      <p class="dato"><b id="n-part">0</b> partículas<br><b id="n-pct">0</b> % reunidas</p>
+
+      <div class="textos">
+        <div class="pila">
+          <article class="capitulo es-activa">
+            <p class="etiqueta">Partículas</p>
+            <h2 class="titulo-m">Una nube que se vuelve marca</h2>
+            <p class="bajada">Miles de puntos sueltos convergen en la letra. Cada uno tiene su propio retraso y su propia curva, así que no llegan todos juntos.</p>
+            <p class="nota">↓ Seguí bajando</p>
+          </article>
+          <article class="capitulo">
+            <p class="etiqueta">Listo</p>
+            <h2 class="titulo-m">La W respira apenas</h2>
+            <p class="bajada">Cuando llegaron todas, un latido muy leve recorre la figura. Probá cambiar la cantidad de partículas en Ajustes.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="banda banda--texto">
+    <div class="contenedor">
+      <p class="etiqueta" data-aparecer>El 3D no flota aparte</p>
+      <h2 class="titulo-l" data-aparecer>Que el objeto aterrice en la página</h2>
+      <p class="bajada" data-aparecer><code>acoplar()</code> mide el hueco de un elemento HTML y devuelve dónde poner el objeto y a qué escala. Así el 3D y la interfaz se tocan: el frasco termina adentro de la tarjeta, no al lado.</p>
+    </div>
+  </section>
+
+  <!-- C · Acople al DOM -->
+  <section data-escenario style="--largo: 420vh" id="esc-c" aria-label="Acople al DOM">
+    <div data-escena class="escena">
+      <div class="acople">
+        <div class="pila">
+          <article class="capitulo es-activa">
+            <p class="etiqueta">Acople al DOM</p>
+            <h2 class="titulo-m">El frasco flota grande</h2>
+            <p class="bajada">Todavía no tiene lugar en la página. Seguí bajando.</p>
+          </article>
+          <article class="capitulo">
+            <p class="etiqueta">Acople al DOM</p>
+            <h2 class="titulo-m">Y se acomoda en la tarjeta</h2>
+            <p class="bajada">El hueco se mide en vivo: si la tarjeta cambia de tamaño o de lugar, el frasco la sigue.</p>
+          </article>
+        </div>
+
+        <article class="tarjeta producto" id="producto" style="--card: 0">
+          <div class="hueco" id="hueco">
+            <svg class="hueco__respaldo" viewBox="0 0 200 320" aria-hidden="true"><use href="#frasco"/></svg>
+          </div>
+          <div class="producto__datos">
+            <p class="etiqueta">Sérum facial</p>
+            <h3 class="titulo-m">Alba · Vitamina C</h3>
+            <p class="nota">30 ml · piel opaca o con manchas</p>
+            <div class="producto__pie">
+              <span class="precio">$ 18.900</span>
+              <button class="boton" type="button" id="agregar">Agregar</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- el canvas va por encima de la tarjeta (el frasco se ve adentro del hueco) y no atrapa clics -->
+      <div class="lienzo lienzo--frente" id="lienzo-c" role="img" aria-label="Frasco de sérum que flota y se acomoda dentro de la tarjeta del producto"></div>
+    </div>
+  </section>
+
+  <section class="banda banda--texto">
+    <div class="contenedor">
+      <p class="etiqueta" data-aparecer>Cómo se usa</p>
+      <h2 class="titulo-l" data-aparecer>Un contenedor, una función y la cámara</h2>
+      <p class="bajada" data-aparecer>El progreso <code>p</code> llega solo desde el <code>[data-escenario]</code> más cercano. <code>armar</code> puede ser <code>async</code>: se espera a que esté todo antes del primer cuadro.</p>
+      <pre data-aparecer><b>import</b> { escena3d, camaraPorCapitulos } <b>from</b> "../kit/escena3d.js";
+
+escena3d(document.querySelector("#lienzo"), <b>async</b> ({ THREE, escena, camara, render }) => {
+  <b>// …armar la escena con THREE…</b>
+  const ir = camaraPorCapitulos(camara, [
+    { pos: [3, 1, 9],  mira: [0, 0, 0] },
+    { pos: [-3, 1, 7], mira: [0, 0.5, 0] },
+  ]);
+  return { cuadro(t, dt, p) { ir(p); } };   <b>// p: 0..1 del escenario</b>
+}, { dprMax: 2, suavizar: 0.1 });</pre>
+      <p class="nota" data-aparecer>Todo lo de esta página es procedural: no hay un solo modelo ni textura externa.</p>
+    </div>
+  </section>
+</main>
+
+<details class="panel" open>
+  <summary>Ajustes</summary>
+  <div class="panel__cuerpo">
+    <label><span>Separación (vista explotada) <output>1.00</output></span>
+      <input id="aj-sep" type="range" min="0.5" max="1.5" step="0.05" value="1"></label>
+    <label><span>Cantidad de partículas <output>8.000</output></span>
+      <input id="aj-part" type="range" min="1000" max="16000" step="500" value="8000"></label>
+    <label><span>Suavizar <output>0.10</output></span>
+      <input id="aj-suav" type="range" min="0" max="0.3" step="0.01" value="0.1"></label>
+  </div>
+</details>
+
+<script type="module">
+import {
+  escena3d, camaraPorCapitulos, particulasAFigura, acoplar,
+  puntosDeTexto, luzDeEstudio, entornoDeEstudio, colorToken,
+} from "../kit/escena3d.js";
+import { escenario, capitulos, aparecer, limitar } from "../kit/motor-scroll.js";
+
+const $ = (s, raiz = document) => raiz.querySelector(s);
+const $$ = (s, raiz = document) => [...raiz.querySelectorAll(s)];
+const suave = (t) => t * t * (3 - 2 * t);
+const tramo = (p, a, b) => limitar((p - a) / (b - a));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// En el celu: menos partículas, vidrio liviano y dpr 1.5
+const movil = matchMedia("(max-width: 760px)").matches || matchMedia("(pointer: coarse)").matches;
+const dprMax = movil ? 1.5 : 2;
+const PARTICULAS_MAX = movil ? 8000 : 16000;
+const ajustes = { separacion: 1, particulas: movil ? 3000 : 8000, suavizar: 0.1 };
+const hooks = {}; // lo que el panel necesita llamar dentro de las escenas
+
+if (matchMedia("(max-width: 700px)").matches) $(".panel").open = false;
+
+// Azar con semilla para que el campo de puntos sea igual en cada carga
+const azar = (() => { let s = 20241012; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; })();
+
+/* ---------- Textos por capítulos (andan también sin 3D) ---------- */
+
+function marcar(lista, indice) { lista.forEach((el, i) => el.classList.toggle("es-activa", i === indice)); }
+
+function textosDe(pista, cortes, extra) {
+  const caps = $$(".capitulo", pista);
+  escenario(pista, (p) => { marcar(caps, capitulos(p, cortes).indice); if (extra) extra(p); }, { suavizar: 0 });
+}
+
+const producto = $("#producto");
+const hueco = $("#hueco");
+const lienzoC = $("#lienzo-c");
+const datoPart = $("#n-part");
+const datoPct = $("#n-pct");
+let ultimoPct = -1;
+const fmt = new Intl.NumberFormat("es-AR");
+
+textosDe($("#esc-a"), [0, 0.28, 0.72, 1]);
+textosDe($("#esc-b"), [0, 0.8, 1], (p) => {
+  const pct = Math.round(tramo(p, 0, 0.82) * 100);
+  if (pct !== ultimoPct) { ultimoPct = pct; datoPct.textContent = pct; }
+});
+textosDe($("#esc-c"), [0, 0.5, 1], (p) => {
+  producto.style.setProperty("--card", suave(tramo(p, 0.2, 0.46)).toFixed(3));
+  // sin 3D no hay quien marque el acople: lo hace el scroll directo
+  if (lienzoC.classList.contains("sin-3d")) producto.classList.toggle("es-acoplado", p > 0.9);
+});
+datoPart.textContent = fmt.format(ajustes.particulas);
+
+$("#agregar").addEventListener("click", (e) => {
+  const b = e.currentTarget;
+  b.textContent = "Agregado ✓";
+  setTimeout(() => { b.textContent = "Agregar"; }, 1600);
+});
+
+/* ---------- Piezas de escena ---------- */
+
+// "rgba()" desde un THREE.Color de los tokens, para pintar canvas 2D
+function rgba(THREE, color, a) {
+  const o = {};
+  color.getRGB(o, THREE.SRGBColorSpace);
+  return `rgba(${Math.round(o.r * 255)},${Math.round(o.g * 255)},${Math.round(o.b * 255)},${a})`;
+}
+
+// Fondo con profundidad: degradé vertical + resplandor del acento abajo + viñeta. Sale de los tokens.
+function fondoDegradado(THREE) {
+  const tinta = colorToken(THREE, "--tinta");
+  const tinta2 = colorToken(THREE, "--tinta-2");
+  const hondo = colorToken(THREE, "--acento-hondo");
+  const c = document.createElement("canvas");
+  c.width = c.height = 512;
+  const g = c.getContext("2d");
+  const v = g.createLinearGradient(0, 0, 0, 512);
+  v.addColorStop(0, rgba(THREE, tinta2, 1));
+  v.addColorStop(1, rgba(THREE, tinta, 1));
+  g.fillStyle = v;
+  g.fillRect(0, 0, 512, 512);
+  const r = g.createRadialGradient(256, 340, 0, 256, 340, 300);
+  r.addColorStop(0, rgba(THREE, hondo, 0.6));
+  r.addColorStop(0.6, rgba(THREE, hondo, 0.12));
+  r.addColorStop(1, rgba(THREE, hondo, 0));
+  g.fillStyle = r;
+  g.fillRect(0, 0, 512, 512);
+  const vi = g.createRadialGradient(256, 256, 170, 256, 256, 400);
+  vi.addColorStop(0, rgba(THREE, tinta, 0));
+  vi.addColorStop(1, rgba(THREE, tinta, 0.7));
+  g.fillStyle = vi;
+  g.fillRect(0, 0, 512, 512);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+// Campo de puntos lejanos en tres cascarones a distancias distintas: al moverse la cámara se corren a ritmos
+// distintos y eso es profundidad de verdad (no un fondo pintado).
+function estrellas(THREE) {
+  const c = document.createElement("canvas");
+  c.width = c.height = 64;
+  const g = c.getContext("2d");
+  const rg = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  rg.addColorStop(0, "rgba(255,255,255,1)"); // máscara: el color lo pone el material
+  rg.addColorStop(0.35, "rgba(255,255,255,0.55)");
+  rg.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = rg;
+  g.fillRect(0, 0, 64, 64);
+  const mapa = new THREE.CanvasTexture(c);
+  mapa.colorSpace = THREE.SRGBColorSpace;
+
+  const capas = [
+    { n: 260, r0: 30, r1: 40, tam: 0.17, op: 0.85, color: "--acento-claro" },
+    { n: 360, r0: 44, r1: 64, tam: 0.28, op: 0.7, color: "--hueso" },
+    { n: 480, r0: 72, r1: 110, tam: 0.55, op: 0.55, color: "--bruma" },
+  ];
+  return capas.map(({ n, r0, r1, tam, op, color }) => {
+    const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      const u = azar() * 2 - 1, th = azar() * Math.PI * 2, s = Math.sqrt(1 - u * u), r = lerp(r0, r1, azar());
+      pos[i * 3] = r * s * Math.cos(th);
+      pos[i * 3 + 1] = r * u * 0.8;
+      pos[i * 3 + 2] = r * s * Math.sin(th);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({
+      map: mapa, color: colorToken(THREE, color), size: tam, sizeAttenuation: true,
+      transparent: true, opacity: op, depthWrite: false, blending: THREE.AdditiveBlending,
+    });
+    return new THREE.Points(geo, mat);
+  });
+}
+
+// Etiqueta del frasco pintada en un canvas con los tokens (papel = --hueso, tinta = --tinta)
+async function texturaEtiqueta(THREE, render) {
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  try {
+    await Promise.race([document.fonts.load("800 200px 'Bricolage Grotesque'"), new Promise((r) => setTimeout(r, 1500))]);
+  } catch { /* se dibuja con la fuente de respaldo */ }
+  const W = 1600, H = 500;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const g = c.getContext("2d");
+  const conEspacio = "letterSpacing" in g;
+  g.fillStyle = css("--hueso");
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = css("--acento-hondo");
+  g.fillRect(0, H - 56, W, 56);
+  g.textAlign = "center";
+  g.textBaseline = "alphabetic";
+  g.fillStyle = css("--tinta");
+  g.font = `800 215px ${css("--f-titulo")}`;
+  g.fillText("ALBA", W / 2, 300);
+  g.font = `500 34px ${css("--f-mono")}`;
+  if (conEspacio) g.letterSpacing = "10px";
+  g.fillText("SÉRUM FACIAL", W / 2, 118);
+  g.fillText("VITAMINA C · 15 %", W / 2, 384);
+  g.fillRect(W / 2 - 250, 332, 500, 3);
+  g.fillStyle = css("--hueso");
+  g.font = `500 28px ${css("--f-mono")}`;
+  g.fillText("30 ML  ·  LOTE 0142", W / 2, 478);
+  if (conEspacio) g.letterSpacing = "0px";
+  // un sello a cada lado: se ve al girar el frasco
+  for (const x of [W * 0.17, W * 0.83]) {
+    g.strokeStyle = css("--tinta");
+    g.lineWidth = 6;
+    g.beginPath(); g.arc(x, 235, 62, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = css("--tinta");
+    g.font = `800 72px ${css("--f-titulo")}`;
+    g.fillText("A", x, 262);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = Math.min(8, render.capabilities.getMaxAnisotropy());
+  return tex;
+}
+
+/* El frasco: cuatro piezas armadas por código.
+   Los perfiles se giran con LatheGeometry (puntos x = radio, y = altura, de abajo hacia arriba:
+   así las caras miran hacia afuera). El vidrio es un solo perfil que sube por afuera y baja por adentro. */
+async function armarFrasco(THREE, render, { transmision }) {
+  const V = (x, y) => new THREE.Vector2(x, y);
+  const hueso = colorToken(THREE, "--hueso");
+  const claro = colorToken(THREE, "--acento-claro");
+  const acento = colorToken(THREE, "--acento");
+  const hondo = colorToken(THREE, "--acento-hondo");
+  const tenue = colorToken(THREE, "--tenue");
+
+  const arco = (cx, cy, r, a0, a1, n) =>
+    Array.from({ length: n + 1 }, (_, i) => { const a = lerp(a0, a1, i / n); return V(cx + Math.cos(a) * r, cy + Math.sin(a) * r); });
+
+  // Cuerpo hueco o macizo: base plana con filete, pared recta y hombro en S hacia el cuello
+  function cuerpo({ R, base, f, yHombro, rCuello, yCuello, yTope }) {
+    const pts = [V(0, base), ...arco(R - f, base + f, f, -Math.PI / 2, 0, 6), V(R, yHombro)];
+    for (let i = 1; i <= 8; i++) { const t = i / 8; pts.push(V(lerp(R, rCuello, suave(t)), lerp(yHombro, yCuello, t))); }
+    pts.push(V(rCuello, yTope));
+    return pts;
+  }
+
+  // Vidrio: afuera de abajo hacia arriba, borde de la boca, y adentro de arriba hacia abajo
+  const afuera = cuerpo({ R: 0.95, base: -1.82, f: 0.2, yHombro: 0.15, rCuello: 0.44, yCuello: 0.78, yTope: 1.1 });
+  afuera.push(V(0.5, 1.1), V(0.5, 1.2));
+  const adentro = cuerpo({ R: 0.86, base: -1.69, f: 0.16, yHombro: 0.15, rCuello: 0.3, yCuello: 0.8, yTope: 1.2 });
+  const perfilVidrio = [...afuera, ...adentro.reverse()];
+
+  // Contenido: macizo, sin llegar al hombro
+  const R2 = 0.84, f2 = 0.15, base2 = -1.69, nivel = 0.0;
+  const perfilLiquido = [V(0, base2), ...arco(R2 - f2, base2 + f2, f2, -Math.PI / 2, 0, 6), V(R2, nivel), V(0, nivel)];
+
+  // Tapa metálica con ranura, hueco abajo para calzar en la boca
+  const perfilTapa = [
+    V(0, 1.22), V(0.53, 1.22), V(0.53, 1.02), V(0.62, 1.02),
+    V(0.62, 1.26), V(0.595, 1.275), V(0.595, 1.305), V(0.62, 1.32),
+    V(0.62, 1.72), ...arco(0.52, 1.72, 0.1, 0, Math.PI / 2, 5).slice(1), V(0, 1.82),
+  ];
+
+  const vidrioMat = transmision
+    ? new THREE.MeshPhysicalMaterial({
+        color: hueso, roughness: 0.03, metalness: 0, transmission: 1, thickness: 0.8, ior: 1.5,
+        attenuationColor: claro, attenuationDistance: 5, clearcoat: 1, clearcoatRoughness: 0.03,
+      })
+    : new THREE.MeshPhysicalMaterial({
+        // liviano: semitransparente y brillante; sin pasada extra de transmisión (cuesta mucho en el celu)
+        color: hueso, roughness: 0.04, metalness: 0, transparent: true, opacity: 0.3,
+        clearcoat: 1, clearcoatRoughness: 0.03, depthWrite: false,
+      });
+
+  const vidrio = new THREE.Mesh(new THREE.LatheGeometry(perfilVidrio, 72), vidrioMat);
+  const contenido = new THREE.Mesh(
+    new THREE.LatheGeometry(perfilLiquido, 56),
+    new THREE.MeshPhysicalMaterial({ color: acento, roughness: 0.2, clearcoat: 0.6, clearcoatRoughness: 0.15, emissive: hondo, emissiveIntensity: 0.22 })
+  );
+  const tapa = new THREE.Mesh(
+    new THREE.LatheGeometry(perfilTapa, 64),
+    new THREE.MeshStandardMaterial({ color: hondo, metalness: 1, roughness: 0.28 })
+  );
+  const arcoEtiqueta = 3.5; // ~200°: envuelve el frente y deja la espalda lisa
+  const etiqueta = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.962, 0.962, 1.05, 64, 1, true, -arcoEtiqueta / 2, arcoEtiqueta),
+    new THREE.MeshStandardMaterial({ map: await texturaEtiqueta(THREE, render), roughness: 0.55, metalness: 0, side: THREE.DoubleSide })
+  );
+  etiqueta.position.y = -0.72;
+
+  // Cada pieza va en su grupo para poder moverla sin tocar su geometría. dy = cuánto sube/baja al explotar.
+  const grupo = new THREE.Group();
+  const piezas = {};
+  const pieza = (nombre, objeto, yCentro, dy) => {
+    const g = new THREE.Group();
+    g.name = nombre;
+    g.add(objeto);
+    grupo.add(g);
+    piezas[nombre] = { g, dy, ancla: new THREE.Vector3(0, yCentro, 0) };
+  };
+  pieza("tapa", tapa, 1.52, 1.45);
+  pieza("vidrio", vidrio, -0.31, 0.35);
+  pieza("etiqueta", etiqueta, -0.72, -1.75);
+  pieza("contenido", contenido, -0.82, -3.45);
+
+  // Eje fino que une las piezas cuando se separan
+  const eje = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -5.6, 0), new THREE.Vector3(0, 3.7, 0)]),
+    new THREE.LineBasicMaterial({ color: tenue, transparent: true, opacity: 0 })
+  );
+  eje.scale.y = 0;
+
+  return {
+    grupo, piezas, eje,
+    // ex: 0 armado .. 1 explotado; sep: multiplicador del panel
+    aplicar(ex, sep) {
+      for (const k in piezas) piezas[k].g.position.y = piezas[k].dy * ex * sep;
+      eje.scale.y = Math.max(ex * sep, 0.0001);
+      eje.material.opacity = 0.55 * ex;
+    },
+  };
+}
+
+/* ---------- A · Producto que se desarma ---------- */
+
+async function armarA({ THREE, escena, camara, render }) {
+  escena.background = fondoDegradado(THREE);
+  entornoDeEstudio(THREE, render, escena);
+  luzDeEstudio(THREE, escena);
+  const campo = estrellas(THREE);
+  campo.forEach((c) => escena.add(c));
+
+  const frasco = await armarFrasco(THREE, render, { transmision: !movil });
+  escena.add(frasco.grupo, frasco.eje);
+
+  // Poses: armado de 3/4 · vista explotada, más lejos · detalle final desde el otro lado.
+  // En vertical se alejan y se corren hacia arriba para dejarle el pie al texto.
+  let ir = null;
+  let ancho = 1, alto = 1;
+  function reconstruirPoses() {
+    const asp = camara.aspect;
+    const retrato = asp < 0.8;
+    const k = retrato ? 1.25 : 1;
+    const base = [
+      { pos: [3.3, 1.2, 9.0], mira: [0, 0.1, 0], k: 1 },
+      { pos: [4.6, 0.8, 19.5 * (1 + 0.5 * (ajustes.separacion - 1))], mira: [0, -0.9, 0], k: retrato ? 1.12 : 1 },
+      { pos: [-2.9, 1.1, 7.8], mira: [0, 0.35, 0], k: 1 },
+    ];
+    const tanF = Math.tan((camara.fov * Math.PI) / 360);
+    const poses = base.map((b) => {
+      const dir = b.pos.map((v, i) => v - b.mira[i]);
+      const pos = b.mira.map((m, i) => m + dir[i] * k * b.k);
+      const dist = Math.hypot(...dir) * k * b.k;
+      const subir = retrato ? 0.16 * 2 * dist * tanF : 0; // la cámara baja = el objeto se ve más arriba
+      return { pos: [pos[0], pos[1] - subir, pos[2]], mira: [b.mira[0], b.mira[1] - subir, b.mira[2]] };
+    });
+    ir = camaraPorCapitulos(camara, poses);
+  }
+  reconstruirPoses();
+  hooks.poseA = reconstruirPoses;
+
+  // Líneas y nombres: un <g> por pieza con una línea y un punto, más el rótulo HTML
+  const svg = $("#piezas-lineas");
+  const NS = "http://www.w3.org/2000/svg";
+  const rot = {};
+  for (const nombre of Object.keys(frasco.piezas)) {
+    const g = document.createElementNS(NS, "g");
+    const linea = document.createElementNS(NS, "line");
+    const punto = document.createElementNS(NS, "circle");
+    punto.setAttribute("r", "2.5");
+    g.append(linea, punto);
+    svg.append(g);
+    rot[nombre] = { g, linea, punto, texto: $(`.pieza[data-pieza="${nombre}"]`) };
+  }
+  const v = new THREE.Vector3();
+  let visibles = false;
+
+  function rotulos(ex) {
+    const a = tramo(ex, 0.55, 0.95);
+    if (a <= 0 && !visibles) return; // ya están ocultos: no se escribe nada
+    visibles = a > 0;
+    const colX = ancho < 560 ? ancho - 124 : ancho / 2 + Math.min(270, ancho * 0.2);
+    for (const nombre in frasco.piezas) {
+      const pz = frasco.piezas[nombre];
+      const r = rot[nombre];
+      v.copy(pz.ancla);
+      pz.g.localToWorld(v);
+      v.project(camara);
+      const x = (v.x * 0.5 + 0.5) * ancho;
+      const y = (-v.y * 0.5 + 0.5) * alto;
+      r.g.style.opacity = a.toFixed(3);
+      r.linea.setAttribute("x1", x.toFixed(1)); r.linea.setAttribute("y1", y.toFixed(1));
+      r.linea.setAttribute("x2", (colX - 2).toFixed(1)); r.linea.setAttribute("y2", y.toFixed(1));
+      r.punto.setAttribute("cx", x.toFixed(1)); r.punto.setAttribute("cy", y.toFixed(1));
+      r.texto.style.opacity = a.toFixed(3);
+      r.texto.style.transform = `translate(${colX.toFixed(1)}px, ${y.toFixed(1)}px) translateY(-50%)`;
+    }
+  }
+
+  return {
+    alRedimensionar(w, h) {
+      ancho = w; alto = h;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      reconstruirPoses();
+    },
+    cuadro(t, dt, p) {
+      // se separa en el tramo medio y vuelve a cerrarse hacia el final
+      const ex = suave(tramo(p, 0.2, 0.46)) * (1 - suave(tramo(p, 0.76, 0.96)));
+      frasco.aplicar(ex, ajustes.separacion);
+      frasco.grupo.rotation.y = lerp(0.45, Math.PI * 2 - 0.3, p);
+      frasco.grupo.rotation.z = Math.sin(t * 0.5) * 0.015;
+      frasco.grupo.position.y = Math.sin(t * 0.9) * 0.06 * (1 - ex);
+      campo.forEach((c, i) => { c.rotation.y = t * 0.006 * (i + 1) + p * 0.08 * (i + 1); });
+      ir(p);
+      frasco.grupo.updateMatrixWorld(true);
+      rotulos(ex);
+    },
+  };
+}
+
+/* ---------- B · Partículas que arman una W ---------- */
+
+async function armarB({ THREE, escena, camara }) {
+  const fuente = `800 420px ${getComputedStyle(document.documentElement).getPropertyValue("--f-titulo").trim()}`;
+  const base = await puntosDeTexto("W", { fuente, cantidad: PARTICULAS_MAX, alto: 3.1, grosor: 0.35 });
+  const grupo = new THREE.Group();
+  escena.add(grupo);
+
+  let nube = null;
+  function reconstruir() {
+    if (nube) {
+      grupo.remove(nube.malla);
+      nube.malla.geometry.dispose();
+      nube.malla.material.dispose();
+    }
+    const n = ajustes.particulas;
+    // menos partículas → cada una más grande, para que la figura no se vacíe
+    const tam = 0.034 * limitar(Math.sqrt(8000 / n), 0.6, 2.2);
+    nube = particulasAFigura(THREE, { puntos: base, cantidad: n, color: "--acento-claro", tamano: tam });
+    grupo.add(nube.malla);
+    datoPart.textContent = fmt.format(n);
+  }
+  reconstruir();
+  hooks.reconstruirB = reconstruir;
+
+  let ir = null;
+  function poses() {
+    const asp = camara.aspect;
+    const k = Math.max(1, 7.6 / asp / 9.5); // en vertical la W tiene que entrar a lo ancho
+    const subir = asp < 0.8 ? 0.7 : 0;
+    const e = (pos, mira) => ({ pos: [pos[0] * k, pos[1] * k - subir, pos[2] * k], mira: [mira[0], mira[1] - subir, mira[2]] });
+    ir = camaraPorCapitulos(camara, [
+      e([3.2, 1.4, 10.5], [0, 0, 0]),
+      e([-1.6, 0.6, 9.8], [0, 0, 0]),
+      e([0, 0, 9.0], [0, 0, 0]),
+    ]);
+  }
+  poses();
+
+  return {
+    alRedimensionar: poses,
+    cuadro(t, dt, p) {
+      const pc = tramo(p, 0, 0.82); // llega al 82 %; el resto del scroll la deja respirando
+      nube.avanzar(pc, t);
+      grupo.rotation.y = (1 - pc) * 1.2;
+      grupo.rotation.x = (1 - pc) * 0.22;
+      ir(p);
+    },
+  };
+}
+
+/* ---------- C · Acople al DOM ---------- */
+
+async function armarC({ THREE, escena, camara, render }) {
+  entornoDeEstudio(THREE, render, escena);
+  luzDeEstudio(THREE, escena);
+  // sobre un canvas transparente no se usa la transmisión: el vidrio liviano se ve bien sobre la tarjeta
+  const frasco = await armarFrasco(THREE, render, { transmision: false });
+  const objeto = frasco.grupo;
+  escena.add(objeto);
+
+  camara.position.set(0, 0.5, 10);
+  camara.lookAt(0, 0, 0);
+  camara.updateMatrixWorld();
+
+  const reposo = new THREE.Vector3(0, 0, 0);
+  let escalaReposo = movil ? 0.7 : 1.05;
+  let marca = false;
+
+  return {
+    alRedimensionar(w, h) { escalaReposo = w < 760 ? 0.7 : 1.05; },
+    cuadro(t, dt, p) {
+      const e = suave(tramo(p, 0.45, 0.88)); // cuánto del camino al hueco
+      const giro = suave(tramo(p, 0, 0.9));
+
+      // se mide el hueco con el objeto en reposo: el resultado no depende de en qué punto del viaje está
+      objeto.position.copy(reposo);
+      objeto.scale.setScalar(escalaReposo);
+      objeto.rotation.set(0, lerp(0.5, Math.PI * 2, giro) + Math.sin(t * 0.6) * 0.05 * (1 - e), 0);
+      const destino = acoplar(objeto, camara, hueco, { ajuste: 0.92 });
+
+      objeto.position.lerpVectors(reposo, destino.posicion, e);
+      objeto.position.y += Math.sin(t * 0.9) * 0.12 * (1 - e) + Math.sin(e * Math.PI) * 0.35; // flota y hace un arco al bajar
+      objeto.scale.setScalar(lerp(escalaReposo, destino.escala, e));
+
+      const dentro = e > 0.985;
+      if (dentro !== marca) { marca = dentro; producto.classList.toggle("es-acoplado", dentro); }
+    },
+  };
+}
+
+/* ---------- Arranque ---------- */
+
+const instA = escena3d($("#lienzo-a"), armarA, { fondo: "--tinta", dprMax, suavizar: ajustes.suavizar });
+const instB = escena3d($("#lienzo-b"), armarB, { dprMax, suavizar: ajustes.suavizar });
+const instC = escena3d(lienzoC, armarC, { dprMax, suavizar: ajustes.suavizar, fov: 30 });
+const instancias = [instA, instB, instC];
+
+// Sin WebGL, la tarjeta muestra el frasco dibujado en su hueco
+instC.lista.then(() => { if (lienzoC.classList.contains("sin-3d")) $("#esc-c .escena").classList.add("es-estatica"); });
+
+aparecer();
+
+/* ---------- Panel ---------- */
+
+function ligar(id, formato, alCambiar) {
+  const el = document.getElementById(id);
+  const salida = el.closest("label").querySelector("output");
+  salida.textContent = formato(parseFloat(el.value));
+  el.addEventListener("input", () => {
+    const v = parseFloat(el.value);
+    salida.textContent = formato(v);
+    alCambiar(v);
+  });
+}
+$("#aj-part").max = PARTICULAS_MAX;
+$("#aj-part").value = ajustes.particulas;
+ligar("aj-sep", (v) => v.toFixed(2), (v) => { ajustes.separacion = v; if (hooks.poseA) hooks.poseA(); instA.redibujar(); });
+ligar("aj-part", (v) => fmt.format(v), (v) => { ajustes.particulas = v; if (hooks.reconstruirB) hooks.reconstruirB(); instB.redibujar(); });
+ligar("aj-suav", (v) => v.toFixed(2), (v) => { ajustes.suavizar = v; instancias.forEach((i) => i.suavizar(v)); });
+</script>
+</body>
+</html>

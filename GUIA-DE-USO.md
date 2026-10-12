@@ -71,6 +71,28 @@ tanto) están en [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 Las dos del Estudio guardan en `04-Prospectos\`, que los clientes no pueden ver.
 
+### Sitios con movimiento (kit webi)
+
+Para cuando la web de un cliente tiene que moverse. El mapa completo y cómo ver el banco de pruebas están en
+`01-Capacidades\web\webi\README.md`. Regla de oro: **una sola pieza firma por sitio**.
+
+| Decís… | Skill | Dónde usarla |
+|---|---|---|
+| *"quiero que el sitio impacte"*, *"qué efecto le ponemos"* | `motor:dirigir-sitio` (la entrada: elige la pieza firma) | Cliente |
+| *"que el producto gire / se desarme con el scroll"* | `motor:pelicula-con-scroll` | Cliente |
+| *"un video de fondo en la portada"* | `motor:video-de-portada` | Cliente |
+| *"que siga al cursor"*, *"un antes y después"* | `motor:escena-con-puntero` | Cliente |
+| *"que la imagen tenga profundidad"* | `motor:profundidad-por-capas` | Cliente |
+| *"un objeto 3D en la página"* | `motor:escena-3d` | Cliente |
+| *"un fondo que se mueva con los colores de la marca"* | `motor:fondos-shader` | Cliente |
+| *"un carrusel"*, *"un botón con efecto"* | `motor:componentes-vivos` | Cliente |
+| *"armá la banda de precios / contacto / pie"* | `motor:secciones-de-pagina` | Cliente |
+| *"una pantalla de app o un panel"* | `motor:pantallas-de-app` | Cliente |
+| *"pasá la marca al sitio"* | `motor:sistema-visual` y `motor:motor-de-movimiento` (la base) | Cliente |
+| *"necesito el video / los cuadros"* | `motor:fabricar-recursos` | Cliente |
+| *"revisá la página antes de mostrarla"* | `motor:revisar-sitio` | Cliente |
+| *"analizá este sitio y sumá lo que sirva"* | `motor:estudiar-sitio` | **Motor** (por rama y PR) |
+
 ## Reglas
 
 - **Un proyecto, un cliente:** los permisos impiden mezclar datos entre clientes.

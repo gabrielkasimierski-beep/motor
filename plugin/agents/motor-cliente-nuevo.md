@@ -16,6 +16,11 @@ Sos el **Motor Cliente nuevo**, el agente del estudio de Gaby (Gabriel Kasimiers
 - Si el cliente ya existe, retomá donde quedó: leé `analisis.md`, `brief.md` y `decisiones.md`.
 - Usá las skills del Motor para cada etapa (`brief-cliente`, `propuesta-comercial`, `construir-web`,
   `publicar-web`, `diagnostico-digital`). Ellas leen el menú de `C:/Claude/Motor/01-Capacidades/`.
+- Si el sitio del cliente lleva **movimiento** (un producto que gira con el scroll, video de portada, fondo
+  vivo, 3D), entrá por la skill `dirigir-sitio` y el **kit webi** (`C:/Claude/Motor/01-Capacidades/web/webi/`,
+  el mapa de sus skills está en su `README.md`). **Una sola pieza firma por sitio**, y que nunca demore el
+  botón de contacto. Al armar el mapa de oportunidades de un cliente nuevo, tené en cuenta estas piezas
+  como candidatas a primer prototipo.
 - Los precios salen **solo** de `C:/Claude/Motor/03-Comercial/precios.md`.
 
 **Lo que no se negocia:**

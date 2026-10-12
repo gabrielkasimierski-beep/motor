@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profundidad por capas · Banco del Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<style>
+  /* ---------- Marco del banco: cabecera y panel ---------- */
+  .cab { position: fixed; inset: 0 0 auto 0; z-index: 60; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.6rem var(--margen); background: color-mix(in srgb, var(--tinta) 72%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--linea);
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; }
+  .cab a { color: var(--acento-claro); }
+  .cab a:hover { color: var(--hueso); }
+  .cab span { color: var(--bruma); text-align: right; }
+  .panel { position: fixed; right: var(--margen); bottom: var(--margen); z-index: 60; width: min(17.5rem, calc(100vw - 2 * var(--margen)));
+    background: color-mix(in srgb, var(--superficie) 90%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid var(--linea-fuerte); border-radius: var(--r-medio); font-size: var(--t-nota); }
+  .panel summary { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0.9rem; cursor: pointer; list-style: none;
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acento-claro); }
+  .panel summary::-webkit-details-marker { display: none; }
+  .panel summary::after { content: "–"; font-size: 1rem; }
+  .panel:not([open]) summary::after { content: "+"; }
+  .panel__cuerpo { display: grid; gap: 0.85rem; padding: 0 0.9rem 0.95rem; }
+  .panel label { display: grid; gap: 0.35rem; color: var(--bruma); }
+  .panel label > span { display: flex; justify-content: space-between; gap: 0.5rem; }
+  .panel output { font-family: var(--f-mono); color: var(--hueso); }
+  .panel input[type="range"] { width: 100%; accent-color: var(--acento); }
+
+  /* ---------- Escenas ---------- */
+  .escena { background: var(--tinta); }
+
+  /* Paralaje: capas más grandes que la pantalla, ancladas abajo, para que al moverse no asomen bordes */
+  .capa { position: absolute; inset: -4% -8%; transform-origin: 50% 100%; pointer-events: none; }
+  .capa > svg { width: 100%; height: 100%; }
+
+  /* Portal: cada capa ocupa todo el escenario; la puerta se deja desbordar al crecer */
+  .p-capa { position: absolute; inset: 0; pointer-events: none; }
+  .p-capa > svg { width: 100%; height: 100%; }
+  .p-puerta > svg { overflow: visible; }
+
+  .texto-escena { position: absolute; inset: 4.6rem 0 auto 0; z-index: 5; pointer-events: none; display: grid; gap: 0.8rem; justify-items: start; }
+  .texto-escena .nota { max-width: 27rem; color: var(--bruma); text-wrap: pretty; margin: 0; }
+  .texto-escena .nota b { color: var(--hueso); font-weight: 600; }
+  .texto-escena--ancla { text-shadow: 0 2px 24px color-mix(in srgb, var(--tinta) 70%, transparent); }
+
+  .pista { position: absolute; left: 0; right: 0; bottom: 1.4rem; z-index: 5; text-align: center; color: var(--bruma); pointer-events: none;
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; }
+  .pista i { display: block; font-style: normal; font-size: 1.1rem; margin-top: 0.4rem; animation: bajar 1.8s var(--curva-ida-vuelta) infinite; }
+  @keyframes bajar { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(6px); opacity: 1; } }
+
+  .p-final { position: absolute; inset: auto 0 14% 0; z-index: 5; display: grid; justify-items: center; gap: 0.7rem; text-align: center; padding-inline: var(--margen);
+    opacity: 0; pointer-events: none; color: var(--hueso); text-shadow: 0 2px 28px color-mix(in srgb, var(--tinta) 60%, transparent); }
+  .p-final .etiqueta { color: var(--hueso); }
+
+  .pie { padding: 2.5rem var(--margen) 6rem; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="cab"><a href="index.html">← Banco</a><span>Profundidad por capas</span></header>
+
+<main>
+  <!-- A · Paralaje: cinco capas SVG que se separan con el scroll y derivan con el puntero -->
+  <section data-escenario style="--largo: 300vh" id="paralaje" aria-label="Paralaje por capas">
+    <div data-escena class="escena">
+
+      <!-- profundidad 0: cielo -->
+      <div class="capa" data-prof="0">
+        <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="a-cielo" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" style="stop-color: var(--tinta)"/>
+              <stop offset=".38" style="stop-color: color-mix(in srgb, var(--acento-hondo) 30%, var(--tinta))"/>
+              <stop offset=".72" style="stop-color: color-mix(in srgb, var(--acento) 45%, var(--tinta-2))"/>
+              <stop offset="1" style="stop-color: color-mix(in srgb, var(--acento-claro) 40%, var(--tinta-2))"/>
+            </linearGradient>
+            <radialGradient id="a-luna">
+              <stop offset="0" style="stop-color: var(--hueso); stop-opacity: .5"/>
+              <stop offset="1" style="stop-color: var(--hueso); stop-opacity: 0"/>
+            </radialGradient>
+          </defs>
+          <rect width="1600" height="1000" fill="url(#a-cielo)"/>
+          <circle cx="920" cy="300" r="200" fill="url(#a-luna)"/>
+          <circle cx="920" cy="300" r="44" style="fill: var(--hueso)"/>
+          <g style="fill: var(--hueso)" opacity=".7">
+            <circle cx="140" cy="230" r="2"/><circle cx="330" cy="330" r="1.6"/><circle cx="470" cy="210" r="2.2"/>
+            <circle cx="560" cy="340" r="1.5"/><circle cx="680" cy="250" r="2"/><circle cx="760" cy="400" r="1.5"/>
+            <circle cx="1090" cy="230" r="2"/><circle cx="1180" cy="360" r="1.6"/><circle cx="1290" cy="260" r="2.2"/>
+            <circle cx="1410" cy="340" r="1.5"/><circle cx="1520" cy="220" r="2"/><circle cx="990" cy="190" r="1.4"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- profundidad .2: montañas lejanas -->
+      <div class="capa" data-prof="0.2">
+        <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <path style="fill: color-mix(in srgb, var(--acento-hondo) 34%, var(--tinta))"
+            d="M0 650 L100 600 L230 540 L330 590 L450 500 L560 560 L640 470 L760 580 L860 520 L960 430 L1080 560 L1200 500 L1330 580 L1440 520 L1530 570 L1600 540 V1000 H0 Z"/>
+        </svg>
+      </div>
+
+      <!-- profundidad .45: montañas cercanas -->
+      <div class="capa" data-prof="0.45">
+        <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <path style="fill: color-mix(in srgb, var(--acento-hondo) 14%, var(--tinta))"
+            d="M0 780 L150 700 L300 600 L420 690 L560 570 L700 720 L820 640 L960 520 L1100 700 L1250 620 L1400 710 L1500 660 L1600 720 V1000 H0 Z"/>
+          <g style="fill: color-mix(in srgb, var(--acento) 14%, transparent)">
+            <path d="M300 600 L150 700 L250 720 Z"/><path d="M560 570 L420 690 L520 730 Z"/>
+            <path d="M960 520 L820 640 L900 690 Z"/><path d="M1250 620 L1100 700 L1190 720 Z"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- profundidad .75: árboles -->
+      <div class="capa" data-prof="0.75">
+        <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <defs><path id="a-pino" d="M0 -200 L28 -130 H14 L42 -70 H20 L52 0 H-52 L-20 -70 H-42 L-14 -130 H-28 Z"/></defs>
+          <g style="fill: var(--tinta)">
+            <rect y="940" width="1600" height="70"/>
+            <use href="#a-pino" transform="translate(40 1000) scale(1.1)"/>
+            <use href="#a-pino" transform="translate(130 1000) scale(.8)"/>
+            <use href="#a-pino" transform="translate(210 1000) scale(1.4)"/>
+            <use href="#a-pino" transform="translate(320 1000) scale(.9)"/>
+            <use href="#a-pino" transform="translate(410 1000) scale(1.2)"/>
+            <use href="#a-pino" transform="translate(500 1000) scale(.7)"/>
+            <use href="#a-pino" transform="translate(600 1000) scale(1.5)"/>
+            <use href="#a-pino" transform="translate(700 1000) scale(1)"/>
+            <use href="#a-pino" transform="translate(790 1000) scale(.8)"/>
+            <use href="#a-pino" transform="translate(880 1000) scale(1.3)"/>
+            <use href="#a-pino" transform="translate(980 1000) scale(.9)"/>
+            <use href="#a-pino" transform="translate(1080 1000) scale(1.45)"/>
+            <use href="#a-pino" transform="translate(1170 1000) scale(.75)"/>
+            <use href="#a-pino" transform="translate(1260 1000) scale(1.2)"/>
+            <use href="#a-pino" transform="translate(1350 1000) scale(1)"/>
+            <use href="#a-pino" transform="translate(1440 1000) scale(1.4)"/>
+            <use href="#a-pino" transform="translate(1530 1000) scale(.85)"/>
+            <use href="#a-pino" transform="translate(1600 1000) scale(1.1)"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- profundidad 1: niebla del frente -->
+      <div class="capa" data-prof="1">
+        <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <defs>
+            <radialGradient id="a-niebla">
+              <stop offset="0" style="stop-color: var(--hueso); stop-opacity: .26"/>
+              <stop offset="1" style="stop-color: var(--hueso); stop-opacity: 0"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="300" cy="900" rx="560" ry="140" fill="url(#a-niebla)"/>
+          <ellipse cx="900" cy="950" rx="760" ry="160" fill="url(#a-niebla)"/>
+          <ellipse cx="1450" cy="890" rx="480" ry="120" fill="url(#a-niebla)"/>
+          <ellipse cx="760" cy="780" rx="420" ry="80" fill="url(#a-niebla)" opacity=".6"/>
+        </svg>
+      </div>
+
+      <div class="texto-escena contenedor">
+        <p class="etiqueta">A · paralaje</p>
+        <h2 class="titulo-l">Capas que se separan</h2>
+        <p class="nota"><b>Mirá cómo se separan.</b> Bajá: la niebla y los árboles se mueven y crecen mucho; las montañas lejanas casi nada. Mové el mouse: cada capa deriva en proporción a su profundidad (en el celu queda quieta).</p>
+      </div>
+      <div class="pista">bajá<i>↓</i></div>
+    </div>
+  </section>
+
+  <!-- B · Portal: la puerta crece hasta pasar por encima; el paisaje se acerca despacio; las nubes salen rápido -->
+  <section data-escenario style="--largo: 360vh" id="portal" aria-label="Portal">
+    <div data-escena class="escena">
+
+      <!-- lo que hay del otro lado -->
+      <div class="p-capa" id="p-fondo">
+        <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="p-cielo" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" style="stop-color: color-mix(in srgb, var(--acento-hondo) 62%, var(--tinta))"/>
+              <stop offset=".5" style="stop-color: color-mix(in srgb, var(--acento) 70%, var(--acento-claro))"/>
+              <stop offset=".72" style="stop-color: var(--acento-claro)"/>
+              <stop offset="1" style="stop-color: var(--acento-claro)"/>
+            </linearGradient>
+            <radialGradient id="p-sol">
+              <stop offset="0" style="stop-color: var(--hueso); stop-opacity: .95"/>
+              <stop offset="1" style="stop-color: var(--hueso); stop-opacity: 0"/>
+            </radialGradient>
+          </defs>
+          <rect width="1600" height="1000" fill="url(#p-cielo)"/>
+          <circle cx="800" cy="600" r="320" fill="url(#p-sol)"/>
+          <circle cx="800" cy="600" r="82" style="fill: var(--hueso)"/>
+          <path style="fill: color-mix(in srgb, var(--acento) 40%, var(--acento-claro))"
+            d="M0 700 C200 640 380 660 560 690 S900 640 1100 670 S1450 640 1600 690 V1000 H0 Z"/>
+          <path style="fill: var(--acento)"
+            d="M0 780 C250 720 450 760 700 790 S1150 730 1350 770 S1520 760 1600 780 V1000 H0 Z"/>
+          <path style="fill: var(--acento-hondo)"
+            d="M0 860 C300 800 500 850 800 870 S1250 810 1600 850 V1000 H0 Z"/>
+          <path style="fill: color-mix(in srgb, var(--acento-hondo) 55%, var(--tinta))"
+            d="M0 940 C400 910 800 950 1200 920 S1500 930 1600 925 V1000 H0 Z"/>
+        </svg>
+      </div>
+
+      <!-- la puerta: muro con un vano arqueado transparente -->
+      <div class="p-capa p-puerta" id="p-puerta">
+        <svg viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <defs>
+            <pattern id="p-sillares" width="160" height="160" patternUnits="userSpaceOnUse">
+              <path d="M0 0 H160 M0 80 H160 M0 0 V80 M80 80 V160" fill="none" style="stroke: var(--linea-fuerte)" stroke-width="2"/>
+            </pattern>
+            <radialGradient id="p-sombra" gradientUnits="userSpaceOnUse" cx="400" cy="500" r="760">
+              <stop offset=".35" style="stop-color: var(--tinta); stop-opacity: 0"/>
+              <stop offset="1" style="stop-color: var(--tinta); stop-opacity: .7"/>
+            </radialGradient>
+          </defs>
+          <path fill-rule="evenodd" style="fill: var(--tinta-2)"
+            d="M-4000 -4000 H4800 V5000 H-4000 Z M220 810 V370 A180 180 0 0 1 580 370 V810 Z"/>
+          <path fill-rule="evenodd" fill="url(#p-sillares)"
+            d="M-4000 -4000 H4800 V5000 H-4000 Z M220 810 V370 A180 180 0 0 1 580 370 V810 Z"/>
+          <path fill-rule="evenodd" fill="url(#p-sombra)"
+            d="M-4000 -4000 H4800 V5000 H-4000 Z M220 810 V370 A180 180 0 0 1 580 370 V810 Z"/>
+          <path d="M190 840 V370 A210 210 0 0 1 610 370 V840" fill="none" style="stroke: var(--acento-hondo)" stroke-width="10"/>
+          <path d="M220 810 V370 A180 180 0 0 1 580 370 V810" fill="none" style="stroke: var(--acento)" stroke-width="3" opacity=".85"/>
+        </svg>
+      </div>
+
+      <!-- al frente: nubes y niebla; salen más rápido que la puerta -->
+      <div class="p-capa" id="p-nubes">
+        <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <radialGradient id="p-nube">
+              <stop offset="0" style="stop-color: var(--hueso); stop-opacity: .95"/>
+              <stop offset=".6" style="stop-color: var(--hueso); stop-opacity: .55"/>
+              <stop offset="1" style="stop-color: var(--hueso); stop-opacity: 0"/>
+            </radialGradient>
+          </defs>
+          <g fill="url(#p-nube)">
+            <ellipse cx="240" cy="170" rx="300" ry="110"/><ellipse cx="430" cy="230" rx="240" ry="90"/><ellipse cx="110" cy="270" rx="200" ry="80"/>
+            <ellipse cx="1380" cy="200" rx="330" ry="120"/><ellipse cx="1180" cy="120" rx="220" ry="80"/><ellipse cx="1500" cy="310" rx="220" ry="80"/>
+            <ellipse cx="200" cy="860" rx="380" ry="130"/><ellipse cx="440" cy="930" rx="300" ry="100"/>
+            <ellipse cx="1400" cy="840" rx="400" ry="140"/><ellipse cx="1150" cy="940" rx="300" ry="100"/>
+          </g>
+        </svg>
+      </div>
+      <div class="p-capa" id="p-niebla">
+        <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <radialGradient id="p-bruma">
+              <stop offset="0" style="stop-color: var(--bruma); stop-opacity: .5"/>
+              <stop offset="1" style="stop-color: var(--bruma); stop-opacity: 0"/>
+            </radialGradient>
+          </defs>
+          <g fill="url(#p-bruma)">
+            <ellipse cx="800" cy="880" rx="900" ry="120"/><ellipse cx="300" cy="570" rx="420" ry="70"/>
+            <ellipse cx="1300" cy="530" rx="460" ry="70"/><ellipse cx="800" cy="760" rx="520" ry="60"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="texto-escena texto-escena--ancla contenedor" id="p-inicio">
+        <p class="etiqueta">B · portal</p>
+        <h2 class="titulo-l">Cruzá la puerta</h2>
+        <p class="nota"><b>Mirá tres velocidades.</b> La puerta crece cada vez más rápido hasta pasar por encima; el paisaje se acerca despacio; las nubes salen primero. Probá la escala final en el panel.</p>
+      </div>
+      <div class="p-final" id="p-final">
+        <p class="etiqueta">del otro lado</p>
+        <h2 class="titulo-xl">Ya estás adentro</h2>
+      </div>
+      <div class="pista">bajá<i>↓</i></div>
+    </div>
+  </section>
+</main>
+
+<p class="pie nota">Fin de la prueba · <a href="index.html" style="color: var(--acento-claro)">← Banco</a></p>
+
+<details class="panel" open>
+  <summary>Ajustes</summary>
+  <div class="panel__cuerpo">
+    <label><span>Fuerza del puntero (px) <output>14</output></span>
+      <input id="aj-fuerza" type="range" min="0" max="60" step="1" value="14"></label>
+    <label><span>Escala final del portal <output>9</output></span>
+      <input id="aj-escala" type="range" min="3" max="14" step="0.5" value="9"></label>
+    <label><span>Suavizar <output>0.1</output></span>
+      <input id="aj-suavizar" type="range" min="0" max="0.4" step="0.01" value="0.1"></label>
+  </div>
+</details>
+
+<script type="module">
+import { capas, portal } from "../kit/capas.js";
+import { escenario, mapear, reducido } from "../kit/motor-scroll.js";
+
+const q = (s, raiz = document) => raiz.querySelector(s);
+if (matchMedia("(max-width: 700px)").matches) q(".panel").open = false;
+
+// Deslizador → valor + salida de texto
+function ligar(id, alCambiar) {
+  const el = document.getElementById(id);
+  const salida = el.closest("label").querySelector("output");
+  salida.textContent = el.value;
+  el.addEventListener("input", () => { salida.textContent = el.value; alCambiar(parseFloat(el.value)); });
+}
+
+// A · paralaje: la profundidad de cada capa sale de su data-prof
+const paralaje = capas(q("#paralaje"), {
+  capas: [...document.querySelectorAll("#paralaje [data-prof]")].map((el) => ({ el, profundidad: parseFloat(el.dataset.prof) })),
+  puntero: { fuerza: 14 },
+  suavizar: 0.1,
+});
+
+// B · portal
+const puerta = portal(q("#portal"), {
+  puerta: q("#p-puerta"),
+  fondo: q("#p-fondo"),
+  frente: [q("#p-nubes"), q("#p-niebla")],
+  escalaFinal: 9,
+  origen: [0.5, 0.5],   // el centro del vano coincide con el centro del escenario
+  suavizar: 0.1,
+});
+
+// Los textos del portal: el de entrada se va con la puerta, el de cierre aparece del otro lado.
+const inicio = q("#p-inicio"), cierre = q("#p-final");
+function textos(p) {
+  const quieto = reducido(); // con movimiento reducido el portal queda en su final: se ve el cierre
+  inicio.style.opacity = quieto ? 0 : (1 - mapear(p, 0.05, 0.3, 0, 1)).toFixed(3);
+  const c = quieto ? 1 : mapear(p, 0.82, 0.96, 0, 1);
+  cierre.style.opacity = c.toFixed(3);
+  cierre.style.transform = `translateY(${((1 - c) * 18).toFixed(1)}px)`;
+}
+textos(0);
+escenario(q("#portal"), textos, { suavizar: 0.1 });
+
+ligar("aj-fuerza", (v) => paralaje.cambiar({ puntero: { fuerza: v } }));
+ligar("aj-escala", (v) => puerta.cambiar({ escalaFinal: v }));
+ligar("aj-suavizar", (v) => { paralaje.cambiar({ suavizar: v }); puerta.cambiar({ suavizar: v }); });
+</script>
+</body>
+</html>

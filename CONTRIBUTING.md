@@ -55,6 +55,7 @@ carpeta de trabajo: `claude --plugin-dir C:\Claude\Motor-trabajo\plugin`.
 | Skills y agentes | `plugin/skills/<nombre>/SKILL.md` · `plugin/agents/<nombre>.md` |
 | Cómo trabajamos (embudo, calidad, decidir el tipo de trabajo) | `00-Motor/` |
 | Lo que ofrecemos y lo aprendido (web, apps, 3D, diseño) | `01-Capacidades/` |
+| Kit de sitios con movimiento: código, banco de pruebas, estudios de sitios | `01-Capacidades/web/webi/` (pieza nueva = kit + banco + skill) |
 | Lo que se copia al crear un cliente, y el script | `02-Plantilla-cliente/` |
 | Precios, condiciones, datos del estudio | `03-Comercial/` |
 | Política de tokens y plantilla del inventario | `04-Accesos/` |

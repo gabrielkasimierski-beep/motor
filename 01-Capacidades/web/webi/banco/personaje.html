@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuadros con el puntero · Banco del Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<style>
+  /* ---------- Cabecera y panel del banco ---------- */
+  .cabecera {
+    position: fixed; inset: 0 0 auto 0; z-index: 40;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.7rem var(--margen);
+    background: color-mix(in srgb, var(--tinta) 70%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--linea);
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  .cabecera__nombre { display: flex; align-items: baseline; gap: 0.75rem; color: var(--hueso); }
+  .cabecera__nombre small { color: var(--tenue); font-size: inherit; letter-spacing: 0.08em; text-transform: none; }
+  .cabecera__volver { color: var(--acento-claro); padding: 0.4rem 0; }
+  .cabecera__volver:hover { color: var(--hueso); }
+  @media (max-width: 30rem) { .cabecera__nombre small { display: none; } }
+
+  .panel { position: fixed; right: 12px; bottom: 12px; z-index: 60; }
+  .panel details {
+    border: 1px solid var(--linea-fuerte); border-radius: var(--r-medio);
+    background: color-mix(in srgb, var(--tinta-2) 90%, transparent);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 14px 40px -14px rgba(0, 0, 0, 0.65);
+  }
+  .panel details[open] { width: min(19rem, calc(100vw - 24px)); }
+  .panel summary {
+    list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.75rem 1rem; min-height: 2.75rem;
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--acento-claro);
+  }
+  .panel summary::-webkit-details-marker { display: none; }
+  .panel summary::after { content: "+"; font-size: 1rem; line-height: 1; }
+  .panel details[open] summary::after { content: "–"; }
+  .panel__cuerpo { display: grid; gap: 1rem; padding: 0.25rem 1rem 1rem; }
+  .ajuste { display: grid; gap: 0.4rem; }
+  .ajuste__fila { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; font-size: var(--t-nota); color: var(--bruma); }
+  .ajuste output { font: 500 var(--t-nota)/1 var(--f-mono); color: var(--hueso); }
+  .ajuste input[type="range"] { width: 100%; margin: 0; accent-color: var(--acento); }
+  .ajuste__botones { display: flex; gap: 0.5rem; }
+  button.pastilla { cursor: pointer; min-height: 2.25rem; padding-inline: 1.1rem; }
+  .panel .nota { margin: 0; line-height: 1.45; }
+
+  /* ---------- Página ---------- */
+  .intro { padding-block: 6rem 2rem; }
+  .intro .contenedor { display: grid; gap: 1.25rem; justify-items: start; }
+  .intro .bajada { max-width: 40rem; }
+  .cuerpo { padding-bottom: 7rem; }
+  .cuerpo .contenedor { display: grid; gap: 2rem; }
+
+  /* La zona: todo el rectángulo es sensible al puntero */
+  .zona {
+    position: relative; height: clamp(22rem, 74vh, 48rem); height: clamp(22rem, 74svh, 48rem);
+    border-radius: var(--r-grande); background: var(--tinta-2);
+    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+    cursor: ew-resize;
+  }
+  .zona[data-eje="y"] { cursor: ns-resize; }
+  #lienzo { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Indicadores dentro de la zona */
+  .zona__pie {
+    position: absolute; left: 0.9rem; right: 0.9rem; bottom: 0.9rem; z-index: 3;
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; pointer-events: none;
+  }
+  .zona__pie .pastilla {
+    background: color-mix(in srgb, var(--tinta) 72%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    font-family: var(--f-mono); font-size: var(--t-etiqueta); letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: normal; min-width: 0;
+  }
+  .estado__luz { flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--tenue); transition: background var(--d-media); }
+  .estado[data-modo="sigue"] .estado__luz { background: var(--acento); }
+  .estado[data-modo="barrido"] .estado__luz { background: var(--acento-claro); animation: latido 1.6s var(--curva-ida-vuelta) infinite alternate; }
+  @keyframes latido { from { opacity: 0.35; } to { opacity: 1; } }
+  .contador b { color: var(--hueso); font-weight: 500; }
+  .regla { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; height: 3px; background: var(--linea-fuerte); pointer-events: none; }
+  .regla i { display: block; height: 100%; background: var(--acento); transform-origin: left center; transform: scaleX(0.5); }
+
+  .cargador {
+    position: absolute; inset: 0; z-index: 8; display: grid; place-content: center; justify-items: center; gap: 1rem;
+    background: var(--tinta-2); text-align: center; pointer-events: none;
+    transition: opacity var(--d-larga) var(--curva-salida), visibility 0s linear var(--d-larga);
+  }
+  .cargador.es-oculto { opacity: 0; visibility: hidden; }
+  .cargador__barra { width: min(16rem, 70%); height: 2px; background: var(--linea-fuerte); overflow: hidden; }
+  .cargador__barra i { display: block; height: 100%; background: var(--acento); transform-origin: left center; transform: scaleX(0); }
+  .cargador__num { font: 500 var(--t-nota)/1 var(--f-mono); color: var(--bruma); letter-spacing: 0.1em; }
+  .cargador__error { margin: 0; max-width: 22rem; color: var(--bruma); font-size: var(--t-nota); }
+
+  /* Cómo se comporta */
+  .reglas { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+  .reglas .tarjeta { padding: 1.25rem 1.4rem; display: grid; gap: 0.5rem; align-content: start; }
+  .reglas p { margin: 0; color: var(--bruma); font-size: var(--t-nota); line-height: 1.55; }
+  .uso { padding: 1.25rem 1.4rem; display: grid; gap: 0.75rem; }
+  .uso pre {
+    margin: 0; overflow-x: auto; font: 400 var(--t-nota)/1.65 var(--f-mono); color: var(--bruma); tab-size: 2;
+  }
+  .uso pre b { color: var(--acento-claro); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <span class="cabecera__nombre">Cuadros con el puntero <small>cuadros.js · conPuntero</small></span>
+  <a class="cabecera__volver" href="index.html">← Banco</a>
+</header>
+
+<main>
+  <section class="intro">
+    <div class="contenedor">
+      <span class="etiqueta" data-aparecer>Pieza · cuadros.js</span>
+      <h1 class="titulo-l" data-aparecer>Mové el puntero y la imagen te sigue.</h1>
+      <p class="bajada" data-aparecer>En un sitio real, estos cuadros son un personaje girando la cabeza hacia donde está tu puntero. Acá la muestra es un acercamiento a un fractal: lo que se prueba es el mecanismo.</p>
+    </div>
+  </section>
+
+  <section class="cuerpo">
+    <div class="contenedor">
+      <div class="zona tarjeta" id="zona" data-eje="x">
+        <canvas id="lienzo" role="img" aria-label="Acercamiento a un fractal; se recorre con el puntero"></canvas>
+
+        <div class="zona__pie">
+          <span class="pastilla estado" id="estado" data-modo="espera"><i class="estado__luz"></i><span id="estado-texto">Mové el puntero</span></span>
+          <span class="pastilla contador" id="contador" aria-hidden="true"><b id="contador-n">061</b>&nbsp;/ 120</span>
+        </div>
+        <div class="regla" aria-hidden="true"><i id="regla"></i></div>
+
+        <div class="cargador" id="cargador">
+          <span class="etiqueta" id="cargador-etiqueta">Cargando cuadros</span>
+          <div class="cargador__barra" role="progressbar" aria-label="Carga de cuadros" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="cargador-barra"></i></div>
+          <span class="cargador__num" id="cargador-num">000%</span>
+          <p class="cargador__error" id="cargador-error" hidden></p>
+        </div>
+      </div>
+
+      <div class="reglas">
+        <div class="tarjeta" data-aparecer>
+          <span class="etiqueta">Con puntero</span>
+          <p>Moverlo de lado a lado recorre los 120 cuadros de punta a punta. Con el eje en Y, de arriba a abajo.</p>
+        </div>
+        <div class="tarjeta" data-aparecer>
+          <span class="etiqueta">En reposo</span>
+          <p>Si nadie lo mueve durante unos segundos, hace un barrido lento de ida y vuelta, arrancando desde donde quedó.</p>
+        </div>
+        <div class="tarjeta" data-aparecer>
+          <span class="etiqueta">En el celular</span>
+          <p>Responde al arrastre del dedo en el eje elegido y deja pasar el scroll del otro. Con movimiento reducido se queda en el cuadro del medio.</p>
+        </div>
+      </div>
+
+      <div class="tarjeta uso" data-aparecer>
+        <span class="etiqueta">Uso</span>
+<pre><b>const</b> pelicula = crearCuadros(canvas, { fuente: "medios/cuadros/muestra-####.webp", total: 120 });
+<b>const</b> liga = conPuntero(pelicula, zona, {
+  eje: "x", suavizar: 0.14,
+  reposo: { tras: 6000, modo: "barrido" },
+});
+liga.destruir();   <i style="color:var(--tenue)">// saca listeners y bucle</i></pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<aside class="panel" aria-label="Ajustes de la pieza">
+  <details id="panel">
+    <summary>Ajustes</summary>
+    <div class="panel__cuerpo">
+      <label class="ajuste">
+        <span class="ajuste__fila">Suavizar <output id="o-suavizar">0.14</output></span>
+        <input type="range" id="i-suavizar" min="0" max="0.4" step="0.01" value="0.14">
+      </label>
+      <label class="ajuste">
+        <span class="ajuste__fila">Segundos de reposo <output id="o-reposo">6 s</output></span>
+        <input type="range" id="i-reposo" min="1" max="15" step="1" value="6">
+      </label>
+      <div class="ajuste">
+        <span class="ajuste__fila">Eje <output id="o-eje">X</output></span>
+        <div class="ajuste__botones">
+          <button class="pastilla" type="button" aria-pressed="true" data-eje="x">X</button>
+          <button class="pastilla" type="button" aria-pressed="false" data-eje="y">Y</button>
+        </div>
+      </div>
+      <p class="nota">Al cambiar un ajuste la pieza vuelve a engancharse y arranca en el cuadro del medio. En táctil, con el eje en Y la zona se queda con el scroll vertical.</p>
+    </div>
+  </details>
+</aside>
+
+<script type="module">
+import { aparecer, bucle, reducido } from "../kit/motor-scroll.js";
+import { crearCuadros, conPuntero } from "../kit/cuadros.js";
+
+const TOTAL = 120;
+const $ = (s) => document.querySelector(s);
+const zona = $("#zona"), lienzo = $("#lienzo");
+const cargador = $("#cargador"), barra = $("#cargador-barra"), num = $("#cargador-num");
+
+const estado = { suavizar: 0.14, reposo: 6, eje: "x" };
+
+/* ---------- Película ---------- */
+function alCargar(p) {
+  barra.style.transform = `scaleX(${p})`;
+  num.textContent = String(Math.round(p * 100)).padStart(3, "0") + "%";
+  barra.parentElement.setAttribute("aria-valuenow", Math.round(p * 100));
+}
+const pelicula = crearCuadros(lienzo, { fuente: "medios/cuadros/muestra-####.webp", total: TOTAL, mezclar: true, alCargar });
+pelicula.lista
+  .then(() => setTimeout(() => cargador.classList.add("es-oculto"), 350))   // se ve el 100 % un instante
+  .catch(() => {
+    $("#cargador-etiqueta").textContent = "No se pudo cargar";
+    const e = $("#cargador-error");
+    e.hidden = false;
+    e.textContent = "Abrí el banco desde el servidor local (npm run banco) para que carguen los cuadros.";
+  });
+
+/* ---------- Indicadores ----------
+   conPuntero llama a pelicula.ir(p) cada vez que cambia el valor: envuelvo ir() solo para
+   mostrar el contador. En un sitio real no hace falta. */
+let pActual = 0.5;
+const irOriginal = pelicula.ir;
+pelicula.ir = (p) => { pActual = p; irOriginal(p); };
+
+let ultima = performance.now();   // último movimiento del puntero, para rotular el estado
+let hubo = false;
+const marcar = () => { ultima = performance.now(); hubo = true; };
+["pointermove", "pointerdown", "pointerup", "pointercancel"].forEach((n) => zona.addEventListener(n, marcar));
+
+const elEstado = $("#estado"), elTexto = $("#estado-texto"), elN = $("#contador-n"), elRegla = $("#regla");
+let previo = "";
+bucle(() => {
+  const n = String(Math.round(pActual * (TOTAL - 1)) + 1).padStart(3, "0");
+  if (n !== elN.textContent) elN.textContent = n;
+  elRegla.style.transform = `scaleX(${pActual.toFixed(4)})`;
+
+  let modo, texto;
+  if (reducido()) { modo = "quieto"; texto = "Movimiento reducido · cuadro del medio"; }
+  else if (performance.now() - ultima > estado.reposo * 1000) { modo = "barrido"; texto = "En reposo · barrido solo"; }
+  else if (hubo) { modo = "sigue"; texto = "Siguiendo tu " + (matchMedia("(hover: none)").matches ? "dedo" : "puntero"); }
+  else { modo = "espera"; texto = matchMedia("(hover: none)").matches ? "Arrastrá de lado" : "Mové el puntero"; }
+  const clave = modo + texto;
+  if (clave !== previo) { previo = clave; elEstado.dataset.modo = modo; elTexto.textContent = texto; }
+});
+
+/* ---------- Enganche ---------- */
+let liga = null;
+function enlazar() {
+  if (liga) liga.destruir();
+  zona.dataset.eje = estado.eje;
+  ultima = performance.now();
+  hubo = false;
+  liga = conPuntero(pelicula, zona, {
+    eje: estado.eje,
+    suavizar: estado.suavizar,
+    reposo: { tras: estado.reposo * 1000, modo: "barrido" },
+  });
+}
+
+/* ---------- Panel ---------- */
+const iSuavizar = $("#i-suavizar"), iReposo = $("#i-reposo");
+iSuavizar.addEventListener("input", () => {
+  estado.suavizar = Number(iSuavizar.value);
+  $("#o-suavizar").textContent = estado.suavizar.toFixed(2);
+  enlazar();
+});
+iReposo.addEventListener("input", () => {
+  estado.reposo = Number(iReposo.value);
+  $("#o-reposo").textContent = estado.reposo + " s";
+  enlazar();
+});
+document.querySelectorAll("[data-eje]").forEach((b) => {
+  if (b === zona) return;
+  b.addEventListener("click", () => {
+    if (b.dataset.eje === estado.eje) return;
+    estado.eje = b.dataset.eje;
+    document.querySelectorAll("button[data-eje]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    $("#o-eje").textContent = estado.eje.toUpperCase();
+    enlazar();
+  });
+});
+if (innerWidth >= 900) $("#panel").open = true;   // en el celu arranca plegado
+
+aparecer();
+enlazar();
+</script>
+</body>
+</html>

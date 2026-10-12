@@ -35,6 +35,12 @@ seria como para ganar cuentas de empresas.
 **Estado:** **maduro.** Tiene proceso (skills), grilla de precios, sistema de diseño, kit de
 secciones y plantillas. Ver [`web/aprendizajes.md`](web/aprendizajes.md).
 
+**Sitios con movimiento (kit webi):** cuando la web tiene que impactar —un producto que gira con el
+scroll, un video de portada, un fondo vivo, una escena 3D— se arma con [`web/webi/`](web/webi/README.md):
+15 skills, un kit de código sin dependencias y un banco de pruebas con una página por pieza. Regla de
+oro: **una sola pieza firma por sitio** y que nunca demore el botón de contacto. Crece estudiando sitios
+publicados (skill `estudiar-sitio`). Estado: **nuevo** (11-oct-2026), todavía sin un caso de cliente.
+
 ## Apps
 
 **Qué es:** turnos y reservas con QR y panel por rol con PIN (Fena); carta digital con pedidos

@@ -1,0 +1,12 @@
+{
+  "name": "motor-webi",
+  "private": true,
+  "type": "module",
+  "description": "Motor webi: skills y kit propio para armar sitios web con movimiento",
+  "scripts": {
+    "banco": "node herramientas/servidor.js . 5190",
+    "cuadros": "node herramientas/video-a-cuadros.js",
+    "nuevo-sitio": "node herramientas/nuevo-sitio.js",
+    "archivos": "node herramientas/archivos-del-sitio.js"
+  }
+}

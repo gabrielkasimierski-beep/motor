@@ -1,0 +1,141 @@
+/* carrusel-arco · ver carrusel-arco.js para el truco y el uso.
+   Colores y curvas solo desde kit/tokens.css. */
+
+.carrusel-arco {
+  --ancho-tarjeta: clamp(10rem, 56vw, 17rem);
+  --alto-tarjeta: calc(var(--ancho-tarjeta) * 1.3);
+  /* Los dos siguientes los calcula el JS: radio del círculo y grados entre tarjetas */
+  --radio: 30rem;
+  --paso: 14deg;
+
+  position: relative;
+  border-radius: var(--r-grande);
+}
+.carrusel-arco:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* ---------- Escena: la ventana ---------- */
+.carrusel-arco__escena {
+  position: relative;
+  height: calc(var(--alto-tarjeta) + 9rem);
+  overflow: hidden;
+  overflow: clip; /* clip no deja que el foco desplace el contenido */
+  touch-action: pan-y; /* el dedo horizontal mueve el arco; el vertical sigue siendo scroll */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.carrusel-arco.se-arrastra .carrusel-arco__escena { cursor: grabbing; }
+
+/* ---------- Rueda: UNA sola rotación mueve todo ----------
+   La caja es del tamaño de una tarjeta y está en la cima; el origen de la rotación cae el
+   radio entero por debajo: el centro del círculo. */
+.carrusel-arco__rueda {
+  position: absolute;
+  top: 2.5rem;
+  left: 50%;
+  width: var(--ancho-tarjeta);
+  height: var(--alto-tarjeta);
+  margin-left: calc(var(--ancho-tarjeta) / -2);
+  transform-origin: 50% calc(50% + var(--radio));
+  will-change: transform;
+}
+
+/* Todas en el mismo lugar, cada una pre-rotada i · paso alrededor del mismo centro */
+.carrusel-arco__tarjeta {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-medio);
+  background: var(--superficie);
+  transform-origin: 50% calc(50% + var(--radio));
+  transform: rotate(calc(var(--paso) * var(--i, 0)));
+  opacity: 0.62;
+  transition:
+    opacity var(--d-media) var(--curva-salida),
+    border-color var(--d-media) var(--curva-salida),
+    box-shadow var(--d-media) var(--curva-salida);
+}
+.carrusel-arco__tarjeta.es-activa {
+  opacity: 1;
+  border-color: color-mix(in srgb, var(--acento) 70%, transparent);
+  box-shadow: var(--sombra-acento);
+}
+.carrusel-arco__tarjeta img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+.carrusel-arco__tarjeta figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2.5rem 0.9rem 0.9rem;
+  background: linear-gradient(to top, color-mix(in srgb, var(--tinta) 88%, transparent), transparent);
+  font: 700 var(--t-chico)/1.15 var(--f-titulo);
+  letter-spacing: -0.01em;
+}
+.carrusel-arco__tarjeta figcaption .etiqueta { display: block; margin-bottom: 0.3rem; }
+
+/* ---------- Controles ---------- */
+.carrusel-arco__controles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+.carrusel-arco__boton {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-pastilla);
+  background: color-mix(in srgb, var(--superficie) 60%, transparent);
+  color: var(--hueso);
+  cursor: pointer;
+  transition: transform var(--d-corta) var(--curva-salida), border-color var(--d-corta), background var(--d-corta), opacity var(--d-corta);
+}
+.carrusel-arco__boton:hover { border-color: var(--linea-fuerte); background: var(--superficie); transform: translateY(-2px); }
+.carrusel-arco__boton:active { transform: scale(0.94); }
+.carrusel-arco__boton[aria-disabled="true"] { opacity: 0.35; cursor: default; transform: none; }
+.carrusel-arco__boton svg { width: 1.1rem; height: 1.1rem; }
+.carrusel-arco__cuenta {
+  min-width: 5rem;
+  text-align: center;
+  font: 500 var(--t-etiqueta)/1 var(--f-mono);
+  letter-spacing: 0.2em;
+  color: var(--bruma);
+}
+
+/* ---------- Antes de que arme el JS (o si no corre): fila que se desplaza a mano ---------- */
+.carrusel-arco:not(.esta-lista) .carrusel-arco__escena {
+  display: flex;
+  height: auto;
+  overflow-x: auto;
+  touch-action: auto;
+  cursor: auto;
+  padding: 1rem var(--margen);
+}
+.carrusel-arco:not(.esta-lista) .carrusel-arco__rueda {
+  position: static;
+  display: flex;
+  gap: 0.75rem;
+  width: max-content;
+  height: auto;
+  margin: 0;
+  transform: none;
+}
+.carrusel-arco:not(.esta-lista) .carrusel-arco__tarjeta {
+  position: relative;
+  inset: auto;
+  flex: none;
+  width: var(--ancho-tarjeta);
+  height: var(--alto-tarjeta);
+  transform: none;
+  opacity: 1;
+}
+.carrusel-arco:not(.esta-lista) .carrusel-arco__controles { display: none; }

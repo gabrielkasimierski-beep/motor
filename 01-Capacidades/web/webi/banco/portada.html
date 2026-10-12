@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portada con video · Banco del Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<style>
+  /* ---------- Marco del banco: cabecera y panel ---------- */
+  .cab { position: fixed; inset: 0 0 auto 0; z-index: 60; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.6rem var(--margen); background: color-mix(in srgb, var(--tinta) 72%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--linea);
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; }
+  .cab a { color: var(--acento-claro); }
+  .cab a:hover { color: var(--hueso); }
+  .cab span { color: var(--bruma); text-align: right; }
+  .panel { position: fixed; right: var(--margen); bottom: var(--margen); z-index: 60; width: min(17.5rem, calc(100vw - 2 * var(--margen)));
+    background: color-mix(in srgb, var(--superficie) 90%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid var(--linea-fuerte); border-radius: var(--r-medio); font-size: var(--t-nota); }
+  .panel summary { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0.9rem; cursor: pointer; list-style: none;
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acento-claro); }
+  .panel summary::-webkit-details-marker { display: none; }
+  .panel summary::after { content: "–"; font-size: 1rem; }
+  .panel:not([open]) summary::after { content: "+"; }
+  .panel__cuerpo { display: grid; gap: 0.85rem; padding: 0 0.9rem 0.95rem; }
+  .panel label { display: grid; gap: 0.35rem; color: var(--bruma); }
+  .panel label > span { display: flex; justify-content: space-between; gap: 0.5rem; }
+  .panel output { font-family: var(--f-mono); color: var(--hueso); }
+  .panel input[type="range"] { width: 100%; accent-color: var(--acento); }
+
+  /* ---------- Piezas: video a pantalla casi completa con título gigante ---------- */
+  .pieza { isolation: isolate; display: flex; align-items: flex-end; }
+  .pieza:not([data-escena]) { position: relative; overflow: hidden; }
+  .portada { min-height: 92svh; border-bottom: 1px solid var(--linea); }
+
+  /* video, imagen del último cuadro y recorte comparten caja y encuadre: el empalme no se ve */
+  .pieza video, .pieza .final, .pieza .recorte { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 72% 50%; }
+  .pieza video { z-index: 0; background: var(--tinta-2); }
+  .pieza .final { z-index: 1; }
+  .pieza .recorte { z-index: 4; pointer-events: none; }
+  /* ocultas hasta que la pieza las muestre (evita el destello antes de que cargue el JS) */
+  .final, .recorte { opacity: 0; }
+
+  /* velo solo del lado del texto: el sujeto del lado derecho no queda oscurecido */
+  .velo { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: radial-gradient(75% 105% at 0% 100%, color-mix(in srgb, var(--tinta) 90%, transparent) 0%, color-mix(in srgb, var(--tinta) 55%, transparent) 45%, transparent 75%); }
+
+  .portada__texto { position: relative; z-index: 3; display: grid; justify-items: start; gap: 0.9rem; padding-block: 5.5rem 2.2rem; }
+  .gigante { font-size: clamp(3rem, 15vw, 10.5rem); line-height: 0.86; letter-spacing: -0.045em; }
+  .portada__nota { max-width: 30rem; padding: 0.6rem 0.85rem; border-radius: var(--r-chico); color: var(--bruma);
+    background: color-mix(in srgb, var(--tinta) 74%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .portada__nota b { color: var(--hueso); font-weight: 600; }
+  .fila { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
+  .estado { color: var(--bruma); }
+
+  /* Escenario con scroll: barra de progreso y tiempo */
+  .hud { display: flex; align-items: center; gap: 0.8rem; width: min(100%, 28rem); }
+  .hud__barra { flex: 1; height: 3px; border-radius: 3px; background: var(--linea-fuerte); overflow: hidden; }
+  .hud__barra i { display: block; height: 100%; background: var(--acento); transform-origin: 0 50%; transform: scaleX(0); }
+
+  .pie { padding: 2.5rem var(--margen) 6rem; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="cab"><a href="index.html">← Banco</a><span>Portada con video</span></header>
+
+<main>
+  <!-- A · una vez y congela -->
+  <section class="pieza portada" id="a" aria-label="Portada: una vez y congela">
+    <video muted playsinline preload="auto" poster="medios/muestra-poster.jpg" src="medios/muestra.mp4"></video>
+    <img class="final" src="medios/muestra-final.jpg" alt="" aria-hidden="true">
+    <div class="velo"></div>
+    <div class="portada__texto contenedor">
+      <p class="etiqueta">A · una vez y congela</p>
+      <h2 class="titulo-xl gigante">Sin corte</h2>
+      <p class="nota portada__nota"><b>Mirá el último cuadro.</b> Al terminar, el video se cambia por la imagen del cuadro final en el mismo instante, sin fundido. El sujeto recortado queda por encima del título (en la muestra se genera en la página; en un sitio real es un PNG con alfa).</p>
+      <div class="fila">
+        <button class="boton boton--fantasma" type="button" data-repetir>↻ Repetir</button>
+        <span class="etiqueta estado" data-estado>▶ reproduciendo</span>
+      </div>
+    </div>
+    <img class="recorte" alt="" aria-hidden="true">
+  </section>
+
+  <!-- B · bucle -->
+  <section class="pieza portada" id="b" aria-label="Portada: bucle">
+    <video muted playsinline preload="metadata" poster="medios/muestra-poster.jpg" src="medios/muestra.mp4"></video>
+    <div class="velo"></div>
+    <div class="portada__texto contenedor">
+      <p class="etiqueta">B · bucle</p>
+      <h2 class="titulo-xl gigante">En bucle</h2>
+      <p class="nota portada__nota"><b>Mirá el punto de unión.</b> Es el loop nativo: este clip no está hecho para repetirse, así que ahí se nota el salto. Se pausa solo al salir de pantalla.</p>
+      <div class="fila"><button class="boton boton--fantasma" type="button" data-repetir>↻ Repetir</button></div>
+    </div>
+  </section>
+
+  <!-- C · bumerán -->
+  <section class="pieza portada" id="c" aria-label="Portada: bumerán">
+    <video muted playsinline preload="metadata" poster="medios/muestra-poster.jpg" src="medios/muestra.mp4"></video>
+    <div class="velo"></div>
+    <div class="portada__texto contenedor">
+      <p class="etiqueta">C · bumerán</p>
+      <h2 class="titulo-xl gigante">Va y vuelve</h2>
+      <p class="nota portada__nota"><b>Mirá el giro.</b> Al llegar al final retrocede cuadro por cuadro y arranca de nuevo, sin corte. Funciona porque el clip es todo-intra; con uno normal se traba al retroceder.</p>
+      <div class="fila"><button class="boton boton--fantasma" type="button" data-repetir>↻ Repetir</button></div>
+    </div>
+  </section>
+
+  <!-- D · con scroll -->
+  <section data-escenario style="--largo: 300vh" id="d" aria-label="Video movido por el scroll">
+    <div data-escena class="pieza">
+      <video muted playsinline preload="auto" poster="medios/muestra-poster.jpg" src="medios/muestra.mp4"></video>
+      <div class="velo"></div>
+      <div class="portada__texto contenedor">
+        <p class="etiqueta">D · con el scroll</p>
+        <h2 class="titulo-xl gigante">Bajá y mirá</h2>
+        <div class="hud" aria-hidden="true">
+          <div class="hud__barra"><i id="d-barra"></i></div>
+          <span class="etiqueta estado" id="d-tiempo">0.00 s</span>
+        </div>
+        <p class="nota portada__nota"><b>Mirá que el cuadro te siga.</b> El scroll mueve la cabeza de reproducción: bajá despacio, frená, volvé. Si la imagen se traba o queda atrás, el clip no es todo-intra.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<p class="pie nota">Fin de la prueba · <a href="index.html" style="color: var(--acento-claro)">← Banco</a></p>
+
+<details class="panel" open>
+  <summary>Ajustes</summary>
+  <div class="panel__cuerpo">
+    <label><span>Suavizar scroll → video <output>0.12</output></span>
+      <input id="aj-suavizar" type="range" min="0" max="0.5" step="0.01" value="0.12"></label>
+  </div>
+</details>
+
+<script type="module">
+import { videoPortada, videoConScroll } from "../kit/video-portada.js";
+import { escenario } from "../kit/motor-scroll.js";
+
+const q = (s, raiz = document) => raiz.querySelector(s);
+if (matchMedia("(max-width: 700px)").matches) q(".panel").open = false;
+
+// Deslizador → valor + salida de texto
+function ligar(id, alCambiar) {
+  const el = document.getElementById(id);
+  const salida = el.closest("label").querySelector("output");
+  salida.textContent = el.value;
+  el.addEventListener("input", () => { salida.textContent = el.value; alCambiar(parseFloat(el.value)); });
+}
+
+// El recorte de muestra: se saca del propio último cuadro con una elipse sobre el cuerpo grande del
+// fractal. En un sitio real es un PNG con alfa hecho a mano; acá solo sirve para ver la capa.
+async function recorteDeMuestra(final) {
+  await final.decode().catch(() => {});
+  const c = document.createElement("canvas");
+  c.width = final.naturalWidth; c.height = final.naturalHeight;
+  const g = c.getContext("2d");
+  g.beginPath();
+  g.ellipse(c.width * 0.709, c.height * 0.583, c.width * 0.209, c.height * 0.42, 0, 0, Math.PI * 2);
+  g.clip();
+  g.drawImage(final, 0, 0);
+  const blob = await new Promise((ok) => c.toBlob(ok, "image/png"));
+  return URL.createObjectURL(blob);
+}
+
+// A · una vez y congela (con recorte encima del título)
+{
+  const sec = q("#a");
+  const final = q(".final", sec), recorte = q(".recorte", sec), estado = q("[data-estado]", sec);
+  try {
+    recorte.src = await recorteDeMuestra(final);
+    await recorte.decode().catch(() => {});
+  } catch { /* sin recorte: la pieza anda igual */ }
+  const pieza = videoPortada(q("video", sec), {
+    modo: "una-vez", final, recorte,
+    alTerminar: () => { estado.textContent = "■ congelado en el último cuadro"; },
+  });
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) estado.textContent = "■ movimiento reducido: final quieto";
+  q("[data-repetir]", sec).addEventListener("click", () => {
+    estado.textContent = "▶ reproduciendo";
+    pieza.reproducir();
+  });
+}
+
+// B · bucle y C · bumerán
+for (const [id, modo] of [["#b", "bucle"], ["#c", "bumeran"]]) {
+  const sec = q(id);
+  const pieza = videoPortada(q("video", sec), { modo });
+  q("[data-repetir]", sec).addEventListener("click", () => pieza.reproducir());
+}
+
+// D · el scroll mueve la cabeza de reproducción
+{
+  const sec = q("#d"), video = q("video", sec);
+  const pieza = videoConScroll(video, sec, { suavizar: 0.12 });
+  ligar("aj-suavizar", (v) => pieza.cambiar({ suavizar: v }));
+  const barra = q("#d-barra"), tiempo = q("#d-tiempo");
+  escenario(sec, (p) => {
+    barra.style.transform = `scaleX(${p.toFixed(4)})`;
+    tiempo.textContent = (p * (video.duration || 4)).toFixed(2) + " s";
+  }, { suavizar: 0 });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+/* texto-foco — estilos.
+
+   QUÉ ES: un texto cuyas palabras están desenfocadas hasta que un marco de cámara viaja hasta cada
+   una y la pone nítida. El marco se estira hacia la caja de la palabra y se cierra sobre ella.
+
+   EL TRUCO (en el JS): cada palabra se envuelve en un span y se MIDE su caja real; el marco es un
+   solo elemento cuyos cuatro bordes persiguen esa caja con inercia, y el borde que va adelante
+   corre más rápido que el de atrás: de ahí el estiramiento al viajar y el cierre al llegar.
+   Como se mide, anda con cualquier tipografía y tamaño, y se vuelve a medir al cambiar el ancho.
+   El desenfoque y la nitidez son una transición CSS que se prende con la clase .es-nitida.
+
+   El texto sigue siendo texto: una copia para lectores de pantalla (.solo-lectores) y las palabras
+   visibles con aria-hidden. Sin JS el texto se ve normal. Con "reducir movimiento" queda todo nítido.
+
+   USO EN HTML:
+     <link rel="stylesheet" href="kit/componentes/texto-foco/texto-foco.css">
+     <p class="titulo-l" data-texto-foco data-con="tiempo">Cada pantalla tiene una idea.</p>
+     <script type="module">
+       import { textosFoco } from "./kit/componentes/texto-foco/texto-foco.js";
+       textosFoco();                       // o textoFoco(elemento, { con: "scroll" })
+     </script>
+   Afinar el desenfoque: style="--tf-desenfoque: 6px" en el elemento. */
+
+.texto-foco { position: relative; }
+
+.texto-foco__palabra {
+  display: inline-block;
+  opacity: 0.5;
+  filter: blur(var(--tf-desenfoque, max(4px, 0.17em)));
+  transition:
+    filter var(--d-larga) var(--curva-salida),
+    opacity var(--d-larga) var(--curva-salida);
+}
+/* Al entrar en foco espera un instante: así se aclara cuando el marco ya casi llegó */
+.texto-foco__palabra.es-nitida {
+  opacity: 1;
+  filter: none;
+  transition-delay: 0.16s;
+}
+.texto-foco__palabra.es-foco {
+  text-shadow: 0 0 0.7em color-mix(in srgb, var(--acento) 38%, transparent);
+}
+
+/* ---------- Marco de cámara: cuatro esquinas dibujadas con degradés ---------- */
+.texto-foco__marco {
+  --tf-grosor: 2px;
+  --tf-brazo: 10px; /* largo de cada esquina; el JS lo ajusta al tamaño de la palabra */
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  color: var(--acento);
+  border-radius: 3px;
+  background:
+    linear-gradient(currentColor, currentColor) left top / var(--tf-brazo) var(--tf-grosor) no-repeat,
+    linear-gradient(currentColor, currentColor) left top / var(--tf-grosor) var(--tf-brazo) no-repeat,
+    linear-gradient(currentColor, currentColor) right top / var(--tf-brazo) var(--tf-grosor) no-repeat,
+    linear-gradient(currentColor, currentColor) right top / var(--tf-grosor) var(--tf-brazo) no-repeat,
+    linear-gradient(currentColor, currentColor) left bottom / var(--tf-brazo) var(--tf-grosor) no-repeat,
+    linear-gradient(currentColor, currentColor) left bottom / var(--tf-grosor) var(--tf-brazo) no-repeat,
+    linear-gradient(currentColor, currentColor) right bottom / var(--tf-brazo) var(--tf-grosor) no-repeat,
+    linear-gradient(currentColor, currentColor) right bottom / var(--tf-grosor) var(--tf-brazo) no-repeat,
+    color-mix(in srgb, var(--acento) 7%, transparent);
+  transition: opacity var(--d-media) var(--curva-salida);
+}
+.texto-foco__marco.se-ve { opacity: 1; }
+
+/* ---------- Estado final quieto ---------- */
+.texto-foco.es-estatico .texto-foco__palabra {
+  opacity: 1;
+  filter: none;
+  transition: none;
+  text-shadow: none;
+}
+.texto-foco.es-estatico .texto-foco__marco { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .texto-foco__palabra { opacity: 1; filter: none; transition: none; text-shadow: none; }
+  .texto-foco__marco { display: none; }
+}
