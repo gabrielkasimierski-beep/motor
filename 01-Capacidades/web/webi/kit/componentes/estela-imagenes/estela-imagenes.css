@@ -1,0 +1,69 @@
+/* estela-imagenes — estilos.
+
+   QUÉ ES: un envoltorio que va dejando figuritas (imágenes) sobre el recorrido del puntero.
+   Aparecen con un saltito, se quedan un momento y se desvanecen.
+
+   EL TRUCO (en el JS): las figuritas se espacian por DISTANCIA recorrida, no por tiempo. Cada
+   movimiento del puntero se trata como un tramo recto y se reparten figuritas a intervalos
+   exactos sobre él, así la estela sale pareja si movés el mouse despacio o lo tirás de un
+   costado al otro. Las figuritas se reciclan (un pozo fijo) y se animan con la Web Animations
+   API: no hay bucle por cuadro. La capa y las figuritas tienen pointer-events: none, así lo que
+   hay debajo (links, botones) sigue andando.
+
+   TÁCTIL (decidido a propósito): no hace nada. Sin puntero que pasee no hay recorrido que
+   dibujar, y una estela bajo el dedo taparía el contenido. El JS ignora los eventos táctiles
+   y la capa se oculta en dispositivos sin hover. Con "reducir movimiento" tampoco aparece nada.
+
+   USO EN HTML:
+     <link rel="stylesheet" href="kit/componentes/estela-imagenes/estela-imagenes.css">
+     <section class="estela-imagenes" data-estela
+              data-imagenes="medios/a.webp medios/b.webp medios/c.webp">
+       …lo que quieras adentro: títulos, botones, links…
+     </section>
+     <script type="module">
+       import { estelaImagenes } from "./kit/componentes/estela-imagenes/estela-imagenes.js";
+       estelaImagenes(document.querySelector("[data-estela]"), { distancia: 90 });
+     </script> */
+
+.estela-imagenes {
+  position: relative;
+  isolation: isolate;
+  --estela-sombra: color-mix(in srgb, var(--tinta) 80%, transparent);
+}
+[data-tema="claro"] .estela-imagenes { --estela-sombra: color-mix(in srgb, var(--hueso) 35%, transparent); }
+
+/* La capa recorta lo que se sale del envoltorio y deja pasar todo el puntero */
+.estela-imagenes__capa {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* Opción: las figuritas por detrás del contenido */
+.estela-imagenes--detras > .estela-imagenes__capa { z-index: -1; }
+
+.estela-imagenes__figura {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--estela-tamano, 11rem);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--r-chico);
+  border: 1px solid var(--linea-fuerte);
+  box-shadow: 0 14px 34px -12px var(--estela-sombra);
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform, opacity;
+}
+
+/* Sin hover (táctil) no se dibuja nada */
+@media (hover: none) {
+  .estela-imagenes__capa { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .estela-imagenes__capa { display: none; }
+}

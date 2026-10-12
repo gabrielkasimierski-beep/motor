@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantalla de app — panel de una casa de comidas</title>
+<meta name="description" content="Banco de pruebas del Motor webi: gráficos en SVG (graficos.js) y maqueta de pantalla (pantalla.css) con el panel de un comercio de comidas.">
+<script>try{if(localStorage.getItem("webi-tema")==="claro")document.documentElement.dataset.tema="claro"}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<link rel="stylesheet" href="../kit/pantalla.css">
+</head>
+<body>
+
+<div class="app" id="app" data-vista="datos">
+
+  <!-- Riel lateral (en móvil pasa a barra inferior) -->
+  <nav class="app-riel" aria-label="Secciones del panel">
+    <span class="app-marca" aria-hidden="true">N</span>
+    <ul class="app-nav">
+      <li><a class="app-enlace" href="#inicio" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+        <span>Inicio</span></a></li>
+      <li><a class="app-enlace" href="#pedidos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>
+        <span>Pedidos</span></a></li>
+      <li><a class="app-enlace" href="#productos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg>
+        <span>Productos</span></a></li>
+      <li><a class="app-enlace" href="#clientes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.4 0 4 1.5 4 4.3"/></svg>
+        <span>Clientes</span></a></li>
+      <li><a class="app-enlace" href="#ajustes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
+        <span>Ajustes</span></a></li>
+    </ul>
+    <div class="app-riel-pie">
+      <a class="app-enlace" href="index.html" aria-label="Volver al Banco"><span class="app-glifo" aria-hidden="true">←</span><span>Banco</span></a>
+    </div>
+  </nav>
+
+  <main class="app-principal" id="inicio">
+
+    <!-- Cabecera -->
+    <header class="app-cabecera">
+      <div class="app-saludo">
+        <h1 id="saludo">Buen día, Nora</h1>
+        <p id="fecha">Rotisería Nora</p>
+      </div>
+      <div class="app-herramientas">
+        <div class="app-periodo" role="group" aria-label="Período">
+          <button class="pastilla" type="button" data-periodo="hoy" aria-pressed="true">Hoy</button>
+          <button class="pastilla" type="button" data-periodo="7d" aria-pressed="false">7 días</button>
+          <button class="pastilla" type="button" data-periodo="30d" aria-pressed="false">30 días</button>
+        </div>
+        <button class="app-interruptor" id="tema" type="button" role="switch" aria-checked="false" aria-label="Tema claro">
+          <span class="app-interruptor-bola" aria-hidden="true">
+            <svg class="app-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+            <svg class="app-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          </span>
+        </button>
+      </div>
+      <form class="app-busqueda" role="search" id="form-busqueda">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></svg>
+        <label class="solo-lectores" for="buscar">Buscar un pedido, un cliente o un plato</label>
+        <input id="buscar" type="search" placeholder="Buscar pedido, cliente o plato" autocomplete="off" spellcheck="false">
+        <kbd aria-hidden="true">/</kbd>
+      </form>
+    </header>
+
+    <!-- Para mostrar los tres estados de la pantalla -->
+    <div class="app-demo" role="group" aria-label="Estado de la pantalla">
+      <span class="app-demo-titulo">Demostración</span>
+      <button class="pastilla" type="button" data-vista="datos" aria-pressed="true">Ver con datos</button>
+      <button class="pastilla" type="button" data-vista="vacio" aria-pressed="false">Ver vacío</button>
+      <button class="pastilla" type="button" data-vista="cargando" aria-pressed="false">Ver cargando</button>
+    </div>
+
+    <p class="solo-lectores" id="anuncio" role="status"></p>
+
+    <div class="app-grilla">
+
+      <!-- Métricas -->
+      <article class="app-mosaico app-mosaico--metrica tarjeta" data-mosaico="metrica-ventas" data-vacio="metrica" data-esqueleto="metrica" aria-labelledby="m-ventas">
+        <h2 class="app-etiqueta" id="m-ventas">Ventas</h2>
+        <div class="app-datos">
+          <p class="app-metrica-valor" data-valor>—</p>
+          <div class="app-metrica-fila"><span class="app-variacion" data-variacion></span><span class="app-metrica-nota" data-nota></span></div>
+          <div class="app-metrica-chispa" data-chispa></div>
+        </div>
+      </article>
+      <article class="app-mosaico app-mosaico--metrica tarjeta" data-mosaico="metrica-pedidos" data-vacio="metrica" data-esqueleto="metrica" aria-labelledby="m-pedidos">
+        <h2 class="app-etiqueta" id="m-pedidos">Pedidos</h2>
+        <div class="app-datos">
+          <p class="app-metrica-valor" data-valor>—</p>
+          <div class="app-metrica-fila"><span class="app-variacion" data-variacion></span><span class="app-metrica-nota" data-nota></span></div>
+          <div class="app-metrica-chispa" data-chispa></div>
+        </div>
+      </article>
+      <article class="app-mosaico app-mosaico--metrica tarjeta" data-mosaico="metrica-ticket" data-vacio="metrica" data-esqueleto="metrica" aria-labelledby="m-ticket">
+        <h2 class="app-etiqueta" id="m-ticket">Ticket promedio</h2>
+        <div class="app-datos">
+          <p class="app-metrica-valor" data-valor>—</p>
+          <div class="app-metrica-fila"><span class="app-variacion" data-variacion></span><span class="app-metrica-nota" data-nota></span></div>
+          <div class="app-metrica-chispa" data-chispa></div>
+        </div>
+      </article>
+      <article class="app-mosaico app-mosaico--metrica tarjeta" data-mosaico="metrica-volvieron" data-vacio="metrica" data-esqueleto="metrica" aria-labelledby="m-volvieron">
+        <h2 class="app-etiqueta" id="m-volvieron">Clientes que volvieron</h2>
+        <div class="app-datos">
+          <p class="app-metrica-valor" data-valor>—</p>
+          <div class="app-metrica-fila"><span class="app-variacion" data-variacion></span><span class="app-metrica-nota" data-nota></span></div>
+          <div class="app-metrica-chispa" data-chispa></div>
+        </div>
+      </article>
+
+      <!-- Gráfico principal -->
+      <section class="app-mosaico app-mosaico--ancho tarjeta" data-mosaico="grafico" data-esqueleto="barras" aria-labelledby="t-grafico">
+        <header class="app-mosaico-cab">
+          <div>
+            <h2 class="app-mosaico-titulo" id="t-grafico">Ventas y pedidos</h2>
+            <p class="app-mosaico-sub" data-sub>Por hora · hoy</p>
+          </div>
+        </header>
+        <div class="app-datos">
+          <ul class="app-leyenda">
+            <li><i style="--c:var(--acento)"></i>Ventas en pesos (eje izquierdo)</li>
+            <li><i style="--c:var(--tenue)"></i>Pedidos (eje derecho)</li>
+          </ul>
+          <div class="app-grafico" data-grafico="ventas"></div>
+        </div>
+      </section>
+
+      <!-- Canales -->
+      <section class="app-mosaico app-mosaico--medio tarjeta" data-mosaico="canales" data-esqueleto="dona" aria-labelledby="t-canales">
+        <header class="app-mosaico-cab">
+          <div>
+            <h2 class="app-mosaico-titulo" id="t-canales">Canales</h2>
+            <p class="app-mosaico-sub">Por dónde entraron los pedidos</p>
+          </div>
+        </header>
+        <div class="app-datos">
+          <div class="app-centrado">
+            <div class="app-grafico" data-grafico="canales"></div>
+            <ul class="app-canales" data-canales></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dial -->
+      <section class="app-mosaico app-mosaico--medio tarjeta" data-mosaico="dial" data-esqueleto="dial" aria-labelledby="t-dial">
+        <header class="app-mosaico-cab">
+          <div>
+            <h2 class="app-mosaico-titulo" id="t-dial">Entregados a tiempo</h2>
+            <p class="app-mosaico-sub">Dentro de la hora prometida</p>
+          </div>
+        </header>
+        <div class="app-datos">
+          <div class="app-centrado">
+            <div class="app-grafico" data-grafico="dial"></div>
+            <p class="app-dial-nota" data-dial-nota></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Últimos pedidos -->
+      <section class="app-mosaico app-mosaico--tabla tarjeta" data-mosaico="tabla" data-esqueleto="tabla" aria-labelledby="t-tabla" id="pedidos">
+        <header class="app-mosaico-cab">
+          <div>
+            <h2 class="app-mosaico-titulo" id="t-tabla">Últimos pedidos</h2>
+            <p class="app-mosaico-sub">Los más nuevos primero</p>
+          </div>
+        </header>
+        <div class="app-datos">
+          <div class="app-filtros" role="group" aria-label="Filtrar por estado" data-filtros></div>
+          <div class="app-tabla-marco" role="region" aria-label="Tabla de últimos pedidos" tabindex="0">
+            <table class="app-tabla" role="table">
+              <caption class="solo-lectores">Últimos pedidos, con cliente, detalle, canal, importe y estado</caption>
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th scope="col" role="columnheader">Pedido</th>
+                  <th scope="col" role="columnheader">Cliente</th>
+                  <th scope="col" role="columnheader">Detalle</th>
+                  <th scope="col" role="columnheader">Canal</th>
+                  <th scope="col" role="columnheader" class="app-num">Importe</th>
+                  <th scope="col" role="columnheader">Estado</th>
+                </tr>
+              </thead>
+              <tbody role="rowgroup" data-filas></tbody>
+            </table>
+          </div>
+          <div class="app-vacio app-vacio--chico" data-sin-resultados>
+            <p class="app-vacio-titulo">No hay pedidos con ese filtro</p>
+            <p class="app-vacio-texto">Probá con otro estado o borrá la búsqueda.</p>
+          </div>
+          <p class="app-resumen" data-resumen></p>
+        </div>
+      </section>
+
+      <!-- Horas pico -->
+      <section class="app-mosaico app-mosaico--franja tarjeta" data-mosaico="matriz" data-esqueleto="matriz" aria-labelledby="t-matriz">
+        <header class="app-mosaico-cab">
+          <div>
+            <h2 class="app-mosaico-titulo" id="t-matriz">Horas pico</h2>
+            <p class="app-mosaico-sub">Pedidos por hora en promedio, según el día</p>
+          </div>
+        </header>
+        <div class="app-datos">
+          <div class="app-grafico" data-grafico="matriz"></div>
+          <span class="app-escala" aria-hidden="true">Menos
+            <i style="--o:.12"></i><i style="--o:.35"></i><i style="--o:.6"></i><i style="--o:.8"></i><i style="--o:1"></i>
+            Más</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script type="module">
+import { barras, chispa, dona, dial, matriz, formatos } from "../kit/graficos.js";
+
+/* ===== DATOS (ficticios) Y CÁLCULO: nada de esto toca el DOM ===== */
+
+const suma = (a) => a.reduce((s, v) => s + v, 0);
+const plural = (n, uno, varios) => `${formatos.numero(n)} ${n === 1 ? uno : varios}`;
+const pedidosTxt = (n) => plural(n, "pedido", "pedidos");
+
+const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+const HORAS = ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"];
+
+const PERIODOS = {
+  hoy: {
+    nombre: "Hoy", sub: "Por hora · hoy", contra: "ayer", unidad: "hora",
+    etiquetas: HORAS,
+    ventas: [38500, 126400, 214900, 142300, 51800, 22100, 18600, 47300, 118700, 203500, 176900, 64200],
+    pedidos: [3, 8, 14, 9, 3, 1, 1, 3, 7, 12, 11, 4],
+    volvieron: [1, 2, 4, 3, 1, 0, 0, 1, 3, 5, 4, 3],
+    anterior: { ventas: 1103800, pedidos: 71, volvieron: 22 },
+    canales: [41, 29, 6],
+    aTiempo: [69, 76],
+  },
+  "7d": {
+    nombre: "Últimos 7 días", sub: "Por día · últimos 7 días", contra: "los 7 días previos", unidad: "día",
+    etiquetas: DIAS,
+    ventas: [842300, 796500, 903200, 1018700, 1612400, 1934800, 1225200],
+    pedidos: [51, 48, 56, 63, 97, 118, 76],
+    volvieron: [14, 13, 16, 17, 23, 29, 19],
+    anterior: { ventas: 7912400, pedidos: 521, volvieron: 128 },
+    canales: [281, 188, 40],
+    aTiempo: [473, 509],
+  },
+  "30d": {
+    nombre: "Últimos 30 días", sub: "Cada 3 días · últimos 30 días", contra: "los 30 días previos", unidad: "tramo",
+    etiquetas: ["1–3", "4–6", "7–9", "10–12", "13–15", "16–18", "19–21", "22–24", "25–27", "28–30"],
+    ventas: [3182400, 3540900, 3318700, 3901500, 3646200, 3287800, 4012300, 3755600, 3498100, 4126700],
+    pedidos: [196, 218, 203, 241, 224, 201, 247, 231, 214, 253],
+    volvieron: [49, 57, 51, 58, 56, 52, 60, 55, 47, 53],
+    anterior: { ventas: 33846500, pedidos: 2141, volvieron: 561 },
+    canales: [1236, 842, 150],
+    aTiempo: [2094, 2228],
+  },
+};
+
+const CANALES = [
+  { nombre: "WhatsApp", color: "--acento" },
+  { nombre: "Mostrador", color: "--bruma" },
+  { nombre: "Web", color: "--tenue" },
+];
+
+const METRICAS = [
+  { id: "ventas", etiqueta: "Ventas", formato: formatos.pesos,
+    valor: (p) => suma(p.ventas), previo: (p) => p.anterior.ventas, serie: (p) => p.ventas },
+  { id: "pedidos", etiqueta: "Pedidos", formato: formatos.numero,
+    valor: (p) => suma(p.pedidos), previo: (p) => p.anterior.pedidos, serie: (p) => p.pedidos },
+  { id: "ticket", etiqueta: "Ticket promedio", formato: formatos.pesos,
+    valor: (p) => suma(p.ventas) / suma(p.pedidos), previo: (p) => p.anterior.ventas / p.anterior.pedidos,
+    serie: (p) => p.ventas.map((v, i) => v / p.pedidos[i]) },
+  { id: "volvieron", etiqueta: "Clientes que volvieron", formato: formatos.numero,
+    valor: (p) => suma(p.volvieron), previo: (p) => p.anterior.volvieron, serie: (p) => p.volvieron },
+];
+
+// Promedio de pedidos por hora, según el día de la semana (las filas suman los pedidos de cada día)
+const HORAS_PICO = [
+  [1, 6, 9, 6, 2, 1, 1, 2, 5, 8, 7, 3],
+  [3, 5, 9, 6, 2, 1, 0, 2, 4, 7, 6, 3],
+  [4, 6, 10, 7, 2, 1, 1, 2, 5, 8, 7, 3],
+  [3, 6, 10, 7, 3, 1, 1, 3, 6, 10, 9, 4],
+  [4, 9, 13, 10, 4, 2, 2, 5, 10, 16, 14, 8],
+  [5, 11, 17, 12, 4, 2, 3, 8, 13, 19, 17, 7],
+  [5, 10, 16, 10, 3, 1, 1, 3, 6, 10, 8, 3],
+];
+
+const PEDIDOS = [
+  { n: 2087, cliente: "Marcela Iribarne", detalle: "Docena de empanadas de carne + 2 gaseosas", canal: 0, importe: 21800, estado: "preparacion" },
+  { n: 2086, cliente: "Joaquín Peralta", detalle: "Milanesa napolitana con fritas (x2)", canal: 1, importe: 29600, estado: "listo" },
+  { n: 2085, cliente: "Lucía Benítez", detalle: "Tarta de jamón y queso + ensalada", canal: 0, importe: 12400, estado: "preparacion" },
+  { n: 2084, cliente: "Federico Salgado", detalle: "Pollo al spiedo con papas", canal: 2, importe: 18900, estado: "listo" },
+  { n: 2083, cliente: "Ana Carolina Vidal", detalle: "Canasta de 24 sándwiches de miga", canal: 0, importe: 38500, estado: "entregado" },
+  { n: 2082, cliente: "Gustavo Ledesma", detalle: "Ravioles de ricota con tuco", canal: 1, importe: 11200, estado: "entregado" },
+  { n: 2081, cliente: "Romina Acosta", detalle: "Media docena de empanadas + flan casero", canal: 0, importe: 14300, estado: "cancelado" },
+  { n: 2080, cliente: "Tomás Villalba", detalle: "Lasaña de carne (porción grande)", canal: 1, importe: 13700, estado: "entregado" },
+  { n: 2079, cliente: "Paula Domínguez", detalle: "Combo familiar: 2 pollos + papas", canal: 0, importe: 46900, estado: "entregado" },
+  { n: 2078, cliente: "Nicolás Rojas", detalle: "Tortilla de papas y 3 empanadas", canal: 2, importe: 15600, estado: "entregado" },
+  { n: 2077, cliente: "Silvana Cabrera", detalle: "Pastelitos de membrillo x12", canal: 0, importe: 9800, estado: "entregado" },
+  { n: 2076, cliente: "Martín Gauna", detalle: "Milanesa de pollo al plato", canal: 1, importe: 10900, estado: "entregado" },
+];
+const ESTADOS = { preparacion: "En preparación", listo: "Listo", entregado: "Entregado", cancelado: "Cancelado" };
+
+function variacion(actual, anterior) {
+  const pct = ((actual - anterior) / anterior) * 100;
+  return { pct, sentido: pct >= 0 ? "sube" : "baja" };
+}
+// Con signo (y el menos tipográfico), para no depender solo del color
+const fmtPct = (n) => `${n >= 0 ? "+" : "−"}${Math.abs(n).toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+const sinTildes = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+function filtrarPedidos(lista, estado, texto) {
+  const q = sinTildes(texto.trim());
+  return lista.filter((p) =>
+    (estado === "todos" || p.estado === estado) &&
+    (!q || sinTildes(`${p.n} ${p.cliente} ${p.detalle} ${CANALES[p.canal].nombre} ${ESTADOS[p.estado]}`).includes(q)));
+}
+
+/* ===== FIN DE DATOS Y CÁLCULO ===== */
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const app = $("#app");
+const estado = { periodo: "hoy", vista: "datos", filtro: "todos", texto: "" };
+
+const icono = (trazos, tam = "") =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"${tam}>${trazos}</svg>`;
+const FLECHA = {
+  sube: icono('<path d="M12 19V5M5 12l7-7 7 7"/>'),
+  baja: icono('<path d="M12 5v14M5 12l7 7 7-7"/>'),
+};
+const ICONO_ESTADO = {
+  preparacion: icono('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
+  listo: icono('<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>'),
+  entregado: icono('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
+  cancelado: icono('<path d="m6 6 12 12M18 6 6 18"/>'),
+};
+const ICONO_VACIO = icono('<path d="M3 13l3-8h12l3 8"/><path d="M3 13v6h18v-6h-5l-1.5 2h-5L8 13z"/>');
+
+/* ---------- estados vacío y cargando: se arman una vez por mosaico ---------- */
+const VACIOS = {
+  metrica: ["Sin datos", "Todavía no hay movimiento."],
+  grafico: ["Todavía no hay ventas en este período", "Cuando entre el primer pedido, el gráfico se arma solo."],
+  canales: ["Sin pedidos para repartir", "Acá vas a ver si te escriben por WhatsApp, vienen al mostrador o piden por la web."],
+  dial: ["Sin entregas todavía", "Se calcula cuando salga el primer pedido."],
+  tabla: ["Todavía no hay pedidos", "Los pedidos nuevos aparecen acá apenas entran."],
+  matriz: ["Sin horas pico todavía", "Con unos días de pedidos se marca cuándo se llena el local."],
+};
+const linea = (w, h = "0.8rem") => `<span class="app-esqueleto" style="--w:${w};--h:${h}"></span>`;
+const ESQUELETOS = {
+  metrica: () => linea("55%", "2rem") + linea("35%") + linea("100%", "2.4rem"),
+  barras: () => linea("40%") + `<div class="app-esqueleto-barras">${[40, 62, 85, 58, 30, 22, 44, 74, 92, 66, 38, 26].map((h) => `<span class="app-esqueleto" style="--h:${h}%"></span>`).join("")}</div>`,
+  dona: () => `<span class="app-esqueleto app-esqueleto--circulo" style="--w:10rem"></span>` + linea("80%") + linea("70%") + linea("60%"),
+  dial: () => `<span class="app-esqueleto app-esqueleto--circulo" style="--w:9rem"></span>` + linea("70%"),
+  tabla: () => linea("60%", "2rem") + [1, 2, 3, 4, 5].map(() => linea("100%", "2.6rem")).join(""),
+  matriz: () => `<div class="app-esqueleto-puntos"></div>`,
+};
+$$("[data-mosaico]").forEach((m) => {
+  const [titulo, texto] = VACIOS[m.dataset.vacio ?? m.dataset.mosaico];
+  const chico = m.dataset.vacio === "metrica" ? " app-vacio--chico" : "";
+  m.insertAdjacentHTML("beforeend",
+    `<div class="app-vacio${chico}"><span class="app-vacio-icono">${ICONO_VACIO}</span><p class="app-vacio-titulo">${titulo}</p><p class="app-vacio-texto">${texto}</p></div>` +
+    `<div class="app-cargando" aria-hidden="true">${ESQUELETOS[m.dataset.esqueleto]()}</div>`);
+});
+
+/* ---------- gráficos montados (se limpian al rehacer la pantalla) ---------- */
+let vivos = [];
+const montar = (el, svg) => { el.replaceChildren(svg); vivos.push(svg); };
+const limpiar = () => { vivos.forEach((s) => s.destruir?.()); vivos = []; };
+const anunciar = (t) => { $("#anuncio").textContent = t; };
+
+function pintarMetricas(p) {
+  for (const m of METRICAS) {
+    const el = $(`[data-mosaico="metrica-${m.id}"]`);
+    const actual = m.valor(p), v = variacion(actual, m.previo(p));
+    const serie = m.serie(p);
+    $("[data-valor]", el).textContent = m.formato(actual);
+    const chip = $("[data-variacion]", el);
+    chip.dataset.sentido = v.sentido;
+    chip.innerHTML = `${FLECHA[v.sentido]}<span>${fmtPct(v.pct)}</span><span class="solo-lectores">, ${v.sentido === "sube" ? "subió" : "bajó"}</span>`;
+    $("[data-nota]", el).textContent = `vs ${p.contra}`;
+    montar($("[data-chispa]", el), chispa(serie, {
+      alto: 44, formato: m.formato, color: v.sentido === "sube" ? "--acento" : "--bruma",
+      etiqueta: `Evolución de ${m.etiqueta.toLowerCase()} (${p.nombre.toLowerCase()}): de ${m.formato(serie[0])} a ${m.formato(serie[serie.length - 1])}.`,
+    }));
+  }
+}
+
+function pintarGrafico(p) {
+  $("[data-sub]", $('[data-mosaico="grafico"]')).textContent = p.sub;
+  const mejor = p.ventas.indexOf(Math.max(...p.ventas));
+  montar($('[data-grafico="ventas"]'), barras(
+    p.etiquetas.map((e, i) => ({ etiqueta: e, valor: p.ventas[i], valor2: p.pedidos[i] })),
+    {
+      alto: 260, nombres: ["Ventas", "Pedidos"], escalaDoble: true, entero: true,
+      formato: formatos.pesos, formato2: pedidosTxt,
+      etiqueta: `Barras de ventas en pesos y de pedidos, ${p.nombre.toLowerCase()}. Total ${formatos.pesos(suma(p.ventas))} en ${pedidosTxt(suma(p.pedidos))}. La mejor ${p.unidad} fue ${p.etiquetas[mejor]}, con ${formatos.pesos(p.ventas[mejor])}.`,
+    }));
+}
+
+function pintarCanales(p) {
+  const total = suma(p.canales);
+  const datos = CANALES.map((c, i) => ({ etiqueta: c.nombre, valor: p.canales[i], color: c.color }));
+  montar($('[data-grafico="canales"]'), dona(datos, {
+    alto: 190, formato: pedidosTxt, centro: { valor: formatos.numero(total), etiqueta: "pedidos" },
+    etiqueta: `Canales de ${p.nombre.toLowerCase()}: ${datos.map((d) => `${d.etiqueta} ${Math.round((d.valor / total) * 100)}%`).join(", ")}.`,
+  }));
+  $("[data-canales]").innerHTML = datos.map((d) =>
+    `<li><i style="--c:var(${d.color})"></i><span>${d.etiqueta}</span><b>${formatos.numero(d.valor)}</b><em>${Math.round((d.valor / total) * 100)}%</em></li>`).join("");
+}
+
+function pintarDial(p) {
+  const [enHora, total] = p.aTiempo, pct = Math.round((enHora / total) * 100);
+  montar($('[data-grafico="dial"]'), dial(pct, {
+    alto: 170, etiquetaCentro: "a tiempo",
+    etiqueta: `Pedidos entregados a tiempo, ${p.nombre.toLowerCase()}: ${pct}%, ${enHora} de ${total}.`,
+  }));
+  $("[data-dial-nota]").textContent = `${formatos.numero(enHora)} de ${formatos.numero(total)} pedidos salieron dentro de la hora prometida.`;
+}
+
+function pintarMatriz() {
+  montar($('[data-grafico="matriz"]'), matriz(HORAS_PICO, {
+    filas: DIAS, columnas: HORAS, formato: pedidosTxt,
+    etiqueta: "Horas pico: pedidos por hora en promedio según el día de la semana. Los picos son el almuerzo, cerca de las 13, y la cena, cerca de las 20; los sábados y domingos son los días más cargados.",
+  }));
+}
+
+/* ---------- tabla ---------- */
+function pintarTabla() {
+  const lista = filtrarPedidos(PEDIDOS, estado.filtro, estado.texto);
+  // contadores: respetan la búsqueda, no el filtro de estado
+  const porTexto = filtrarPedidos(PEDIDOS, "todos", estado.texto);
+  $("[data-filtros]").innerHTML = ["todos", ...Object.keys(ESTADOS)].map((k) => {
+    const cant = k === "todos" ? porTexto.length : porTexto.filter((p) => p.estado === k).length;
+    return `<button class="pastilla" type="button" data-estado="${k}" aria-pressed="${estado.filtro === k}">${k === "todos" ? "Todos" : ESTADOS[k]} <b>${cant}</b></button>`;
+  }).join("");
+  $("[data-filas]").innerHTML = lista.map((p) => {
+    const c = CANALES[p.canal];
+    return `<tr role="row">
+      <th scope="row" role="rowheader" class="app-c-num">#${p.n}</th>
+      <td role="cell" class="app-c-cliente app-cliente">${p.cliente}</td>
+      <td role="cell" class="app-c-detalle app-detalle" title="${p.detalle}">${p.detalle}</td>
+      <td role="cell" class="app-c-canal"><span class="app-canal" style="--c:var(${c.color})">${c.nombre}</span></td>
+      <td role="cell" class="app-c-importe app-num">${formatos.pesos(p.importe)}</td>
+      <td role="cell" class="app-c-estado"><span class="app-estado" data-estado="${p.estado}">${ICONO_ESTADO[p.estado]}${ESTADOS[p.estado]}</span></td>
+    </tr>`;
+  }).join("");
+  $(".app-tabla-marco").hidden = !lista.length;
+  $("[data-sin-resultados]").classList.toggle("app-vacio--visible", !lista.length);
+  $("[data-resumen]").textContent = `Mostrando ${lista.length} de ${PEDIDOS.length} pedidos`;
+}
+
+/* ---------- pantalla completa ---------- */
+function pintar() {
+  limpiar();
+  pintarTabla();
+  if (estado.vista !== "datos") return;
+  const p = PERIODOS[estado.periodo];
+  pintarMetricas(p);
+  pintarGrafico(p);
+  pintarCanales(p);
+  pintarDial(p);
+  pintarMatriz();
+}
+
+/* ---------- controles ---------- */
+$$("[data-periodo]").forEach((b) => b.addEventListener("click", () => {
+  estado.periodo = b.dataset.periodo;
+  $$("[data-periodo]").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+  pintar();
+  anunciar(`Mostrando ${PERIODOS[estado.periodo].nombre.toLowerCase()}`);
+}));
+
+$$(".app-demo [data-vista]").forEach((b) => b.addEventListener("click", () => {
+  estado.vista = b.dataset.vista;
+  app.dataset.vista = estado.vista;
+  app.setAttribute("aria-busy", String(estado.vista === "cargando"));
+  $$(".app-demo [data-vista]").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+  pintar();
+  anunciar({ datos: "Mostrando los datos", vacio: "Mostrando la pantalla vacía", cargando: "Cargando datos" }[estado.vista]);
+}));
+
+$("[data-filtros]").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-estado]");
+  if (!b) return;
+  estado.filtro = b.dataset.estado;
+  pintarTabla();
+  $(`[data-filtros] [data-estado="${estado.filtro}"]`)?.focus(); // el listado se rehace: el foco vuelve a la pastilla
+  anunciar($("[data-resumen]").textContent);
+});
+
+const buscador = $("#buscar");
+buscador.addEventListener("input", () => { estado.texto = buscador.value; pintarTabla(); });
+$("#form-busqueda").addEventListener("submit", (e) => e.preventDefault());
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) { e.preventDefault(); buscador.focus(); }
+});
+
+/* tema claro / oscuro: solo cambia data-tema; los gráficos leen las variables y se recolorean solos */
+const interruptor = $("#tema");
+const raiz = document.documentElement;
+const marcarTema = () => interruptor.setAttribute("aria-checked", String(raiz.dataset.tema === "claro"));
+interruptor.addEventListener("click", () => {
+  if (raiz.dataset.tema === "claro") delete raiz.dataset.tema; else raiz.dataset.tema = "claro";
+  marcarTema();
+  try { localStorage.setItem("webi-tema", raiz.dataset.tema === "claro" ? "claro" : "oscuro"); } catch { /* sin almacenamiento: no pasa nada */ }
+});
+marcarTema();
+
+/* saludo y fecha */
+{
+  const ahora = new Date(), h = ahora.getHours();
+  $("#saludo").textContent = `${h < 12 ? "Buen día" : h < 20 ? "Buenas tardes" : "Buenas noches"}, Nora`;
+  const dia = new Intl.DateTimeFormat("es-AR", { weekday: "long", day: "numeric", month: "long" }).format(ahora).replace(",", "");
+  $("#fecha").textContent = `${dia.charAt(0).toUpperCase()}${dia.slice(1)} · Rotisería Nora`;
+}
+
+pintar();
+</script>
+</body>
+</html>

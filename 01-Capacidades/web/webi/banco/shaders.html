@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fondos shader — Banco del Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<style>
+  :root { --alto-cab: 3rem; }
+
+  /* ---------- Cabecera fija ---------- */
+  .cab {
+    position: fixed; inset: 0 0 auto 0; z-index: 30; height: var(--alto-cab);
+    display: flex; align-items: center; gap: 1rem; padding-inline: var(--margen);
+    background: color-mix(in srgb, var(--tinta) 55%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--linea);
+  }
+  .cab a { font-size: var(--t-nota); font-weight: 500; color: var(--bruma); transition: color var(--d-corta); }
+  .cab a:hover { color: var(--hueso); }
+  .cab span { font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--tenue); }
+
+  /* ---------- Canvas de fondo: entra con un fundido cuando dibujó su primer cuadro ---------- */
+  .fondo {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; transition: opacity var(--d-larga) var(--curva-salida);
+  }
+  .fondo.esta-lista { opacity: 1; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative; isolation: isolate; overflow: hidden;
+    min-height: 100vh; min-height: 100svh;
+    display: flex; flex-direction: column; background: var(--tinta);
+  }
+  .hero__capa { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+  /* Velo suave detrás del texto + degradé hacia --tinta en el borde inferior */
+  .hero__velo {
+    background:
+      radial-gradient(ellipse 75% 55% at 30% 44%, color-mix(in srgb, var(--tinta) 74%, transparent) 0%, color-mix(in srgb, var(--tinta) 34%, transparent) 55%, transparent 82%),
+      linear-gradient(to bottom, transparent 52%, var(--tinta) 100%);
+  }
+  .hero > .contenedor { position: relative; z-index: 2; }
+  .hero__texto {
+    flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 1.25rem;
+    padding-top: calc(var(--alto-cab) + 2.5rem); padding-bottom: 2rem;
+  }
+  .hero__texto .titulo-xl { max-width: 11em; }
+  .hero__acciones { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }
+
+  /* ---------- Mando (controles) ---------- */
+  .mando-caja { padding-bottom: 1.25rem; }
+  .mando {
+    background: color-mix(in srgb, var(--tinta-2) 78%, transparent);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  }
+  .mando > summary {
+    list-style: none; cursor: pointer; display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.85rem 1rem; user-select: none;
+  }
+  .mando > summary::-webkit-details-marker { display: none; }
+  .mando > summary .resumen { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mando > summary .mas { font: 500 1.1rem/1 var(--f-mono); color: var(--bruma); transition: transform var(--d-corta) var(--curva-salida); }
+  .mando[open] > summary .mas { transform: rotate(45deg); }
+  .mando__cuerpo { display: grid; gap: 1rem; padding: 0 1rem 1rem; }
+  .grupo { display: grid; gap: 0.45rem; min-width: 0; }
+  .grupo > .etiqueta { color: var(--tenue); }
+
+  .fila { display: flex; gap: 0.4rem; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .fila::-webkit-scrollbar { display: none; }
+  .fila .pastilla { cursor: pointer; flex: none; }
+  .muestra { width: 1.6rem; height: 0.7rem; border-radius: var(--r-pastilla); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hueso) 22%, transparent); }
+
+  .deslizadores { display: grid; gap: 0.8rem 1.5rem; grid-template-columns: 1fr; }
+  .ctl { display: grid; gap: 0.35rem; min-width: 0; }
+  .ctl__cab { display: flex; justify-content: space-between; align-items: baseline; }
+  .ctl .etiqueta { color: var(--bruma); }
+  .ctl output { font: 500 var(--t-nota)/1 var(--f-mono); color: var(--hueso); }
+  .ctl input[type="range"] { width: 100%; margin: 0; height: 1.4rem; accent-color: var(--acento); cursor: pointer; }
+
+  .acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+  .acciones .boton { padding: 0.65rem 1.1rem; font-size: var(--t-nota); }
+  .acciones .boton[disabled] { opacity: 0.5; pointer-events: none; }
+  #estado { min-height: 1.2em; }
+
+  @media (min-width: 700px) {
+    .mando > summary { padding: 1rem 1.25rem; }
+    .mando__cuerpo { padding: 0 1.25rem 1.25rem; }
+    .fila { flex-wrap: wrap; overflow: visible; }
+    .deslizadores { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ---------- Rejilla de las siete familias ---------- */
+  .rejilla {
+    display: grid; gap: 1rem; margin-top: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+  .mosaico {
+    position: relative; display: block; width: 100%; padding: 0; aspect-ratio: 16 / 9;
+    border: 1px solid var(--linea); border-radius: var(--r-medio); overflow: hidden;
+    background: var(--tinta-2); text-align: left; cursor: pointer;
+    transition: transform var(--d-media) var(--curva-salida), border-color var(--d-corta);
+  }
+  .mosaico:hover { transform: translateY(-3px); border-color: var(--linea-fuerte); }
+  .mosaico.es-activa { border-color: var(--acento); }
+  .mosaico .etiqueta {
+    position: absolute; left: 0.75rem; bottom: 0.75rem; z-index: 1; padding: 0.35rem 0.65rem;
+    border-radius: var(--r-pastilla); color: var(--hueso);
+    background: color-mix(in srgb, var(--tinta) 62%, transparent);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .encabezado { display: grid; gap: 0.9rem; }
+
+  /* ---------- Uso ---------- */
+  .codigo {
+    margin: 1.5rem 0 0; padding: 1rem 1.25rem; overflow-x: auto; white-space: pre;
+    font: 400 var(--t-nota)/1.7 var(--f-mono); color: var(--bruma);
+    background: var(--tinta-2); border: 1px solid var(--linea); border-radius: var(--r-medio);
+  }
+  .codigo b { font-weight: 500; color: var(--acento-claro); }
+  .notas { display: grid; gap: 0.5rem; margin-top: 1.25rem; }
+  .notas p { margin: 0; }
+</style>
+</head>
+<body>
+
+<header class="cab">
+  <a href="index.html">← Banco</a>
+  <span>Fondos shader</span>
+</header>
+
+<main>
+  <!-- Hero: el shader de fondo con un texto encima, para juzgar si el fondo se deja leer -->
+  <section class="hero" id="hero">
+    <canvas class="fondo" id="fondo-hero" aria-hidden="true"></canvas>
+    <div class="hero__capa hero__velo"></div>
+
+    <div class="contenedor hero__texto">
+      <p class="etiqueta">fondo-shader.js</p>
+      <h1 class="titulo-xl">Fondos que respiran</h1>
+      <p class="bajada">Siete familias en la GPU, con la paleta de la marca y un grano de película. Con el texto encima se juzga si un fondo deja leer.</p>
+      <div class="hero__acciones">
+        <a class="boton" href="#rejilla">Ver las siete familias</a>
+        <a class="boton boton--fantasma" href="#uso">Cómo se usa</a>
+      </div>
+    </div>
+
+    <div class="contenedor mando-caja">
+      <details class="tarjeta mando" id="mando">
+        <summary>
+          <span class="etiqueta">Controles</span>
+          <span class="nota resumen" id="resumen"></span>
+          <span class="mas" aria-hidden="true">+</span>
+        </summary>
+        <div class="mando__cuerpo">
+          <div class="grupo">
+            <span class="etiqueta" id="et-familia">Familia</span>
+            <div class="fila" id="pastillas-familia" role="group" aria-labelledby="et-familia"></div>
+          </div>
+          <div class="grupo">
+            <span class="etiqueta" id="et-paleta">Paleta</span>
+            <div class="fila" id="pastillas-paleta" role="group" aria-labelledby="et-paleta"></div>
+          </div>
+          <div class="deslizadores">
+            <label class="ctl">
+              <span class="ctl__cab"><span class="etiqueta">Velocidad</span><output id="v-velocidad">1.00</output></span>
+              <input type="range" id="c-velocidad" min="0" max="3" step="0.05" value="1">
+            </label>
+            <label class="ctl">
+              <span class="ctl__cab"><span class="etiqueta">Escala</span><output id="v-escala">1.00</output></span>
+              <input type="range" id="c-escala" min="0.4" max="3" step="0.05" value="1">
+            </label>
+            <label class="ctl">
+              <span class="ctl__cab"><span class="etiqueta">Grano</span><output id="v-grano">0.040</output></span>
+              <input type="range" id="c-grano" min="0" max="0.2" step="0.005" value="0.04">
+            </label>
+          </div>
+          <div class="acciones">
+            <button class="boton" type="button" id="b-foto">Guardar foto (PNG)</button>
+            <button class="boton boton--fantasma" type="button" id="b-grabar">Grabar 6 s (webm)</button>
+            <span class="nota" id="estado" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+      </details>
+      <!-- Abierto en pantallas anchas, cerrado en el celular: se decide antes del primer pintado -->
+      <script>document.getElementById("mando").open = matchMedia("(min-width: 700px)").matches;</script>
+    </div>
+  </section>
+
+  <!-- Las siete en vivo: varias instancias a la vez; las que salen de pantalla se pausan solas -->
+  <section class="banda" id="rejilla">
+    <div class="contenedor">
+      <div class="encabezado">
+        <p class="etiqueta">Las siete familias, en vivo</p>
+        <h2 class="titulo-l">Una instancia por mosaico</h2>
+        <p class="bajada">Cada mosaico es su propio canvas y su propio contexto WebGL. Seguí la paleta que elegiste arriba; tocá uno para pasarlo al hero. Los que quedan fuera de pantalla no dibujan.</p>
+      </div>
+      <div class="rejilla" id="rejilla-mosaicos"></div>
+    </div>
+  </section>
+
+  <section class="banda" id="uso" style="padding-top: 0">
+    <div class="contenedor">
+      <p class="etiqueta">Uso</p>
+      <pre class="codigo"><code>&lt;canvas id="fondo" class="fondo"&gt;&lt;/canvas&gt;   <i>/* position:absolute; inset:0; width/height:100% */</i>
+
+&lt;script type="module"&gt;
+  import { <b>fondoShader</b> } from "../kit/fondo-shader.js";
+
+  const f = fondoShader(document.getElementById("fondo"), {
+    familia: "aurora",   <i>// malla | aurora | metal | semitono | remolino | celdas | llama</i>
+    velocidad: 0.8, escala: 1, grano: 0.04, semilla: 0,
+    puntero: true,       <i>// lente bajo el cursor (solo mouse)</i>
+  });
+
+  f.cambiar({ familia: "metal" });          <i>// en vivo</i>
+  f.cambiar({ paleta: ["#0b0d10", "#2a3038", "#59636f", "#a7b0ba", "#f2f4f6"] });
+  f.cambiar({ paleta: null });              <i>// vuelve a leer los tokens (cambio de tema)</i>
+  const png = await f.foto();               <i>// Blob PNG</i>
+  const webm = await f.grabar(6);           <i>// Blob webm</i>
+  f.destruir();
+&lt;/script&gt;</code></pre>
+      <div class="notas">
+        <p class="nota">Sin paleta, lee del canvas <code>--tinta</code>, <code>--acento-hondo</code>, <code>--acento</code>, <code>--acento-claro</code> y <code>--hueso</code>. El primer color es siempre el fondo. Acepta hex o cualquier color CSS.</p>
+        <p class="nota">Con "reducir movimiento" dibuja un solo cuadro y queda quieto. Sin WebGL deja un degradé CSS con la paleta.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+  import { fondoShader } from "../kit/fondo-shader.js";
+
+  const FAMILIAS = [
+    ["malla", "Malla"], ["aurora", "Aurora"], ["metal", "Metal"], ["semitono", "Semitono"],
+    ["remolino", "Remolino"], ["celdas", "Celdas"], ["llama", "Llama"],
+  ];
+  // El primer color de cada paleta es el fondo. "marca" = null: el shader lee los tokens.
+  const PALETAS = [
+    { id: "marca", nombre: "De la marca", colores: null },
+    { id: "ambar", nombre: "Ámbar", colores: ["#140c06", "#7a2e0e", "#e8590c", "#ffa94d", "#fff1d6"] },
+    { id: "violeta", nombre: "Violeta", colores: ["#0e0a1c", "#3b1d8a", "#7c4dff", "#c3a6ff", "#f1e9ff"] },
+    { id: "oceano", nombre: "Océano", colores: ["#06121c", "#0b4a6f", "#1c8fc9", "#6fd0f0", "#e4f7ff"] },
+    { id: "coral", nombre: "Coral", colores: ["#1a0a0f", "#7a1f3d", "#ff4d6d", "#ff9e7d", "#ffe8d6"] },
+    { id: "acero", nombre: "Acero", colores: ["#0b0d10", "#2a3038", "#59636f", "#a7b0ba", "#f2f4f6"] },
+  ];
+  const MARCA_CSS = "linear-gradient(90deg, var(--tinta), var(--acento-hondo), var(--acento), var(--acento-claro), var(--hueso))";
+
+  const estado = { familia: "malla", paleta: 0 };
+  const $ = (id) => document.getElementById(id);
+
+  /* ---------- Instancias ---------- */
+  const hero = fondoShader($("fondo-hero"), { familia: estado.familia, puntero: true });
+
+  const mosaicos = FAMILIAS.map(([id, nombre]) => {
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.className = "mosaico";
+    boton.dataset.familia = id;
+    boton.setAttribute("aria-label", `Usar ${nombre} en el hero`);
+    const canvas = document.createElement("canvas");
+    canvas.className = "fondo";
+    canvas.setAttribute("aria-hidden", "true");
+    const et = document.createElement("span");
+    et.className = "etiqueta";
+    et.textContent = id;
+    boton.append(canvas, et);
+    $("rejilla-mosaicos").append(boton);
+    boton.addEventListener("click", () => { elegirFamilia(id); window.scrollTo({ top: 0 }); });
+    return { id, boton, fondo: fondoShader(canvas, { familia: id }) };
+  });
+
+  /* ---------- Pastillas ---------- */
+  function pastilla(texto, alPulsar, muestra) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pastilla";
+    b.setAttribute("aria-pressed", "false");
+    if (muestra) {
+      const m = document.createElement("span");
+      m.className = "muestra";
+      m.style.background = muestra;
+      b.append(m);
+    }
+    b.append(texto);
+    b.addEventListener("click", alPulsar);
+    return b;
+  }
+
+  const pastillasFamilia = FAMILIAS.map(([id, nombre]) => {
+    const b = pastilla(nombre, () => elegirFamilia(id));
+    $("pastillas-familia").append(b);
+    return b;
+  });
+  const pastillasPaleta = PALETAS.map((p, i) => {
+    const muestra = p.colores ? `linear-gradient(90deg, ${p.colores.join(", ")})` : MARCA_CSS;
+    const b = pastilla(p.nombre, () => elegirPaleta(i), muestra);
+    $("pastillas-paleta").append(b);
+    return b;
+  });
+
+  function pintarEstado() {
+    FAMILIAS.forEach(([id], i) => pastillasFamilia[i].setAttribute("aria-pressed", String(id === estado.familia)));
+    PALETAS.forEach((_, i) => pastillasPaleta[i].setAttribute("aria-pressed", String(i === estado.paleta)));
+    mosaicos.forEach((m) => m.boton.classList.toggle("es-activa", m.id === estado.familia));
+    $("resumen").textContent = `${estado.familia} · ${PALETAS[estado.paleta].nombre}`;
+  }
+
+  function elegirFamilia(id) {
+    estado.familia = id;
+    hero.cambiar({ familia: id });
+    pintarEstado();
+  }
+
+  function elegirPaleta(i) {
+    estado.paleta = i;
+    const colores = PALETAS[i].colores;   // null = volver a leer los tokens
+    hero.cambiar({ paleta: colores });
+    mosaicos.forEach((m) => m.fondo.cambiar({ paleta: colores }));
+    pintarEstado();
+  }
+
+  /* ---------- Deslizadores (solo el hero; los mosaicos quedan como referencia) ---------- */
+  function deslizador(clave, decimales) {
+    const c = $(`c-${clave}`), v = $(`v-${clave}`);
+    const aplicar = () => { v.textContent = Number(c.value).toFixed(decimales); hero.cambiar({ [clave]: Number(c.value) }); };
+    c.addEventListener("input", aplicar);
+  }
+  deslizador("velocidad", 2);
+  deslizador("escala", 2);
+  deslizador("grano", 3);
+
+  /* ---------- Foto y grabación ---------- */
+  const bFoto = $("b-foto"), bGrabar = $("b-grabar"), aviso = $("estado");
+
+  function bajar(blob, nombre) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nombre;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+  const nombreArchivo = (ext) => `fondo-${estado.familia}-${PALETAS[estado.paleta].id}.${ext}`;
+
+  bFoto.addEventListener("click", async () => {
+    const blob = await hero.foto();
+    if (!blob) { aviso.textContent = "No se pudo sacar la foto (sin WebGL)."; return; }
+    bajar(blob, nombreArchivo("png"));
+    aviso.textContent = "Listo: se descargó el PNG.";
+  });
+
+  bGrabar.addEventListener("click", async () => {
+    bGrabar.disabled = bFoto.disabled = true;
+    let resta = 6;
+    aviso.textContent = `Grabando… ${resta} s`;
+    const reloj = setInterval(() => { resta -= 1; if (resta > 0) aviso.textContent = `Grabando… ${resta} s`; }, 1000);
+    try {
+      const blob = await hero.grabar(6);
+      if (blob) { bajar(blob, nombreArchivo("webm")); aviso.textContent = "Listo: se descargó el webm."; }
+      else aviso.textContent = "Este navegador no puede grabar (sin WebGL).";
+    } catch (e) {
+      aviso.textContent = (e && e.message) || "No se pudo grabar.";
+    } finally {
+      clearInterval(reloj);
+      bGrabar.disabled = bFoto.disabled = false;
+    }
+  });
+
+  pintarEstado();
+</script>
+</body>
+</html>

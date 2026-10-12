@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detalles que se notan · Banco de pruebas · Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<link rel="stylesheet" href="../kit/componentes/boton-vidrio/boton-vidrio.css">
+<link rel="stylesheet" href="../kit/componentes/cargador-intro/cargador-intro.css">
+<link rel="stylesheet" href="../kit/componentes/texto-foco/texto-foco.css">
+<link rel="stylesheet" href="../kit/componentes/estela-imagenes/estela-imagenes.css">
+<link rel="stylesheet" href="../kit/componentes/pasos-camino/pasos-camino.css">
+<style>
+  /* Página de muestra: solo maqueta, todo con los tokens del kit */
+  body { padding-top: 3.5rem; }
+
+  .cabecera {
+    position: fixed; inset: 0 0 auto 0; z-index: 60; height: 3.5rem;
+    background: color-mix(in srgb, var(--tinta) 80%, transparent);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--linea);
+  }
+  .cabecera .contenedor { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .cabecera h1 { margin: 0; font: 700 1rem/1 var(--f-titulo); letter-spacing: -0.01em; }
+  .cabecera a {
+    font: 500 var(--t-nota)/1 var(--f-mono); letter-spacing: 0.04em; color: var(--bruma);
+    padding: 0.75rem 0.25rem; transition: color var(--d-corta);
+  }
+  .cabecera a:hover { color: var(--hueso); }
+
+  .banda { scroll-margin-top: 3.5rem; }
+  .banda + .banda { border-top: 1px solid var(--linea); }
+  .banda .titulo-m { margin-top: 0.7rem; max-width: 30ch; }
+  .banda .bajada { margin-top: 0.8rem; }
+  .bajada strong { color: var(--hueso); font-weight: 600; }
+  .demo { margin-top: 2.25rem; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2.25rem; }
+  .banda .nota { margin: 1rem 0 0; }
+
+  /* 01 · vidrio: una foto con detalle para que se note lo que desenfoca */
+  .escena-vidrio {
+    display: grid; place-items: center; gap: 1.25rem;
+    min-height: 21rem; padding: 2.5rem var(--margen);
+    border: 1px solid var(--linea); border-radius: var(--r-grande);
+    background: url("medios/cuadros/muestra-0090.webp") center / cover no-repeat;
+  }
+  .escena-vidrio__fila { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+  .escena-vidrio__nota {
+    margin: 0; padding: 0.45rem 0.95rem; max-width: 100%; text-align: center;
+    font-size: var(--t-nota); color: var(--hueso); border-radius: var(--r-pastilla);
+    background: color-mix(in srgb, var(--tinta) 62%, transparent);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  }
+
+  /* 03 · texto en foco */
+  .foco-grande { margin-top: 2.25rem; max-width: 24ch; }
+  .foco-parrafo { margin: 0; max-width: 36rem; font: 600 var(--t-medio)/1.4 var(--f-texto); letter-spacing: -0.01em; }
+  .foco-bloque { margin-top: 5rem; }
+  .foco-bloque .etiqueta { margin: 0 0 1.25rem; color: var(--tenue); }
+
+  /* 04 · estela */
+  .estela-demo {
+    display: grid; place-items: center; text-align: center;
+    min-height: 24rem; padding: 2rem var(--margen);
+    border: 1px dashed var(--linea-fuerte); border-radius: var(--r-grande);
+    background: var(--tinta-2);
+  }
+  .estela-demo__contenido { display: grid; justify-items: center; gap: 1rem; }
+  .estela-demo__titulo { margin: 0; font: 800 var(--t-grande)/1 var(--f-titulo); letter-spacing: -0.025em; }
+  .estela-demo__contenido p { margin: 0; color: var(--bruma); }
+  .solo-tactil { display: none; }
+  @media (hover: none) {
+    .solo-mouse { display: none; }
+    .solo-tactil { display: inline; }
+  }
+
+  /* 05 · pasos */
+  .pasos-demo { margin-top: 2.5rem; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="contenedor">
+    <h1>Detalles que se notan</h1>
+    <a href="index.html">← Banco</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- 01 · Botón de vidrio -->
+  <section class="banda" id="vidrio">
+    <div class="contenedor">
+      <p class="etiqueta">01 · Botón de vidrio</p>
+      <h2 class="titulo-m">Una pastilla que desenfoca, refleja la luz y se hunde</h2>
+      <p class="bajada"><strong>El truco:</strong> la luz, la inclinación y la presión son propiedades CSS registradas con <code>@property</code>; el JS solo escribe dónde está el puntero y las transiciones hacen el resto.</p>
+      <div class="demo escena-vidrio">
+        <div class="escena-vidrio__fila">
+          <button class="boton-vidrio" type="button">Reservar una mesa</button>
+          <a class="boton-vidrio boton-vidrio--acento" href="#cargador">Ver la carta</a>
+        </div>
+        <p class="escena-vidrio__nota"><span class="solo-mouse">Pasá el mouse y apretá.</span><span class="solo-tactil">Apoyá el dedo: la luz va al punto de contacto y el botón se hunde.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 · Cargador de entrada -->
+  <section class="banda" id="cargador">
+    <div class="contenedor">
+      <p class="etiqueta">02 · Cargador de entrada</p>
+      <h2 class="titulo-m">Un lema que se arma y una pantalla que se abre en dos</h2>
+      <p class="bajada"><strong>El truco:</strong> son dos paneles y cada uno lleva su propia copia de la escena, alineada con la otra; por eso el logo se parte al medio y cada mitad se va con su panel.</p>
+      <div class="acciones">
+        <button class="boton" id="ver-entrada" type="button">Ver la entrada</button>
+        <button class="boton boton--fantasma" id="ver-carga" type="button">Atada a una carga (simulada)</button>
+      </div>
+      <p class="nota" id="estado-entrada" role="status">Mientras dura, el scroll queda bloqueado. Tocá la pantalla o apretá Esc para saltarla.</p>
+    </div>
+  </section>
+
+  <!-- 03 · Texto en foco -->
+  <section class="banda" id="foco">
+    <div class="contenedor">
+      <p class="etiqueta">03 · Texto en foco</p>
+      <h2 class="titulo-m">Palabras desenfocadas hasta que el marco llega</h2>
+      <p class="bajada"><strong>El truco:</strong> se mide la caja real de cada palabra y los cuatro bordes del marco la persiguen con inercia; el que va adelante corre más que el de atrás, y de ahí sale el estirarse al viajar.</p>
+
+      <p class="foco-grande titulo-l" data-texto-foco data-con="tiempo">Cada pantalla tiene una sola idea y todo lo demás espera su turno.</p>
+
+      <div class="foco-bloque">
+        <p class="etiqueta">Atado al scroll · bajá despacio</p>
+        <p class="foco-parrafo" data-texto-foco data-con="scroll">Un sitio con movimiento no es uno que se mueve todo el tiempo: es uno que sabe cuándo llevar tu mirada a una palabra, a un precio o a un botón, y después se queda quieto.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · Estela de imágenes -->
+  <section class="banda" id="estela">
+    <div class="contenedor">
+      <p class="etiqueta">04 · Estela de imágenes</p>
+      <h2 class="titulo-m">Figuritas sobre el recorrido del puntero</h2>
+      <p class="bajada"><strong>El truco:</strong> caen cada tantos píxeles recorridos, no cada tanto tiempo, así la estela sale pareja si movés el mouse despacio o lo tirás de un lado al otro.</p>
+      <div class="demo estela-demo" data-estela
+           data-imagenes="medios/cuadros/muestra-0001.webp medios/cuadros/muestra-0016.webp medios/cuadros/muestra-0031.webp medios/cuadros/muestra-0046.webp medios/cuadros/muestra-0061.webp medios/cuadros/muestra-0076.webp medios/cuadros/muestra-0091.webp medios/cuadros/muestra-0106.webp">
+        <div class="estela-demo__contenido">
+          <h3 class="estela-demo__titulo">Dibujá con el mouse</h3>
+          <p><span class="solo-mouse">Mové el puntero por acá. El botón de abajo sigue funcionando, aunque las figuritas pasen por encima.</span><span class="solo-tactil">En táctil esta pieza no hace nada, a propósito: sin puntero no hay recorrido que dibujar.</span></p>
+          <button class="boton boton--fantasma" id="prueba-clic" type="button">Esto sigue andando (0)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · Pasos con camino -->
+  <section class="banda" id="pasos">
+    <div class="contenedor">
+      <p class="etiqueta">05 · Pasos con camino</p>
+      <h2 class="titulo-m">Un proceso unido por una línea que se dibuja</h2>
+      <p class="bajada"><strong>El truco:</strong> se miden las posiciones reales de los puntos y el punteado se ve a través de una máscara; lo que se anima con el scroll es una línea sólida adentro de esa máscara.</p>
+
+      <div class="pasos-demo pasos-camino" data-pasos-camino>
+        <ol class="pasos-camino__lista" role="list">
+          <li class="pasos-camino__paso">
+            <span class="pasos-camino__punto" aria-hidden="true">1</span>
+            <div class="pasos-camino__cuerpo">
+              <h3 class="pasos-camino__titulo">Escuchamos</h3>
+              <p class="pasos-camino__texto">Qué vendés, a quién y qué te frena hoy. Una charla de 15 minutos.</p>
+            </div>
+          </li>
+          <li class="pasos-camino__paso">
+            <span class="pasos-camino__punto" aria-hidden="true">2</span>
+            <div class="pasos-camino__cuerpo">
+              <h3 class="pasos-camino__titulo">Proponemos</h3>
+              <p class="pasos-camino__texto">Una propuesta concreta, con precio y plazos, antes de tocar nada.</p>
+            </div>
+          </li>
+          <li class="pasos-camino__paso">
+            <span class="pasos-camino__punto" aria-hidden="true">3</span>
+            <div class="pasos-camino__cuerpo">
+              <h3 class="pasos-camino__titulo">Construimos</h3>
+              <p class="pasos-camino__texto">El sitio con su movimiento, probado en el celular y con reducir movimiento.</p>
+            </div>
+          </li>
+          <li class="pasos-camino__paso">
+            <span class="pasos-camino__punto" aria-hidden="true">4</span>
+            <div class="pasos-camino__cuerpo">
+              <h3 class="pasos-camino__titulo">Publicamos</h3>
+              <p class="pasos-camino__texto">Lo ponemos online, medimos y ajustamos lo que haga falta el primer mes.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script type="module">
+  import { botonVidrio } from "../kit/componentes/boton-vidrio/boton-vidrio.js";
+  import { cargadorIntro } from "../kit/componentes/cargador-intro/cargador-intro.js";
+  import { textosFoco } from "../kit/componentes/texto-foco/texto-foco.js";
+  import { estelaImagenes } from "../kit/componentes/estela-imagenes/estela-imagenes.js";
+  import { pasosCamino } from "../kit/componentes/pasos-camino/pasos-camino.js";
+
+  botonVidrio();
+  textosFoco();
+  estelaImagenes(document.querySelector("[data-estela]"), { distancia: 90, maxVivas: 12 });
+  pasosCamino(document.querySelector("[data-pasos-camino]"));
+
+  // La entrada solo se dispara con los botones (siempre: true ignora el "ya se vio" de la sesión)
+  const estado = document.getElementById("estado-entrada");
+  let corriendo = false;
+
+  function verEntrada({ conCarga }) {
+    if (corriendo) return;
+    corriendo = true;
+    let carga = 0;
+    const intro = cargadorIntro({
+      lema: "Hecho a mano, pensado para vender",
+      logo: "webi",
+      siempre: true,
+      recordar: false,
+      conProgreso: conCarga,
+      alTerminar() {
+        corriendo = false;
+        clearInterval(carga);
+        estado.textContent = intro.saltado
+          ? "Tu sistema pide reducir movimiento: la entrada se saltea y la página queda quieta."
+          : "Listo: se sacó sola del DOM y el scroll volvió. Podés repetirla.";
+      },
+    });
+    if (conCarga && !intro.saltado) {
+      // Una carga inventada y lenta, para ver que no se abre hasta llegar a 1
+      let p = 0;
+      carga = setInterval(() => {
+        p = Math.min(1, p + 0.015 + Math.random() * 0.03);
+        intro.progreso(p);
+        if (p >= 1) clearInterval(carga);
+      }, 150);
+    }
+  }
+  document.getElementById("ver-entrada").addEventListener("click", () => verEntrada({ conCarga: false }));
+  document.getElementById("ver-carga").addEventListener("click", () => verEntrada({ conCarga: true }));
+
+  // Prueba de que la capa de figuritas no tapa los clics
+  let clics = 0;
+  const prueba = document.getElementById("prueba-clic");
+  prueba.addEventListener("click", () => { clics++; prueba.textContent = `Esto sigue andando (${clics})`; });
+</script>
+</body>
+</html>

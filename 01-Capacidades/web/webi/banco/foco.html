@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foco que revela · Banco del Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<style>
+  /* ---------- Marco del banco: cabecera y panel ---------- */
+  .cab { position: fixed; inset: 0 0 auto 0; z-index: 60; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.6rem var(--margen); background: color-mix(in srgb, var(--tinta) 72%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--linea);
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; }
+  .cab a { color: var(--acento-claro); }
+  .cab a:hover { color: var(--hueso); }
+  .cab span { color: var(--bruma); text-align: right; }
+  .panel { position: fixed; right: var(--margen); bottom: var(--margen); z-index: 60; width: min(17.5rem, calc(100vw - 2 * var(--margen)));
+    background: color-mix(in srgb, var(--superficie) 90%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid var(--linea-fuerte); border-radius: var(--r-medio); font-size: var(--t-nota); }
+  .panel summary { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0.9rem; cursor: pointer; list-style: none;
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--acento-claro); }
+  .panel summary::-webkit-details-marker { display: none; }
+  .panel summary::after { content: "–"; font-size: 1rem; }
+  .panel:not([open]) summary::after { content: "+"; }
+  .panel__cuerpo { display: grid; gap: 0.85rem; padding: 0 0.9rem 0.95rem; }
+  .panel label { display: grid; gap: 0.35rem; color: var(--bruma); }
+  .panel label > span { display: flex; justify-content: space-between; gap: 0.5rem; }
+  .panel output { font-family: var(--f-mono); color: var(--hueso); }
+  .panel input[type="range"] { width: 100%; accent-color: var(--acento); }
+
+  /* ---------- Escena: título al costado, dibujos apilados a la derecha ---------- */
+  .foco-escena { min-height: 100svh; display: grid; align-items: center; gap: 1.6rem; max-width: var(--ancho); margin-inline: auto;
+    padding: 4.8rem var(--margen) 6rem; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 52rem) {
+    .foco-escena { grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); gap: 4rem; padding-block: 5rem 3rem; }
+  }
+  .texto { display: grid; gap: 1rem; justify-items: start; }
+  .texto .nota { color: var(--bruma); max-width: 26rem; text-wrap: pretty; margin: 0; }
+  .texto .nota b { color: var(--hueso); font-weight: 600; }
+
+  /* Los dos dibujos miden lo mismo y tienen el mismo viewBox: coinciden al píxel */
+  .ilus { position: relative; justify-self: center; width: min(100%, 44rem, calc(100svh - 9rem)); aspect-ratio: 1;
+    border: 1px solid var(--linea-fuerte); border-radius: var(--r-grande); overflow: hidden; cursor: crosshair; }
+  .capa-ilus { position: absolute; inset: 0; }
+  .capa-ilus > svg { width: 100%; height: 100%; }
+
+  /* Plano técnico: todo línea, nada de relleno */
+  .alambre { fill: none; stroke: var(--acento-claro); stroke-width: 2; stroke-linejoin: round; }
+  .eje { fill: none; stroke: var(--acento); stroke-width: 1.5; stroke-dasharray: 22 6 3 6; opacity: 0.55; }
+  .guia { fill: none; stroke: var(--acento); stroke-width: 1.5; stroke-dasharray: 4 7; opacity: 0.4; }
+  .cota { fill: none; stroke: var(--acento-claro); stroke-width: 1.5; }
+  .punta { fill: var(--acento-claro); stroke: none; }
+  .rotulo { fill: var(--acento-claro); font: 500 20px var(--f-mono); letter-spacing: 0.02em; }
+  .rotulo--tenue { fill: var(--bruma); font-size: 16px; }
+
+  .pie { padding: 0 var(--margen) 6rem; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="cab"><a href="index.html">← Banco</a><span>Foco que revela</span></header>
+
+<!-- Geometría y degradés compartidos. Los dos dibujos la reusan con <use>, así que coinciden exacto. -->
+<svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <circle id="r-caja" cx="400" cy="400" r="196"/>
+    <circle id="r-bisel" cx="400" cy="400" r="170"/>
+    <circle id="r-esfera" cx="400" cy="400" r="150"/>
+    <rect id="r-asa-sup" x="296" y="176" width="208" height="46" rx="12"/>
+    <rect id="r-asa-inf" x="296" y="578" width="208" height="46" rx="12"/>
+    <path id="r-correa-sup" d="M300 182 H500 L518 -20 H282 Z"/>
+    <path id="r-correa-inf" d="M300 618 H500 L518 820 H282 Z"/>
+    <rect id="r-corona" x="592" y="382" width="36" height="36" rx="8"/>
+
+    <!-- marcas de las horas: polígonos cerrados (se rellenan en el terminado, se delinean en el plano) -->
+    <path id="r-marca" d="M397 262 H403 V284 H397 Z"/>
+    <path id="r-marca-g" d="M394 258 H406 V294 H394 Z"/>
+    <g id="r-marcas">
+      <use href="#r-marca-g"/>
+      <use href="#r-marca" transform="rotate(30 400 400)"/><use href="#r-marca" transform="rotate(60 400 400)"/>
+      <use href="#r-marca-g" transform="rotate(90 400 400)"/>
+      <use href="#r-marca" transform="rotate(120 400 400)"/><use href="#r-marca" transform="rotate(150 400 400)"/>
+      <use href="#r-marca-g" transform="rotate(180 400 400)"/>
+      <use href="#r-marca" transform="rotate(210 400 400)"/><use href="#r-marca" transform="rotate(240 400 400)"/>
+      <use href="#r-marca-g" transform="rotate(270 400 400)"/>
+      <use href="#r-marca" transform="rotate(300 400 400)"/><use href="#r-marca" transform="rotate(330 400 400)"/>
+    </g>
+
+    <!-- agujas a las 10:08:35 -->
+    <path id="r-hora" d="M391 414 L400 300 L409 414 Z"/>
+    <path id="r-minuto" d="M394 414 L400 262 L406 414 Z"/>
+    <path id="r-segundo" d="M398.5 250 H401.5 V442 H398.5 Z"/>
+    <use id="r-m-hora" href="#r-hora" transform="rotate(304 400 400)"/>
+    <use id="r-m-minuto" href="#r-minuto" transform="rotate(51 400 400)"/>
+    <use id="r-m-segundo" href="#r-segundo" transform="rotate(210 400 400)"/>
+    <circle id="r-eje" cx="400" cy="400" r="12"/>
+
+    <g id="r-agujeros">
+      <circle cx="400" cy="670" r="8"/><circle cx="400" cy="710" r="8"/>
+      <circle cx="400" cy="750" r="8"/><circle cx="400" cy="790" r="8"/>
+    </g>
+
+    <!-- degradés del terminado (colores de los tokens) -->
+    <radialGradient id="r-fondo" cx=".5" cy=".5" r=".7">
+      <stop offset="0" style="stop-color: color-mix(in srgb, var(--acento-hondo) 22%, var(--superficie))"/>
+      <stop offset="1" style="stop-color: var(--tinta-2)"/>
+    </radialGradient>
+    <linearGradient id="r-cuero" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" style="stop-color: var(--tinta-2)"/>
+      <stop offset=".5" style="stop-color: color-mix(in srgb, var(--superficie) 65%, var(--acento-hondo))"/>
+      <stop offset="1" style="stop-color: var(--tinta-2)"/>
+    </linearGradient>
+    <linearGradient id="r-metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" style="stop-color: var(--hueso)"/>
+      <stop offset=".4" style="stop-color: var(--bruma)"/>
+      <stop offset=".6" style="stop-color: var(--hueso)"/>
+      <stop offset="1" style="stop-color: var(--tenue)"/>
+    </linearGradient>
+    <linearGradient id="r-bisel-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" style="stop-color: var(--tenue)"/>
+      <stop offset=".5" style="stop-color: var(--bruma)"/>
+      <stop offset="1" style="stop-color: var(--hueso)"/>
+    </linearGradient>
+    <radialGradient id="r-esfera-g" cx=".5" cy=".42" r=".65">
+      <stop offset="0" style="stop-color: color-mix(in srgb, var(--acento-hondo) 70%, var(--tinta))"/>
+      <stop offset="1" style="stop-color: color-mix(in srgb, var(--acento-hondo) 25%, var(--tinta))"/>
+    </radialGradient>
+
+    <!-- rejilla del plano -->
+    <pattern id="r-rejilla" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 H0 V40" fill="none" style="stroke: var(--linea)" stroke-width="1"/>
+    </pattern>
+    <pattern id="r-rejilla-g" width="200" height="200" patternUnits="userSpaceOnUse">
+      <path d="M200 0 H0 V200" fill="none" style="stroke: var(--linea-fuerte)" stroke-width="1"/>
+    </pattern>
+  </defs>
+</svg>
+
+<main class="foco-escena">
+  <div class="texto">
+    <p class="etiqueta">Foco que revela</p>
+    <h1 class="titulo-xl">Mirá por adentro</h1>
+    <p class="bajada">Dos dibujos idénticos, uno encima del otro. El de arriba se abre donde pasa el cursor y deja ver el de abajo: el mismo reloj, pero en plano.</p>
+    <p class="nota"><b>Mirá el borde de la ventana.</b> Es blando, sin anillo. Mové el mouse sobre el reloj; en el celu, arrastrá el dedo. Si no tocás nada, la ventana pasea sola.</p>
+  </div>
+
+  <div class="ilus" id="zona">
+
+    <!-- abajo: el plano técnico -->
+    <div class="capa-ilus">
+      <svg viewBox="0 0 800 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <rect width="800" height="800" style="fill: var(--tinta)"/>
+        <rect width="800" height="800" fill="url(#r-rejilla)"/>
+        <rect width="800" height="800" fill="url(#r-rejilla-g)"/>
+
+        <path class="eje" d="M400 -20 V820 M-20 400 H820"/>
+        <circle class="guia" cx="400" cy="400" r="100"/>
+        <circle class="guia" cx="400" cy="400" r="60"/>
+
+        <g class="alambre">
+          <use href="#r-correa-sup"/><use href="#r-correa-inf"/>
+          <use href="#r-asa-sup"/><use href="#r-asa-inf"/>
+          <use href="#r-corona"/>
+          <use href="#r-caja"/><use href="#r-bisel"/><use href="#r-esfera"/>
+          <use href="#r-marcas"/>
+          <use href="#r-m-hora"/><use href="#r-m-minuto"/><use href="#r-m-segundo"/>
+          <use href="#r-eje"/>
+          <use href="#r-agujeros"/>
+        </g>
+
+        <!-- cota del ancho de la correa -->
+        <path class="cota" d="M304 130 H496"/>
+        <path class="punta" d="M304 130 l18 -6 v12 Z M496 130 l-18 -6 v12 Z"/>
+        <text class="rotulo" x="400" y="116" text-anchor="middle">20 mm</text>
+
+        <!-- cota del diámetro de la caja -->
+        <path class="cota" d="M472 204 H772 M472 596 H772 M764 204 V596"/>
+        <path class="punta" d="M764 204 l-6 18 h12 Z M764 596 l-6 -18 h12 Z"/>
+        <text class="rotulo" transform="translate(746 400) rotate(-90)" text-anchor="middle">Ø 40 mm</text>
+
+        <!-- llamadas -->
+        <path class="cota" d="M280 280 L180 160 H24"/>
+        <text class="rotulo" x="24" y="148">01 bisel · acero</text>
+        <path class="cota" d="M262 440 L170 540 H24"/>
+        <text class="rotulo" x="24" y="528">02 esfera</text>
+        <path class="cota" d="M610 382 V330"/>
+        <text class="rotulo" x="600" y="316">03 corona</text>
+
+        <!-- cajetín -->
+        <rect x="520" y="716" width="260" height="64" fill="none" style="stroke: var(--acento-claro)" stroke-width="1.5"/>
+        <text class="rotulo" x="534" y="744">WEBI · PLANO 01</text>
+        <text class="rotulo rotulo--tenue" x="534" y="768">ESC 1:1 · ACERO</text>
+      </svg>
+    </div>
+
+    <!-- arriba: el producto terminado; recibe la máscara -->
+    <div class="capa-ilus" id="arriba">
+      <svg viewBox="0 0 800 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <rect width="800" height="800" fill="url(#r-fondo)"/>
+
+        <use href="#r-correa-sup" fill="url(#r-cuero)"/>
+        <use href="#r-correa-inf" fill="url(#r-cuero)"/>
+        <use href="#r-correa-sup" fill="none" style="stroke: var(--linea-fuerte)" stroke-width="2"/>
+        <use href="#r-correa-inf" fill="none" style="stroke: var(--linea-fuerte)" stroke-width="2"/>
+        <use href="#r-agujeros" style="fill: var(--tinta)"/>
+
+        <use href="#r-asa-sup" fill="url(#r-metal)"/>
+        <use href="#r-asa-inf" fill="url(#r-metal)"/>
+        <use href="#r-corona" fill="url(#r-metal)"/>
+        <use href="#r-caja" fill="url(#r-metal)"/>
+        <use href="#r-bisel" fill="url(#r-bisel-g)"/>
+        <use href="#r-esfera" fill="url(#r-esfera-g)"/>
+
+        <use href="#r-marcas" style="fill: var(--hueso)"/>
+        <text x="400" y="352" text-anchor="middle" style="fill: var(--bruma); font: 700 24px var(--f-titulo); letter-spacing: 6px">WEBI</text>
+        <text x="400" y="474" text-anchor="middle" style="fill: var(--tenue); font: 500 14px var(--f-mono); letter-spacing: 4px">AUTOMATIC</text>
+
+        <use href="#r-m-hora" style="fill: var(--hueso)"/>
+        <use href="#r-m-minuto" style="fill: var(--hueso)"/>
+        <use href="#r-m-segundo" style="fill: var(--acento)"/>
+        <use href="#r-eje" style="fill: var(--acento)"/>
+
+        <!-- brillo sobre el cristal -->
+        <path d="M290 300 A150 150 0 0 1 400 252" fill="none" style="stroke: var(--hueso)" stroke-width="12" stroke-linecap="round" opacity=".14"/>
+      </svg>
+    </div>
+  </div>
+</main>
+
+<p class="pie nota"><a href="index.html" style="color: var(--acento-claro)">← Banco</a></p>
+
+<details class="panel" open>
+  <summary>Ajustes</summary>
+  <div class="panel__cuerpo">
+    <label><span>Radio (px) <output>260</output></span>
+      <input id="aj-radio" type="range" min="60" max="500" step="10" value="260"></label>
+    <label><span>Núcleo <output>0.4</output></span>
+      <input id="aj-nucleo" type="range" min="0" max="0.9" step="0.05" value="0.4"></label>
+    <label><span>Suavizar <output>0.18</output></span>
+      <input id="aj-suavizar" type="range" min="0" max="0.5" step="0.01" value="0.18"></label>
+  </div>
+</details>
+
+<script type="module">
+import { foco } from "../kit/puntero.js";
+
+if (matchMedia("(max-width: 700px)").matches) document.querySelector(".panel").open = false;
+
+// Deslizador → valor + salida de texto
+function ligar(id, alCambiar) {
+  const el = document.getElementById(id);
+  const salida = el.closest("label").querySelector("output");
+  salida.textContent = el.value;
+  el.addEventListener("input", () => { salida.textContent = el.value; alCambiar(parseFloat(el.value)); });
+}
+
+// La máscara va sobre #arriba; la zona del puntero es su padre (.ilus)
+const ventana = foco(document.getElementById("arriba"), { radio: 260, nucleo: 0.4, suavizar: 0.18 });
+
+ligar("aj-radio", (v) => ventana.cambiar({ radio: v }));
+ligar("aj-nucleo", (v) => ventana.cambiar({ nucleo: v }));
+ligar("aj-suavizar", (v) => ventana.cambiar({ suavizar: v }));
+</script>
+</body>
+</html>

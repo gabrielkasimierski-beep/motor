@@ -1,0 +1,160 @@
+/* boton-vidrio — pastilla de vidrio.
+
+   QUÉ ES: un botón (o link) que desenfoca lo que tiene detrás, con un bisel fino cuyo brillo
+   persigue al puntero, una leve inclinación hacia donde apuntás y un hundimiento al apretar.
+
+   EL TRUCO: la luz, la inclinación y la presión no son estilos que cambia el JS cuadro a cuadro:
+   son propiedades CSS REGISTRADAS (@property) con tipo, así el navegador las interpola y las
+   transiciones las suavizan solas. El JS (boton-vidrio.js) solo escribe --luz-x / --luz-y /
+   --inclina-x / --inclina-y en pointermove; la presión sale de :active (o .es-apretado).
+   Sin JS el botón igual se ve bien: bisel quieto con luz arriba, brillo en hover, hundimiento en :active.
+
+   CÓMO SE USA EN HTML:
+     <link rel="stylesheet" href="kit/tokens.css">
+     <link rel="stylesheet" href="kit/componentes/boton-vidrio/boton-vidrio.css">
+     <button class="boton-vidrio">Reservar</button>
+     <a class="boton-vidrio boton-vidrio--acento" href="#contacto">Escribinos</a>
+     <script type="module">
+       import { botonVidrio } from "./kit/componentes/boton-vidrio/boton-vidrio.js";
+       botonVidrio();   // engancha todos los .boton-vidrio de la página
+     </script>
+   Para que se note el vidrio tiene que haber algo detrás (una foto, un degradé, un video).
+   Ojo: backdrop-filter solo ve hasta el ancestro más cercano con opacity < 1, filter, mask o
+   clip-path. No pongas el botón adentro de uno de esos o no va a desenfocar nada. */
+
+@property --luz-x { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+@property --luz-y { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
+@property --presion { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --brillo { syntax: "<number>"; inherits: true; initial-value: 0.3; }
+@property --inclina-x { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
+@property --inclina-y { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
+
+.boton-vidrio {
+  /* Qué color de luz usa el bisel y de dónde sale la sombra (todo desde tokens) */
+  --vidrio-luz: var(--hueso);
+  --vidrio-tinte: color-mix(in srgb, var(--hueso) 9%, transparent);
+  --vidrio-sombra: color-mix(in srgb, var(--tinta) 55%, transparent);
+  /* Movimiento de las luces y la inclinación; la presión va aparte (cambia según el sentido) */
+  --vidrio-mov:
+    --luz-x 0.45s var(--curva-salida),
+    --luz-y 0.45s var(--curva-salida),
+    --brillo var(--d-media) var(--curva-salida),
+    --inclina-x 0.6s var(--curva-salida),
+    --inclina-y 0.6s var(--curva-salida);
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0.9rem 1.8rem;
+  border: 0;
+  border-radius: var(--r-pastilla);
+  background: var(--vidrio-tinte);
+  color: var(--hueso);
+  font: 600 var(--t-texto)/1 var(--f-texto);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  backdrop-filter: blur(14px) saturate(1.6);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--vidrio-luz) 30%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--vidrio-sombra) 70%, transparent),
+    inset 0 max(0px, calc(var(--presion, 0) * 7px)) max(0px, calc(var(--presion, 0) * 16px)) var(--vidrio-sombra),
+    0 calc(12px - var(--presion, 0) * 8px) calc(30px - var(--presion, 0) * 18px) -10px var(--vidrio-sombra);
+  transform:
+    perspective(40rem)
+    rotateX(var(--inclina-y, 0deg))
+    rotateY(var(--inclina-x, 0deg))
+    translateY(calc(var(--presion, 0) * 1px))
+    scale(calc(1 + (var(--brillo, 0.3) - 0.3) * 0.03 - var(--presion, 0) * 0.05));
+  transition: var(--vidrio-mov), --presion var(--d-media) var(--curva-rebote);
+}
+
+/* Bisel: un aro de 1px cuyo brillo se concentra donde está la luz.
+   La máscara solo recorta el aro (alfa), no pinta nada: el color sale de --vidrio-luz. */
+.boton-vidrio::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(9rem circle at var(--luz-x, 50%) var(--luz-y, 0%),
+      color-mix(in srgb, var(--vidrio-luz) calc(var(--brillo, 0.3) * 95%), transparent),
+      transparent 70%),
+    linear-gradient(170deg,
+      color-mix(in srgb, var(--vidrio-luz) 42%, transparent),
+      color-mix(in srgb, var(--vidrio-luz) 7%, transparent) 38%,
+      color-mix(in srgb, var(--vidrio-luz) 4%, transparent) 62%,
+      color-mix(in srgb, var(--vidrio-luz) 22%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+/* Reflejo sobre la superficie: un brillo suave que sigue a la luz y un velo arriba */
+.boton-vidrio::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(7rem circle at var(--luz-x, 50%) var(--luz-y, 0%),
+      color-mix(in srgb, var(--vidrio-luz) calc(var(--brillo, 0.3) * 24%), transparent),
+      transparent 72%),
+    linear-gradient(to bottom, color-mix(in srgb, var(--vidrio-luz) 13%, transparent), transparent 55%);
+}
+
+/* Variante con el acento: el vidrio toma el color de marca */
+.boton-vidrio--acento {
+  --vidrio-luz: var(--acento-claro);
+  --vidrio-tinte: color-mix(in srgb, var(--acento) 26%, transparent);
+}
+
+/* Estados. El hover solo donde hay hover de verdad: en táctil no se queda pegado. */
+@media (hover: hover) {
+  .boton-vidrio:hover { --brillo: 1; }
+}
+.boton-vidrio:focus-visible,
+.boton-vidrio.es-encima { --brillo: 1; }
+
+.boton-vidrio:active,
+.boton-vidrio.es-apretado {
+  --presion: 1;
+  --brillo: 1;
+  /* Al apretar baja rápido y sin rebote; el rebote queda para cuando suelta */
+  transition: var(--vidrio-mov), --presion 90ms var(--curva-salida);
+}
+
+.boton-vidrio:focus-visible { outline: 2px solid var(--acento); outline-offset: 4px; }
+
+/* En tema claro la sombra sale del texto (oscuro), no del fondo */
+[data-tema="claro"] .boton-vidrio { --vidrio-sombra: color-mix(in srgb, var(--hueso) 28%, transparent); }
+
+/* Sin backdrop-filter el vidrio sería transparente y el texto no se leería: se vuelve más sólido */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .boton-vidrio { background: color-mix(in srgb, var(--superficie) 82%, transparent); }
+  .boton-vidrio--acento { background: color-mix(in srgb, var(--acento-hondo) 70%, var(--superficie)); }
+}
+
+/* Reducir movimiento: sin inclinación ni rebote; se queda el estado (hundido al apretar) */
+@media (prefers-reduced-motion: reduce) {
+  .boton-vidrio,
+  .boton-vidrio:active,
+  .boton-vidrio.es-apretado {
+    transition: none;
+  }
+  .boton-vidrio { transform: scale(calc(1 - var(--presion, 0) * 0.04)); }
+}

@@ -1,0 +1,144 @@
+/* tarjetas-expandibles · ver tarjetas-expandibles.js para el truco y el uso.
+   Colores y curvas solo desde kit/tokens.css. */
+
+.tarjetas-expandibles {
+  --crece: 5; /* cuántas veces más ancha es la abierta (lo fija data-crece) */
+  --ancho-abierto: 22rem; /* lo calcula el JS: ancho real de la tarjeta abierta */
+  --alto: clamp(22rem, 62vh, 30rem);
+  --hueco: 0.5rem;
+
+  display: flex;
+  gap: var(--hueco);
+  height: var(--alto);
+  padding: 0; /* el JS mide el ancho útil del riel: nada de padding acá */
+}
+
+.tarjeta-expandible {
+  position: relative;
+  flex: 1 1 0; /* base 0: el reparto depende solo de flex-grow */
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-grande);
+  background: var(--superficie);
+  cursor: pointer;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+/* La transición se habilita recién cuando el JS terminó de armar (así no se anima el estado inicial) */
+.tarjetas-expandibles.esta-lista .tarjeta-expandible {
+  transition:
+    flex-grow var(--d-larga) var(--curva-salida),
+    border-color var(--d-media) var(--curva-salida),
+    box-shadow var(--d-media) var(--curva-salida);
+}
+.tarjeta-expandible.es-activa {
+  flex-grow: var(--crece);
+  border-color: var(--linea-fuerte);
+  box-shadow: var(--sombra-acento);
+}
+.tarjeta-expandible:focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; z-index: 2; }
+
+/* Imagen: maquetada al ancho abierto y centrada. La tarjeta es una ventana que se abre sobre ella;
+   la imagen nunca se reescala durante la apertura. */
+.tarjeta-expandible__imagen {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: -2;
+  width: var(--ancho-abierto);
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  transform: translateX(-50%);
+  filter: saturate(0.75) brightness(0.8);
+}
+.tarjetas-expandibles.esta-lista .tarjeta-expandible__imagen { transition: filter var(--d-larga) var(--curva-salida); }
+.tarjeta-expandible.es-activa .tarjeta-expandible__imagen { filter: none; }
+
+/* Velo para que el texto se lea sobre cualquier imagen */
+.tarjeta-expandible::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to top, color-mix(in srgb, var(--tinta) 90%, transparent) 0%, color-mix(in srgb, var(--tinta) 30%, transparent) 55%, transparent 100%);
+}
+
+/* Rótulo vertical: lo único que se ve en una astilla cerrada */
+.tarjeta-expandible__rotulo {
+  position: absolute;
+  inset: auto 0 1rem 0;
+  display: flex;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity var(--d-corta) var(--curva-salida);
+}
+.tarjeta-expandible__rotulo > span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg); /* se lee de abajo hacia arriba */
+  font: 700 var(--t-chico)/1 var(--f-titulo);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.tarjeta-expandible.es-activa .tarjeta-expandible__rotulo { opacity: 0; }
+
+/* Epígrafe: ancho FIJO = ancho de la tarjeta abierta. Se maqueta una sola vez; la tarjeta lo revela. */
+.tarjeta-expandible__contenido {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--ancho-abierto);
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.25rem 1.25rem 1.4rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--d-corta) var(--curva-salida), transform var(--d-corta) var(--curva-salida);
+}
+.tarjeta-expandible.es-activa .tarjeta-expandible__contenido {
+  opacity: 1;
+  transform: none;
+  /* entra cuando la tarjeta ya empezó a abrirse */
+  transition: opacity var(--d-media) var(--curva-salida) 0.2s, transform var(--d-media) var(--curva-salida) 0.2s;
+}
+
+.tarjeta-expandible__tipo {
+  font: 500 var(--t-etiqueta)/1.2 var(--f-mono);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--acento-claro);
+}
+.tarjeta-expandible__titulo {
+  margin: 0;
+  font: 800 var(--t-medio)/1.05 var(--f-titulo);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.tarjeta-expandible__texto {
+  margin: 0;
+  max-width: 28rem;
+  color: var(--bruma);
+  font-size: var(--t-nota);
+  text-wrap: pretty;
+}
+.tarjeta-expandible__ver {
+  justify-self: start;
+  margin-top: 0.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--r-pastilla);
+  background: var(--acento);
+  color: var(--sobre-acento);
+  font-size: var(--t-nota);
+  font-weight: 600;
+  line-height: 1;
+}
+
+@media (max-width: 40rem) {
+  .tarjetas-expandibles { --hueco: 0.375rem; --alto: clamp(24rem, 66vh, 30rem); }
+  .tarjeta-expandible { border-radius: var(--r-medio); }
+  .tarjeta-expandible__contenido { padding: 1rem 1rem 1.15rem; }
+  .tarjeta-expandible__titulo { font-size: var(--t-chico); }
+}

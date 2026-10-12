@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banco de pruebas · Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<style>
+  /* Índice del banco: solo CSS, todo con los tokens del kit */
+  .cabeza { padding-block: clamp(3rem, 9vw, 6rem) clamp(2rem, 5vw, 3rem); }
+  .cabeza .contenedor { display: grid; gap: 1.25rem; justify-items: start; }
+
+  .grilla {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    margin: 0; padding: 0; list-style: none;
+    counter-reset: pieza;
+  }
+  .grilla li { display: flex; counter-increment: pieza; }
+
+  .pieza {
+    flex: 1;
+    display: flex; flex-direction: column; gap: 0.5rem;
+    padding: 1.4rem 1.4rem 1.25rem;
+    background: var(--tinta-2);
+    transition: transform var(--d-media) var(--curva-salida), border-color var(--d-media) var(--curva-salida),
+      box-shadow var(--d-media) var(--curva-salida), background var(--d-media) var(--curva-salida);
+    animation: entra var(--d-larga) var(--curva-salida) backwards;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+  .pieza::before {
+    content: counter(pieza, decimal-leading-zero);
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.2em; color: var(--tenue);
+  }
+  .pieza::after {
+    content: "→";
+    position: absolute; top: 1.2rem; right: 1.3rem;
+    font: 500 1.1rem/1 var(--f-mono); color: var(--tenue);
+    transition: transform var(--d-media) var(--curva-salida), color var(--d-corta);
+  }
+  .pieza h2 { margin: 0.35rem 0 0; font: 700 var(--t-medio)/1.1 var(--f-titulo); letter-spacing: -0.015em; padding-right: 2rem; }
+  .pieza p { margin: 0; color: var(--bruma); font-size: var(--t-nota); line-height: 1.55; text-wrap: pretty; }
+  .pieza code { margin-top: auto; padding-top: 0.9rem; font: 400 var(--t-nota)/1.3 var(--f-mono); color: var(--acento-claro); overflow-wrap: anywhere; }
+
+  .pieza:hover, .pieza:focus-visible {
+    transform: translateY(-4px);
+    border-color: var(--linea-fuerte);
+    background: var(--superficie);
+    box-shadow: 0 22px 44px -22px color-mix(in srgb, var(--acento) 38%, transparent);
+  }
+  .pieza:hover::after, .pieza:focus-visible::after { transform: translateX(4px); color: var(--acento-claro); }
+  .pieza:active { transform: translateY(-1px); }
+
+  .pie { padding-block: 3rem 4rem; }
+  .pie code { font-family: var(--f-mono); color: var(--bruma); }
+
+  @keyframes entra { from { opacity: 0; transform: translateY(14px); } }
+  @media (prefers-reduced-motion: reduce) { .pieza { animation: none; } }
+</style>
+</head>
+<body>
+
+<header class="cabeza banda resplandor grano">
+  <div class="contenedor">
+    <p class="etiqueta">MOTOR WEBI</p>
+    <h1 class="titulo-xl">Banco de pruebas</h1>
+    <p class="bajada">Una página por pieza del kit: se ve funcionando y se ajusta a ojo antes de llevarla a un sitio.</p>
+  </div>
+</header>
+
+<main>
+  <div class="contenedor">
+    <ul class="grilla">
+      <li style="--i:0"><a class="tarjeta pieza" href="pelicula.html">
+        <h2>Película con scroll</h2>
+        <p>Un video que avanza cuadro a cuadro mientras se baja por la página.</p>
+        <code>cuadros.js</code>
+      </a></li>
+      <li style="--i:1"><a class="tarjeta pieza" href="personaje.html">
+        <h2>Cuadros con el puntero</h2>
+        <p>La misma película, pero la dirige el puntero; en táctil, el dedo.</p>
+        <code>cuadros.js</code>
+      </a></li>
+      <li style="--i:2"><a class="tarjeta pieza" href="portada.html">
+        <h2>Video de portada</h2>
+        <p>Un video que abre el sitio: se reproduce una vez, en bucle o de ida y vuelta.</p>
+        <code>video-portada.js</code>
+      </a></li>
+      <li style="--i:3"><a class="tarjeta pieza" href="capas.html">
+        <h2>Profundidad por capas</h2>
+        <p>Imágenes planas que se mueven a ritmos distintos y dan sensación de 3D.</p>
+        <code>capas.js</code>
+      </a></li>
+      <li style="--i:4"><a class="tarjeta pieza" href="foco.html">
+        <h2>Foco que revela</h2>
+        <p>Una ventana blanda sigue al puntero y descubre la imagen de abajo.</p>
+        <code>puntero.js</code>
+      </a></li>
+      <li style="--i:5"><a class="tarjeta pieza" href="shaders.html">
+        <h2>Fondos shader</h2>
+        <p>Siete familias de fondos en GPU con la paleta de la marca.</p>
+        <code>fondo-shader.js</code>
+      </a></li>
+      <li style="--i:6"><a class="tarjeta pieza" href="escena-3d.html">
+        <h2>Escena 3D</h2>
+        <p>three.js dormido hasta que entra en pantalla, con cámara por capítulos.</p>
+        <code>escena3d.js</code>
+      </a></li>
+      <li style="--i:7"><a class="tarjeta pieza" href="carruseles.html">
+        <h2>Carruseles y tarjetas</h2>
+        <p>Anillo, arco, marquesina y tarjetas que se expanden.</p>
+        <code>componentes/</code>
+      </a></li>
+      <li style="--i:8"><a class="tarjeta pieza" href="detalles.html">
+        <h2>Detalles que se notan</h2>
+        <p>Botones, cargadores y microinteracciones que dan terminación.</p>
+        <code>componentes/</code>
+      </a></li>
+      <li style="--i:9"><a class="tarjeta pieza" href="sitio-base.html">
+        <h2>Sitio base: todas las bandas</h2>
+        <p>Precios, contacto, pie y el resto de las bandas de una página, apiladas.</p>
+        <code>secciones.css</code>
+      </a></li>
+      <li style="--i:10"><a class="tarjeta pieza" href="pantalla-app.html">
+        <h2>Pantalla de app</h2>
+        <p>Un panel con gráficos en SVG que toman los colores de la marca.</p>
+        <code>graficos.js, pantalla.css</code>
+      </a></li>
+    </ul>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="contenedor">
+    <p class="nota">Se abre con <code>npm run banco</code> en <code>http://localhost:5190/banco/</code></p>
+  </div>
+</footer>
+
+</body>
+</html>

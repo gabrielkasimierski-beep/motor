@@ -1,0 +1,82 @@
+/* marquesina · ver marquesina.js para el truco y el uso.
+   Colores y curvas solo desde kit/tokens.css. */
+
+.marquesina {
+  --hueco: 1rem; /* espacio entre elementos */
+  --vuelta: 40s; /* lo pisa el JS según data-velocidad */
+  --alto: 24rem; /* solo para data-eje="y" */
+  --borde: 8%; /* cuánto se desvanece en cada punta */
+
+  position: relative;
+  overflow: hidden;
+  direction: ltr; /* el −50 % de la animación asume que la pista arranca a la izquierda */
+  /* La máscara solo mira el alfa: --tinta es un opaco cualquiera del sistema */
+  -webkit-mask-image: linear-gradient(to right, transparent, var(--tinta) var(--borde), var(--tinta) calc(100% - var(--borde)), transparent);
+  mask-image: linear-gradient(to right, transparent, var(--tinta) var(--borde), var(--tinta) calc(100% - var(--borde)), transparent);
+}
+
+/* Antes de que el JS arme la cinta (o si no corre) se ve como una fila que se desplaza a mano */
+.marquesina:not(.esta-lista) {
+  display: flex;
+  gap: var(--hueco);
+  overflow-x: auto;
+}
+
+.marquesina__pista {
+  display: flex;
+  width: max-content;
+  animation: marquesina-correr var(--vuelta) linear infinite;
+  will-change: transform;
+}
+
+/* Cada mitad lleva el hueco también al final: así −50 % cae justo donde empieza la copia */
+.marquesina__grupo {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--hueco);
+  padding-inline-end: var(--hueco);
+}
+.marquesina__grupo > * { flex: none; }
+.marquesina img { -webkit-user-drag: none; user-select: none; }
+
+/* ---------- Variantes ---------- */
+.marquesina[data-sentido="reversa"] .marquesina__pista { animation-direction: reverse; }
+
+.marquesina[data-eje="y"] {
+  height: var(--alto);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, var(--tinta) var(--borde), var(--tinta) calc(100% - var(--borde)), transparent);
+  mask-image: linear-gradient(to bottom, transparent, var(--tinta) var(--borde), var(--tinta) calc(100% - var(--borde)), transparent);
+}
+.marquesina[data-eje="y"]:not(.esta-lista) { flex-direction: column; overflow-x: hidden; overflow-y: auto; }
+.marquesina[data-eje="y"] .marquesina__pista {
+  flex-direction: column;
+  width: 100%;
+  height: max-content;
+  animation-name: marquesina-subir;
+}
+.marquesina[data-eje="y"] .marquesina__grupo {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  padding-inline-end: 0;
+  padding-block-end: var(--hueco);
+}
+
+@keyframes marquesina-correr { to { transform: translate3d(-50%, 0, 0); } }
+@keyframes marquesina-subir { to { transform: translate3d(0, -50%, 0); } }
+
+/* ---------- Se frena: fuera de pantalla, al enfocar, y con el puntero (solo si hay puntero) ---------- */
+.marquesina.es-pausada .marquesina__pista,
+.marquesina:focus-within .marquesina__pista { animation-play-state: paused; }
+@media (hover: hover) {
+  .marquesina:hover .marquesina__pista { animation-play-state: paused; }
+}
+
+/* ---------- Reducir movimiento: contenido original quieto, desplazable a mano ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .marquesina { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+  .marquesina[data-eje="y"] { overflow-x: hidden; overflow-y: auto; }
+  .marquesina__pista { animation: none; }
+  .marquesina [data-clon] { display: none; }
+}

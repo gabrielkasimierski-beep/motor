@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Película con scroll · Banco del Motor webi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<style>
+  /* ---------- Cabecera y panel del banco ---------- */
+  .cabecera {
+    position: fixed; inset: 0 0 auto 0; z-index: 40;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.7rem var(--margen);
+    background: color-mix(in srgb, var(--tinta) 70%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--linea);
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  .cabecera__nombre { display: flex; align-items: baseline; gap: 0.75rem; color: var(--hueso); }
+  .cabecera__nombre small { color: var(--tenue); font-size: inherit; letter-spacing: 0.08em; text-transform: none; }
+  .cabecera__volver { color: var(--acento-claro); padding: 0.4rem 0; }
+  .cabecera__volver:hover { color: var(--hueso); }
+  @media (max-width: 30rem) { .cabecera__nombre small { display: none; } }
+
+  .panel { position: fixed; right: 12px; bottom: 12px; z-index: 60; }
+  .panel details {
+    border: 1px solid var(--linea-fuerte); border-radius: var(--r-medio);
+    background: color-mix(in srgb, var(--tinta-2) 90%, transparent);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 14px 40px -14px rgba(0, 0, 0, 0.65);
+  }
+  .panel details[open] { width: min(19rem, calc(100vw - 24px)); }
+  .panel summary {
+    list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.75rem 1rem; min-height: 2.75rem;
+    font: 500 var(--t-etiqueta)/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--acento-claro);
+  }
+  .panel summary::-webkit-details-marker { display: none; }
+  .panel summary::after { content: "+"; font-size: 1rem; line-height: 1; }
+  .panel details[open] summary::after { content: "–"; }
+  .panel__cuerpo { display: grid; gap: 1rem; padding: 0.25rem 1rem 1rem; }
+  .ajuste { display: grid; gap: 0.4rem; }
+  .ajuste__fila { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; font-size: var(--t-nota); color: var(--bruma); }
+  .ajuste output { font: 500 var(--t-nota)/1 var(--f-mono); color: var(--hueso); }
+  .ajuste input[type="range"] { width: 100%; margin: 0; accent-color: var(--acento); }
+  .ajuste__botones { display: flex; gap: 0.5rem; }
+  button.pastilla { cursor: pointer; min-height: 2.25rem; padding-inline: 1.1rem; }
+  .panel .nota { margin: 0; line-height: 1.45; }
+
+  /* ---------- Portada y banda de cierre ---------- */
+  .portada { min-height: 78vh; min-height: 78svh; display: grid; align-content: center; padding-block: 6rem 4rem; }
+  .portada .contenedor { display: grid; gap: 1.25rem; justify-items: start; }
+  .portada .bajada { max-width: 38rem; }
+  .cierre .contenedor { display: grid; gap: 2.5rem; }
+  .cierre__cabeza { display: grid; gap: 1rem; justify-items: start; }
+  .cierre__rejilla { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+  .cierre .tarjeta { padding: 1.5rem; display: grid; gap: 0.6rem; align-content: start; }
+  .cierre .tarjeta p { margin: 0; color: var(--bruma); font-size: var(--t-nota); line-height: 1.55; }
+  .cierre .tarjeta code { font-family: var(--f-mono); color: var(--acento-claro); font-size: 0.92em; }
+
+  /* ---------- Escenario ---------- */
+  .escena { background: var(--tinta); }
+  #lienzo { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .velo {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(to top, color-mix(in srgb, var(--tinta) 55%, transparent), transparent 22%),
+      radial-gradient(120% 95% at 50% 50%, transparent 58%, color-mix(in srgb, var(--tinta) 50%, transparent) 100%);
+  }
+
+  /* Capítulos: alternan de lado para dejar el centro de la imagen libre */
+  .capitulo { position: absolute; z-index: 4; width: min(24rem, 40vw); pointer-events: none; }
+  .capitulo--izq { left: max(var(--margen), 4vw); top: 50%; translate: 0 -50%; }
+  .capitulo--der { right: max(var(--margen), 4vw); top: 50%; translate: 0 -50%; }
+  .capitulo__caja {
+    display: grid; gap: 0.6rem; padding: 1.25rem 1.4rem; opacity: 0; will-change: opacity, transform;
+    background: color-mix(in srgb, var(--tinta) 74%, transparent);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--linea-fuerte); border-radius: var(--r-medio);
+  }
+  .capitulo__caja p { margin: 0; color: var(--bruma); font-size: var(--t-chico); line-height: 1.5; text-wrap: pretty; }
+  .capitulo code { font-family: var(--f-mono); color: var(--acento-claro); font-size: 0.9em; }
+  @media (max-width: 47.9375rem) {
+    /* en el celu la imagen manda: el texto baja y se alterna por lado, no por altura */
+    .capitulo { width: min(20rem, 84vw); top: auto; bottom: 4.75rem; translate: none; }
+    .capitulo--izq { left: var(--margen); }
+    .capitulo--der { right: var(--margen); }
+    .capitulo__caja { padding: 1rem 1.1rem; }
+    .capitulo__caja p { font-size: var(--t-nota); }
+  }
+
+  /* Llamada anclada: su origen es (0,0) del escenario y JS la lleva al punto de la imagen */
+  .llamada { position: absolute; left: 0; top: 0; z-index: 3; width: 0; height: 0; pointer-events: none; opacity: 0; will-change: transform; }
+  .llamada__marca {
+    position: absolute; left: -7px; top: -7px; width: 14px; height: 14px; border-radius: 50%;
+    border: 1.5px solid var(--hueso); background: color-mix(in srgb, var(--tinta) 55%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--tinta) 70%, transparent);
+  }
+  .llamada__marca::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--acento); }
+  .llamada__hilo {
+    position: absolute; left: 0; bottom: 7px; width: 1px; height: 4.5rem; background: var(--hueso);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--tinta) 55%, transparent);
+  }
+  .llamada__texto {
+    position: absolute; left: 0; bottom: calc(7px + 4.5rem); transform: translate(-1px, 50%); white-space: nowrap;
+    padding: 0.35rem 0.6rem 0.35rem 0.7rem; border-left: 2px solid var(--acento);
+    background: color-mix(in srgb, var(--tinta) 80%, transparent);
+    font: 500 var(--t-etiqueta)/1.35 var(--f-mono); letter-spacing: 0.08em; color: var(--hueso);
+  }
+  .llamada__texto small { display: block; color: var(--bruma); font-size: inherit; letter-spacing: 0.02em; }
+  .llamada--izq .llamada__texto { transform: translate(calc(-100% + 1px), 50%); border-left: 0; border-right: 2px solid var(--acento); text-align: right; padding: 0.35rem 0.7rem 0.35rem 0.6rem; }
+  .llamada--abajo .llamada__hilo { bottom: auto; top: 7px; }
+  .llamada--abajo .llamada__texto { bottom: auto; top: calc(7px + 4.5rem); transform: translate(-1px, -50%); }
+  .llamada--abajo.llamada--izq .llamada__texto { transform: translate(calc(-100% + 1px), -50%); }
+
+  .contador { position: absolute; left: var(--margen); bottom: 1rem; z-index: 5; font-family: var(--f-mono); color: var(--bruma); letter-spacing: 0.1em; }
+  .contador b { color: var(--hueso); font-weight: 500; }
+  .aviso { position: absolute; left: var(--margen); right: var(--margen); top: 4rem; z-index: 5; margin: 0; max-width: 26rem; font-size: var(--t-nota); color: var(--bruma); }
+  .aviso[hidden] { display: none; }
+
+  /* Cargador con progreso real */
+  .cargador {
+    position: absolute; inset: 0; z-index: 8; display: grid; place-content: center; justify-items: center; gap: 1rem;
+    background: var(--tinta); text-align: center;
+    transition: opacity var(--d-larga) var(--curva-salida), visibility 0s linear var(--d-larga);
+  }
+  .cargador.es-oculto { opacity: 0; visibility: hidden; pointer-events: none; }
+  .cargador__barra { width: min(18rem, 70vw); height: 2px; background: var(--linea-fuerte); overflow: hidden; }
+  .cargador__barra i { display: block; height: 100%; background: var(--acento); transform-origin: left center; transform: scaleX(0); }
+  .cargador__num { font: 500 var(--t-nota)/1 var(--f-mono); color: var(--bruma); letter-spacing: 0.1em; }
+  .cargador__error { margin: 0; max-width: 22rem; color: var(--bruma); font-size: var(--t-nota); }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <span class="cabecera__nombre">Película con scroll <small>cuadros.js · motor-scroll.js</small></span>
+  <a class="cabecera__volver" href="index.html">← Banco</a>
+</header>
+
+<main>
+  <section class="portada">
+    <div class="contenedor">
+      <span class="etiqueta" data-aparecer>Pieza · cuadros.js</span>
+      <h1 class="titulo-xl" data-aparecer>Una toma que avanza cuando bajás.</h1>
+      <p class="bajada" data-aparecer>Ciento veinte imágenes sobre un canvas y el scroll elige cuál se ve. Escenario fijo, carga progresiva con barra real y una llamada atada a un punto de la imagen.</p>
+      <span class="pastilla" data-aparecer>Bajá para empezar ↓</span>
+    </div>
+  </section>
+
+  <!-- El escenario: una pista alta con la escena pegada. El progreso del scroll recorre los cuadros -->
+  <section id="pista" data-escenario style="--largo:400vh" aria-label="Película que avanza con el scroll">
+    <div data-escena class="escena">
+      <canvas id="lienzo" role="img" aria-label="Acercamiento continuo a un fractal de colores"></canvas>
+      <div class="velo"></div>
+
+      <div class="llamada" id="llamada" aria-hidden="true">
+        <span class="llamada__hilo"></span>
+        <span class="llamada__marca"></span>
+        <span class="llamada__texto">ANCLA <span id="llamada-xy">0.50 · 0.57</span><small>atada a la imagen, no a la pantalla</small></span>
+      </div>
+
+      <div class="capitulo capitulo--izq" data-cap>
+        <div class="capitulo__caja">
+          <span class="etiqueta">01 · Cuadros</span>
+          <h2 class="titulo-m">Cada cuadro es una foto.</h2>
+          <p>120 imágenes WebP de 960×540 que se dibujan sobre un canvas. El scroll elige cuál; entre dos cuadros se funden.</p>
+        </div>
+      </div>
+      <div class="capitulo capitulo--der" data-cap>
+        <div class="capitulo__caja">
+          <span class="etiqueta">02 · Anclaje</span>
+          <h2 class="titulo-m">La llamada no se mueve de lugar.</h2>
+          <p>Está atada a un punto de la imagen con <code>punto(x, y)</code>. Cambiá el tamaño de la ventana: sigue sobre el mismo sitio.</p>
+        </div>
+      </div>
+      <div class="capitulo capitulo--izq" data-cap>
+        <div class="capitulo__caja">
+          <span class="etiqueta">03 · Carga</span>
+          <h2 class="titulo-m">Primero el 1, después el resto.</h2>
+          <p>Arranca con el cuadro 1, sigue con 1 de cada 8, de cada 4, de cada 2 y completa. Se puede usar antes de terminar.</p>
+        </div>
+      </div>
+
+      <p class="aviso" id="aviso" hidden>Movimiento reducido: se muestra el cuadro final, quieto.</p>
+      <div class="contador pastilla" id="contador" aria-hidden="true"><b id="contador-n">001</b>&nbsp;/ 120</div>
+
+      <div class="cargador" id="cargador">
+        <span class="etiqueta" id="cargador-etiqueta">Cargando cuadros</span>
+        <div class="cargador__barra" role="progressbar" aria-label="Carga de cuadros" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="cargador-barra"></i></div>
+        <span class="cargador__num" id="cargador-num">000%</span>
+        <p class="cargador__error" id="cargador-error" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Después del escenario: una banda normal para comprobar que se suelta bien -->
+  <section class="banda cierre">
+    <div class="contenedor">
+      <div class="cierre__cabeza">
+        <span class="etiqueta" data-aparecer>Fuera del escenario</span>
+        <h2 class="titulo-l" data-aparecer>El escenario se soltó.</h2>
+        <p class="bajada" data-aparecer>Esta banda es una sección común. Si llegaste hasta acá sin un salto ni un hueco, la pista termina donde tiene que terminar.</p>
+      </div>
+      <div class="cierre__rejilla">
+        <div class="tarjeta" data-aparecer>
+          <span class="etiqueta">crearCuadros</span>
+          <p>Carga con fetch, decodifica con <code>createImageBitmap</code> y dibuja “cubrir” respetando el foco. Solo redibuja si cambió el cuadro o el tamaño.</p>
+        </div>
+        <div class="tarjeta" data-aparecer>
+          <span class="etiqueta">conScroll</span>
+          <p>Engancha la película al escenario fijo. Con “reducir movimiento” deja un cuadro quieto en vez de recorrerla.</p>
+        </div>
+        <div class="tarjeta" data-aparecer>
+          <span class="etiqueta">punto(x, y)</span>
+          <p>Devuelve dónde cae un punto de la imagen dentro del canvas, con el mismo encaje del dibujo. Sirve para anclar textos y marcas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<aside class="panel" aria-label="Ajustes de la pieza">
+  <details id="panel">
+    <summary>Ajustes</summary>
+    <div class="panel__cuerpo">
+      <label class="ajuste">
+        <span class="ajuste__fila">Suavizar <output id="o-suavizar">0.12</output></span>
+        <input type="range" id="i-suavizar" min="0" max="0.3" step="0.01" value="0.12">
+      </label>
+      <div class="ajuste">
+        <span class="ajuste__fila">Mezclar cuadros <output id="o-mezclar">sí</output></span>
+        <div class="ajuste__botones">
+          <button class="pastilla" type="button" aria-pressed="true" data-mezclar="1">Sí</button>
+          <button class="pastilla" type="button" aria-pressed="false" data-mezclar="0">No</button>
+        </div>
+      </div>
+      <label class="ajuste">
+        <span class="ajuste__fila">Largo del escenario <output id="o-largo">400vh</output></span>
+        <input type="range" id="i-largo" min="200" max="600" step="20" value="400">
+      </label>
+      <p class="nota">Cambiar “mezclar” vuelve a cargar los cuadros: es una buena ocasión para ver el cargador.</p>
+    </div>
+  </details>
+</aside>
+
+<script type="module">
+import { escenario, capitulos, aparecer, curvas, limitar, reducido } from "../kit/motor-scroll.js";
+import { crearCuadros, conScroll } from "../kit/cuadros.js";
+
+const TOTAL = 120;
+// ?toma=producto usa la botella generada (un giro completo); sin parámetro, el fractal de prueba
+const PRODUCTO = new URLSearchParams(location.search).get("toma") === "producto";
+const FUENTE = PRODUCTO ? "medios/producto/nogal-####.webp" : "medios/cuadros/muestra-####.webp";
+const ANCLA = PRODUCTO ? { x: 0.5, y: 0.5 } : { x: 0.498, y: 0.57 };   // la etiqueta / el cuello entre los dos bulbos
+const CORTES = [0, 0.3, 0.66, 1];      // tres capítulos de texto sobre el progreso 0..1
+
+const $ = (s) => document.querySelector(s);
+const pista = $("#pista"), lienzo = $("#lienzo"), llamada = $("#llamada");
+const contadorN = $("#contador-n"), aviso = $("#aviso");
+const cargador = $("#cargador"), barra = $("#cargador-barra"), num = $("#cargador-num");
+const cajas = [...document.querySelectorAll("[data-cap]")];
+
+const estado = { suavizar: 0.12, mezclar: true, largo: 400 };
+let pelicula = null, ligaPelicula = null, ligaTexto = null;
+
+/* ---------- Texto y contador: siguen el mismo progreso que los cuadros ---------- */
+// entra con un movimiento corto, se sostiene y sale; el primero ya está puesto al empezar y el último queda al final
+function envolvente(i, indice, local) {
+  if (i !== indice) return { o: 0, y: 0 };
+  const entra = i === 0 ? 1 : curvas.salida(limitar(local / 0.2));
+  const sale = i === cajas.length - 1 ? 1 : 1 - limitar((local - 0.8) / 0.2);
+  return { o: Math.min(entra, sale), y: (1 - entra) * 26 - (1 - sale) * 26 };
+}
+
+function alProgreso(p) {
+  const quieto = reducido();
+  const { indice, local } = capitulos(p, CORTES);
+  cajas.forEach((cap, i) => {
+    const { o, y } = envolvente(i, indice, local);
+    const caja = cap.firstElementChild;
+    caja.style.opacity = o.toFixed(3);
+    caja.style.transform = quieto ? "none" : `translateY(${y.toFixed(1)}px)`;
+    cap.style.visibility = o > 0.01 ? "visible" : "hidden";
+  });
+  llamada.style.opacity = envolvente(1, indice, local).o.toFixed(3); // la llamada vive en el capítulo 2
+  // con movimiento reducido conScroll deja el cuadro final: el contador dice lo mismo
+  contadorN.textContent = String(quieto ? TOTAL : Math.round(p * (TOTAL - 1)) + 1).padStart(3, "0");
+  aviso.hidden = !quieto;
+  anclar();
+}
+
+/* ---------- Llamada anclada al punto de la imagen ---------- */
+let anclaPrevia = "";
+function anclar() {
+  if (!pelicula) return;
+  const pt = pelicula.punto(ANCLA.x, ANCLA.y);
+  const w = lienzo.clientWidth;
+  const clave = pt.x.toFixed(1) + "," + pt.y.toFixed(1) + "," + w;
+  if (clave === anclaPrevia) return;
+  anclaPrevia = clave;
+  llamada.style.transform = `translate(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px)`;
+  llamada.classList.toggle("llamada--izq", pt.x > w * 0.58);   // la etiqueta se da vuelta si no entra
+  llamada.classList.toggle("llamada--abajo", pt.y < 120);
+}
+
+/* ---------- Cargador ---------- */
+function alCargar(p) {
+  barra.style.transform = `scaleX(${p})`;
+  num.textContent = String(Math.round(p * 100)).padStart(3, "0") + "%";
+  barra.parentElement.setAttribute("aria-valuenow", Math.round(p * 100));
+}
+
+/* ---------- Armado ---------- */
+function enlazar() {
+  if (ligaPelicula) ligaPelicula.destruir();
+  if (ligaTexto) ligaTexto.destruir();
+  // los dos enganches usan el mismo suavizado, así el texto y el cuadro no se despegan
+  ligaPelicula = conScroll(pelicula, pista, { suavizar: estado.suavizar });
+  ligaTexto = escenario(pista, alProgreso, { suavizar: estado.suavizar });
+}
+
+function crear() {
+  cargador.classList.remove("es-oculto");
+  $("#cargador-error").hidden = true;
+  alCargar(0);
+  anclaPrevia = "";
+  const mia = crearCuadros(lienzo, { fuente: FUENTE, total: TOTAL, mezclar: estado.mezclar, alCargar });
+  pelicula = mia;
+  mia.lista
+    .then(() => {
+      if (mia !== pelicula) return;
+      anclar();
+      setTimeout(() => { if (mia === pelicula) cargador.classList.add("es-oculto"); }, 350); // se ve el 100 % un instante
+    })
+    .catch(() => {
+      if (mia !== pelicula) return;
+      $("#cargador-etiqueta").textContent = "No se pudo cargar";
+      const e = $("#cargador-error");
+      e.hidden = false;
+      e.textContent = "Abrí el banco desde el servidor local (npm run banco) para que carguen los cuadros.";
+    });
+  enlazar();
+}
+
+function reiniciar() {
+  if (ligaPelicula) ligaPelicula.destruir();
+  pelicula.destruir();
+  crear();
+}
+
+/* ---------- Panel ---------- */
+const iSuavizar = $("#i-suavizar"), iLargo = $("#i-largo");
+iSuavizar.addEventListener("input", () => {
+  estado.suavizar = Number(iSuavizar.value);
+  $("#o-suavizar").textContent = estado.suavizar.toFixed(2);
+  enlazar();
+});
+iLargo.addEventListener("input", () => {
+  estado.largo = Number(iLargo.value);
+  $("#o-largo").textContent = estado.largo + "vh";
+  pista.style.setProperty("--largo", estado.largo + "vh");
+});
+document.querySelectorAll("[data-mezclar]").forEach((b) => b.addEventListener("click", () => {
+  const si = b.dataset.mezclar === "1";
+  if (si === estado.mezclar) return;
+  estado.mezclar = si;
+  document.querySelectorAll("[data-mezclar]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  $("#o-mezclar").textContent = si ? "sí" : "no";
+  reiniciar();
+}));
+if (innerWidth >= 900) $("#panel").open = true;   // en el celu arranca plegado
+
+// si cambia el tamaño, la llamada se reubica cuando el canvas ya tomó su nueva medida
+new ResizeObserver(() => requestAnimationFrame(() => { anclaPrevia = ""; anclar(); })).observe(pista.querySelector("[data-escena]"));
+
+aparecer();
+crear();
+</script>
+</body>
+</html>

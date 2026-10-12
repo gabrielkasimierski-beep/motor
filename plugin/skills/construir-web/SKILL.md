@@ -44,6 +44,10 @@ Del brief salen, y se dejan escritas en `decisiones.md`:
 - **Carril A o B** (árbol de `decidir-trabajo.md`) + el motivo en una frase
 - **Personalidad · paleta · tipografías · tipo de hero · radios** (de `sistema-diseno.md`)
 - **Mapa de páginas** y qué secciones va a tener la home, en qué orden
+- **¿Lleva una pieza con movimiento?** (un producto que gira con el scroll, un video de portada, un fondo
+  vivo, 3D). Si el brief o el prototipo lo piden, esa parte la dirige la skill `dirigir-sitio` con el
+  **kit webi** (`C:/Claude/Motor/01-Capacidades/web/webi/`): **una sola** pieza firma por sitio y el resto
+  quieto. Si no hace falta, no se agrega: el movimiento es un medio, nunca el objetivo.
 
 Si el brief no alcanza para decidir algo: se elige la opción más conservadora y se anota
 como pregunta para Gaby. **No se frena la obra por una duda.**

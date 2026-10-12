@@ -1,0 +1,151 @@
+/* pasos-camino — estilos.
+
+   QUÉ ES: los pasos de un proceso unidos por UNA sola línea punteada que salta de punto en punto
+   y se dibuja a medida que entrás en pantalla. Cada paso aparece cuando la línea llega a su punto.
+
+   EL TRUCO (en el JS): el recorrido no se dibuja a mano: se MIDEN las posiciones reales de los
+   puntos y se traza una curva con un saltito entre cada par, así que sigue a cualquier maqueta y
+   se recalcula al cambiar el ancho (en escritorio los pasos van en fila y la línea salta por
+   arriba; en el celu van en columna y la línea baja en vertical, saltando hacia la derecha).
+   Lo punteado y el dibujarse conviven así: el trazo punteado se ve a través de una MÁSCARA, y lo
+   que se anima con el scroll (stroke-dashoffset) es una línea sólida adentro de esa máscara. Si
+   se animara el dashoffset del propio punteado, los puntos correrían en vez de aparecer.
+
+   SIN JS: los pasos se ven todos, sin línea. El JS suma .esta-lista y recién ahí los pasos esperan.
+   REDUCIR MOVIMIENTO: la línea queda dibujada entera y todos los pasos a la vista.
+
+   USO EN HTML (la lista va adentro de un contenedor: el SVG de la línea es hermano de la lista):
+     <link rel="stylesheet" href="kit/componentes/pasos-camino/pasos-camino.css">
+     <div class="pasos-camino" data-pasos-camino>
+       <ol class="pasos-camino__lista" role="list">
+         <li class="pasos-camino__paso">
+           <span class="pasos-camino__punto" aria-hidden="true">1</span>
+           <div class="pasos-camino__cuerpo">
+             <h3 class="pasos-camino__titulo">Escuchamos</h3>
+             <p class="pasos-camino__texto">Qué vendés, a quién y qué te frena hoy.</p>
+           </div>
+         </li>
+         …
+       </ol>
+     </div>
+     <script type="module">
+       import { pasosCamino } from "./kit/componentes/pasos-camino/pasos-camino.js";
+       pasosCamino(document.querySelector("[data-pasos-camino]"));
+     </script>
+   (role="list" porque con list-style: none Safari deja de anunciarla como lista.) */
+
+.pasos-camino { position: relative; }
+
+.pasos-camino__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2.75rem;
+}
+
+.pasos-camino__paso {
+  position: relative;
+  z-index: 1; /* por encima de la línea */
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 1.25rem;
+  align-items: start;
+}
+
+.pasos-camino__punto {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--linea-fuerte);
+  background: var(--tinta-2);
+  color: var(--tenue);
+  font: 500 0.9375rem/1 var(--f-mono);
+  transition:
+    background var(--d-media) var(--curva-salida),
+    color var(--d-media) var(--curva-salida),
+    border-color var(--d-media) var(--curva-salida),
+    box-shadow var(--d-media) var(--curva-salida),
+    transform var(--d-media) var(--curva-rebote);
+}
+/* Sin JS no hay línea que los encienda: se muestran ya con el acento */
+.pasos-camino:not(.esta-lista) .pasos-camino__punto {
+  border-color: var(--acento);
+  color: var(--acento-claro);
+}
+
+.pasos-camino__cuerpo { padding-top: 0.4rem; }
+.pasos-camino__titulo {
+  margin: 0 0 0.35rem;
+  font: 700 1.25rem/1.15 var(--f-titulo);
+  letter-spacing: -0.01em;
+}
+.pasos-camino__texto { margin: 0; color: var(--bruma); font-size: var(--t-chico); text-wrap: pretty; }
+
+/* ---------- Estados que prende el JS ---------- */
+.pasos-camino.esta-lista .pasos-camino__punto { transform: scale(0.82); }
+.pasos-camino.esta-lista .pasos-camino__paso.es-activo .pasos-camino__punto {
+  transform: none;
+  background: var(--acento);
+  border-color: transparent;
+  color: var(--sobre-acento);
+  box-shadow: var(--sombra-acento);
+}
+.pasos-camino.esta-lista .pasos-camino__cuerpo {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity var(--d-larga) var(--curva-salida),
+    transform var(--d-larga) var(--curva-salida);
+}
+.pasos-camino.esta-lista .pasos-camino__paso.es-activo .pasos-camino__cuerpo {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- La línea (SVG que arma el JS, en coordenadas de píxel del contenedor) ---------- */
+.pasos-camino__svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.pasos-camino__base,
+.pasos-camino__trazo {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.01 11; /* largo casi nulo + cabo redondo = puntos */
+}
+.pasos-camino__base { stroke: var(--linea-fuerte); }
+.pasos-camino__trazo { stroke: var(--acento); }
+/* La máscara solo importa por su alfa; más gruesa que los puntos para no recortarlos de costado */
+.pasos-camino__mascara { fill: none; stroke: var(--hueso); stroke-width: 14; }
+.pasos-camino__cabeza {
+  fill: var(--acento-claro);
+  opacity: 0;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--acento) 70%, transparent));
+  transition: opacity var(--d-corta) var(--curva-salida);
+}
+
+/* ---------- Escritorio: los pasos en fila, la línea salta por arriba ---------- */
+@media (min-width: 48rem) {
+  .pasos-camino__lista {
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 2rem;
+    padding-top: 3.5rem; /* aire para los saltos */
+  }
+  .pasos-camino__paso { grid-template-columns: 1fr; row-gap: 1.25rem; }
+  .pasos-camino__punto { justify-self: start; }
+  .pasos-camino__cuerpo { padding-top: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pasos-camino.esta-lista .pasos-camino__cuerpo { opacity: 1; transform: none; transition: none; }
+  .pasos-camino.esta-lista .pasos-camino__punto { transition: none; }
+}

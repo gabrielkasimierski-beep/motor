@@ -1,0 +1,202 @@
+/* cargador-intro — entrada de página (estilos).
+
+   QUÉ ES: una pantalla de entrada. Un lema se arma palabra por palabra, da paso al logo y la
+   pantalla se abre en dos paneles hacia los costados, mostrando la página. Después se saca del DOM.
+
+   EL TRUCO: son dos paneles de media pantalla y CADA UNO lleva su propia copia de la escena
+   (lema + logo), alineada para que juntas formen una sola. Así, al abrirse, el logo se parte al
+   medio y cada mitad viaja con su panel. Las dos copias se animan con las mismas clases del
+   contenedor (es-lema → es-logo → es-abriendo), sin sincronizar nada a mano. El ancho de la
+   escena es el del contenedor (100cqw), no el de la ventana, así no se corre con la barra de scroll.
+
+   CÓMO SE USA: no se escribe HTML; lo arma cargador-intro.js. Solo hay que linkear este .css:
+     <link rel="stylesheet" href="kit/componentes/cargador-intro/cargador-intro.css">
+     import { cargadorIntro } from "…/cargador-intro.js";
+     cargadorIntro({ lema: "Hecho a mano para vender", logo: "webi", alTerminar() { … } });
+   Las duraciones las escribe el JS en variables (--ci-*) para que haya una sola fuente de tiempos. */
+
+.cargador-intro {
+  --ci-z: 1000;
+  position: fixed;
+  inset: 0;
+  z-index: var(--ci-z);
+  container-type: inline-size;
+  overscroll-behavior: contain;
+  touch-action: none;
+  color: var(--hueso);
+  cursor: pointer;
+}
+
+/* Los paneles se pisan 1px para que no asome una costura en pantallas de ancho impar */
+.cargador-intro__panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(50% + 1px);
+  overflow: hidden;
+  background: var(--tinta);
+  will-change: transform;
+  transition:
+    transform var(--ci-abrir, 1s) var(--curva-ida-vuelta),
+    box-shadow var(--d-media) var(--curva-salida);
+}
+.cargador-intro__panel--izq { left: 0; }
+.cargador-intro__panel--der { right: 0; }
+
+/* La escena mide lo que el contenedor entero y se ancla al borde externo de su panel */
+.cargador-intro__escena {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  width: 100cqw;
+  display: grid;
+  place-items: center;
+  padding-inline: var(--margen);
+  text-align: center;
+  background: radial-gradient(48% 42% at 50% 50%, color-mix(in srgb, var(--acento) 11%, transparent), transparent 75%);
+}
+.cargador-intro__panel--izq .cargador-intro__escena { left: 0; }
+.cargador-intro__panel--der .cargador-intro__escena { right: 0; }
+.cargador-intro__escena > * { grid-area: 1 / 1; }
+
+/* ---------- Lema: cada palabra sube desde una máscara ---------- */
+.cargador-intro__lema {
+  margin: 0;
+  max-width: 17ch;
+  font: 800 var(--t-grande)/1.04 var(--f-titulo);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.cargador-intro__palabra {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* aire para que la máscara no corte las patas de la g ni los acentos */
+  padding: 0.1em 0.03em 0.16em;
+  margin: -0.1em -0.03em -0.16em;
+}
+.cargador-intro__palabra > span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(112%);
+  filter: blur(8px);
+  transition:
+    transform var(--ci-palabra, 0.9s) var(--curva-salida) calc(var(--i, 0) * var(--ci-escalon, 0.11s)),
+    opacity var(--ci-palabra, 0.9s) var(--curva-salida) calc(var(--i, 0) * var(--ci-escalon, 0.11s)),
+    filter var(--ci-palabra, 0.9s) var(--curva-salida) calc(var(--i, 0) * var(--ci-escalon, 0.11s));
+}
+.cargador-intro.es-lema .cargador-intro__palabra > span {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+/* Al pasar al logo, las palabras salen hacia arriba (más rápido de lo que entraron) */
+.cargador-intro.es-logo .cargador-intro__palabra > span {
+  opacity: 0;
+  transform: translateY(-112%);
+  filter: blur(6px);
+  transition-duration: var(--ci-salida, 0.6s);
+  transition-delay: calc(var(--i, 0) * 0.05s);
+}
+
+/* ---------- Logo ---------- */
+.cargador-intro__logo {
+  display: grid;
+  justify-items: center;
+  gap: 1.1rem;
+  opacity: 0;
+  transform: scale(0.9);
+  filter: blur(10px);
+  transition:
+    opacity var(--ci-logo, 0.9s) var(--curva-salida),
+    transform var(--ci-logo, 0.9s) var(--curva-salida),
+    filter var(--ci-logo, 0.9s) var(--curva-salida);
+}
+.cargador-intro.es-logo .cargador-intro__logo {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition-delay: var(--ci-demora-logo, 0.3s);
+}
+.cargador-intro__logo > * { max-width: min(70cqw, 26rem); max-height: 40svh; }
+.cargador-intro__logo-texto {
+  font: 800 var(--t-gigante)/1 var(--f-titulo);
+  letter-spacing: -0.04em;
+}
+/* Una línea del acento que se estira debajo del logo */
+.cargador-intro__logo::after {
+  content: "";
+  width: 3.5rem;
+  height: 3px;
+  border-radius: var(--r-pastilla);
+  background: var(--acento);
+  transform: scaleX(0);
+  transition: transform var(--ci-logo, 0.9s) var(--curva-salida);
+}
+.cargador-intro.es-logo .cargador-intro__logo::after {
+  transform: scaleX(1);
+  transition-delay: calc(var(--ci-demora-logo, 0.3s) + 0.25s);
+}
+
+/* ---------- Progreso real (solo si se usa progreso()) y aviso de saltar ---------- */
+.cargador-intro__barra {
+  position: absolute;
+  left: 50%;
+  bottom: max(2.25rem, env(safe-area-inset-bottom));
+  width: min(14rem, 50%);
+  height: 2px;
+  translate: -50% 0;
+  overflow: hidden;
+  border-radius: var(--r-pastilla);
+  background: var(--linea-fuerte);
+  opacity: 0;
+  transition: opacity var(--d-media) var(--curva-salida);
+}
+.cargador-intro__barra > i {
+  display: block;
+  height: 100%;
+  background: var(--acento);
+  transform-origin: left center;
+  transform: scaleX(var(--p, 0));
+  transition: transform var(--d-media) var(--curva-salida);
+}
+.cargador-intro.es-con-progreso .cargador-intro__barra { opacity: 1; }
+
+.cargador-intro__salto {
+  position: absolute;
+  right: var(--margen);
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  font: 500 var(--t-etiqueta)/1 var(--f-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tenue);
+  opacity: 0;
+  transition: opacity var(--d-larga) var(--curva-salida);
+}
+.cargador-intro.es-lema .cargador-intro__salto { opacity: 1; transition-delay: 1.2s; }
+
+/* ---------- Apertura: los paneles se van hacia los costados ---------- */
+.cargador-intro.es-abriendo { pointer-events: none; cursor: default; }
+.cargador-intro.es-abriendo .cargador-intro__barra,
+.cargador-intro.es-abriendo .cargador-intro__salto { opacity: 0; transition-delay: 0s; }
+.cargador-intro.es-abriendo .cargador-intro__panel--izq {
+  transform: translateX(-100%);
+  box-shadow: 1px 0 0 color-mix(in srgb, var(--acento) 55%, transparent), 0 0 70px color-mix(in srgb, var(--acento) 22%, transparent);
+}
+.cargador-intro.es-abriendo .cargador-intro__panel--der {
+  transform: translateX(100%);
+  box-shadow: -1px 0 0 color-mix(in srgb, var(--acento) 55%, transparent), 0 0 70px color-mix(in srgb, var(--acento) 22%, transparent);
+}
+
+/* Saltar: se desvanece entero y rápido */
+.cargador-intro.es-saltando {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--curva-salida);
+}
+
+/* Reducir movimiento: el JS ni lo arma; esto cubre el caso de que cambie en vivo */
+@media (prefers-reduced-motion: reduce) {
+  .cargador-intro { display: none; }
+}

@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller Nogal · Muebles de madera a medida</title>
+<meta name="description" content="Taller Nogal: cocinas, placards y muebles de madera a medida en Villa Urquiza. Medimos en tu casa, fabricamos en el taller y colocamos. Presupuesto por escrito en 48 horas.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit/tokens.css">
+<link rel="stylesheet" href="../kit/secciones.css">
+<style>
+  /* Solo de esta página de muestra: la barra que avisa que es un ejemplo del banco */
+  .muestra { border-bottom: 1px solid var(--linea); background: var(--superficie); color: var(--bruma); text-align: center; padding-block: 0.5rem; font: 500 var(--t-etiqueta)/1.3 var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; }
+  .muestra a { color: var(--acento-claro); }
+  .muestra a:hover { text-decoration: underline; text-underline-offset: 3px; }
+</style>
+<noscript><style>[data-aparecer] { opacity: 1; transform: none; }</style></noscript>
+</head>
+<body>
+
+<!-- Íconos de línea: se usan con <svg class="icono"><use href="#i-…"/></svg> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.3-4.7A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-reloj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></symbol>
+  <symbol id="i-marca" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12.5" cy="12" r="6.2"/><circle cx="12" cy="12.5" r="2.4"/></symbol>
+  <symbol id="i-comillas" viewBox="0 0 32 32"><path d="M6 20c0-5 2-9 7-12l1.5 2.2C11.8 12 11 14 11 16h4v10H6zm13 0c0-5 2-9 7-12l1.5 2.2C24.8 12 24 14 24 16h4v10h-9z"/></symbol>
+</svg>
+
+<a class="salto" href="#contenido">Saltar al contenido</a>
+
+<div class="muestra"><div class="contenedor">Página de muestra del Motor webi · <a href="index.html">← Banco</a></div></div>
+
+<!-- ============ a. AVISO ============ -->
+<div class="aviso" id="aviso">
+  <div class="contenedor aviso__fila">
+    <p class="aviso__texto"><span class="aviso__punto" aria-hidden="true"></span><span><strong>Octubre: 10 % menos en cocinas</strong> si señás hasta el 31.</span></p>
+    <time class="aviso__cuenta" role="timer" datetime="2026-10-31T23:59:59-03:00" data-cuenta>hasta el 31/10</time>
+    <a class="aviso__boton" href="#contacto">Aprovechar <svg class="icono" style="width:.9rem;height:.9rem" aria-hidden="true"><use href="#i-flecha"/></svg></a>
+  </div>
+</div>
+
+<!-- ============ b. NAV ============ -->
+<header class="nav" id="nav">
+  <div class="contenedor nav__fila">
+    <a class="nav__logo" href="#inicio" aria-label="Taller Nogal, inicio">
+      <svg class="icono" aria-hidden="true"><use href="#i-marca"/></svg>Taller Nogal
+    </a>
+    <nav class="nav__links" id="menu-principal" aria-label="Principal">
+      <a href="#trabajos">Trabajos</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#como">Cómo trabajamos</a>
+      <a href="#precios">Precios</a>
+      <a href="#preguntas">Preguntas</a>
+    </nav>
+    <a class="boton boton--chico nav__boton" href="#contacto"><span class="nav__largo">Pedir presupuesto</span><span class="nav__corto">Presupuesto</span></a>
+    <button class="nav__menu" type="button" data-menu aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menú"><span class="nav__raya"></span></button>
+  </div>
+</header>
+
+<main id="contenido">
+
+<!-- ============ c. PORTADA ============ -->
+<section class="portada resplandor" id="inicio" aria-labelledby="portada-titulo">
+  <canvas class="portada__fondo" aria-hidden="true"></canvas>
+  <div class="portada__velo" aria-hidden="true"></div>
+  <div class="portada__degrade" aria-hidden="true"></div>
+  <div class="contenedor portada__contenido">
+    <a class="pastilla portada__novedad" href="#trabajos" data-aparecer>
+      <span class="portada__sello">Nuevo</span>Vestidores en nogal con luz integrada
+      <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg>
+    </a>
+    <h1 class="titulo-xl portada__titulo" id="portada-titulo" data-aparecer>
+      <span>Muebles que</span>
+      <span>encajan <span class="portada__acento">justo</span></span>
+    </h1>
+    <p class="portada__bajada" data-aparecer>Diseñamos, cortamos y colocamos cocinas, placards y bibliotecas de madera. Medimos en tu casa, armamos en nuestro taller de Villa Urquiza y te pasamos el presupuesto por escrito en 48 horas.</p>
+    <div class="portada__acciones" data-aparecer>
+      <a class="boton boton--grande" href="#contacto">Pedir presupuesto</a>
+      <a class="boton boton--grande boton--fantasma" href="#trabajos">Ver trabajos</a>
+    </div>
+    <ul class="portada__confianza" data-aparecer>
+      <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>+180 muebles entregados</li>
+      <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>12 años en el taller</li>
+      <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Garantía por escrito</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ d. CINTA ============ -->
+<section class="cinta" aria-label="Materiales y oficios del taller">
+  <div class="cinta__pista">
+    <ul class="cinta__lista">
+      <li>Roble macizo</li><li>Nogal</li><li>Lenga</li><li>Petiribí</li><li>Guayubira</li><li>Laqueado mate</li><li>Aceite natural</li><li>Herrajes ocultos</li><li>Corte a CNC</li><li>Enchapado</li><li>Cocinas</li><li>Placards</li><li>Bibliotecas</li>
+    </ul>
+    <ul class="cinta__lista" aria-hidden="true">
+      <li>Roble macizo</li><li>Nogal</li><li>Lenga</li><li>Petiribí</li><li>Guayubira</li><li>Laqueado mate</li><li>Aceite natural</li><li>Herrajes ocultos</li><li>Corte a CNC</li><li>Enchapado</li><li>Cocinas</li><li>Placards</li><li>Bibliotecas</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ e. TRABAJOS ============ -->
+<section class="banda trabajos" id="trabajos" aria-labelledby="trabajos-titulo">
+  <div class="contenedor">
+    <div class="trabajos__cabeza">
+      <div class="trabajos__titulo" data-aparecer>
+        <span class="etiqueta">Trabajos</span>
+        <h2 class="titulo-l" id="trabajos-titulo">Lo que sale del taller</h2>
+      </div>
+      <div class="trabajos__filtros" role="group" aria-label="Filtrar trabajos por categoría" data-aparecer>
+        <button type="button" class="pastilla trabajos__filtro" data-filtro="todos" data-nombre="todos" aria-pressed="true">Todos</button>
+        <button type="button" class="pastilla trabajos__filtro" data-filtro="cocinas" data-nombre="cocinas" aria-pressed="false">Cocinas</button>
+        <button type="button" class="pastilla trabajos__filtro" data-filtro="placards" data-nombre="placards" aria-pressed="false">Placards</button>
+        <button type="button" class="pastilla trabajos__filtro" data-filtro="living" data-nombre="living" aria-pressed="false">Living</button>
+        <button type="button" class="pastilla trabajos__filtro" data-filtro="oficina" data-nombre="oficinas" aria-pressed="false">Oficinas</button>
+      </div>
+    </div>
+    <p class="solo-lectores" role="status" data-filtro-estado></p>
+
+    <ul class="trabajos__grilla">
+      <li data-aparecer data-categoria="cocinas">
+        <article class="tarjeta trabajos__tarjeta">
+          <a class="trabajos__enlace" href="#trabajo-cocina-belgrano">
+            <div class="trabajos__imagen"><img src="medios/cuadros/muestra-0008.webp" width="960" height="540" loading="lazy" alt="Cocina en roble con laqueado mate y una isla central de 2,4 metros"><span class="trabajos__ver">Ver <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg></span></div>
+            <div class="trabajos__pie"><span class="trabajos__tipo">Cocinas · Belgrano</span><h3 class="trabajos__nombre">Cocina en roble con laqueado mate</h3><p class="trabajos__dato">Roble macizo · isla de 2,4 m · 6 semanas</p></div>
+          </a>
+        </article>
+      </li>
+      <li data-aparecer data-categoria="placards">
+        <article class="tarjeta trabajos__tarjeta">
+          <a class="trabajos__enlace" href="#trabajo-vestidor-urquiza">
+            <div class="trabajos__imagen"><img src="medios/cuadros/muestra-0022.webp" width="960" height="540" loading="lazy" alt="Vestidor en nogal enchapado con tiras de luz LED en los estantes"><span class="trabajos__ver">Ver <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg></span></div>
+            <div class="trabajos__pie"><span class="trabajos__tipo">Placards · Villa Urquiza</span><h3 class="trabajos__nombre">Vestidor en nogal con luz integrada</h3><p class="trabajos__dato">Nogal enchapado · 3,2 m de frente · 4 semanas</p></div>
+          </a>
+        </article>
+      </li>
+      <li data-aparecer data-categoria="living">
+        <article class="tarjeta trabajos__tarjeta">
+          <a class="trabajos__enlace" href="#trabajo-biblioteca-palermo">
+            <div class="trabajos__imagen"><img src="medios/cuadros/muestra-0036.webp" width="960" height="540" loading="lazy" alt="Biblioteca flotante de lenga que ocupa toda una pared del living"><span class="trabajos__ver">Ver <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg></span></div>
+            <div class="trabajos__pie"><span class="trabajos__tipo">Living · Palermo</span><h3 class="trabajos__nombre">Biblioteca flotante en lenga</h3><p class="trabajos__dato">Lenga maciza · 4 m de largo · 3 semanas</p></div>
+          </a>
+        </article>
+      </li>
+      <li data-aparecer data-categoria="oficina">
+        <article class="tarjeta trabajos__tarjeta">
+          <a class="trabajos__enlace" href="#trabajo-escritorio-caballito">
+            <div class="trabajos__imagen"><img src="medios/cuadros/muestra-0050.webp" width="960" height="540" loading="lazy" alt="Escritorio doble con canto de roble en un estudio contable"><span class="trabajos__ver">Ver <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg></span></div>
+            <div class="trabajos__pie"><span class="trabajos__tipo">Oficinas · Caballito</span><h3 class="trabajos__nombre">Escritorio doble para estudio contable</h3><p class="trabajos__dato">Melamina y canto de roble · 2 puestos · 3 semanas</p></div>
+          </a>
+        </article>
+      </li>
+      <li data-aparecer data-categoria="living">
+        <article class="tarjeta trabajos__tarjeta">
+          <a class="trabajos__enlace" href="#trabajo-mesa-nunez">
+            <div class="trabajos__imagen"><img src="medios/cuadros/muestra-0064.webp" width="960" height="540" loading="lazy" alt="Mesa de comedor de guayubira de dos metros cuarenta con diez sillas"><span class="trabajos__ver">Ver <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg></span></div>
+            <div class="trabajos__pie"><span class="trabajos__tipo">Living · Núñez</span><h3 class="trabajos__nombre">Mesa de comedor de 2,4 m</h3><p class="trabajos__dato">Guayubira maciza · para 10 personas · 5 semanas</p></div>
+          </a>
+        </article>
+      </li>
+      <li data-aparecer data-categoria="cocinas">
+        <article class="tarjeta trabajos__tarjeta">
+          <a class="trabajos__enlace" href="#trabajo-cocina-olivos">
+            <div class="trabajos__imagen"><img src="medios/cuadros/muestra-0078.webp" width="960" height="540" loading="lazy" alt="Cocina integrada al comedor con barra de nogal y frentes blancos"><span class="trabajos__ver">Ver <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg></span></div>
+            <div class="trabajos__pie"><span class="trabajos__tipo">Cocinas · Olivos</span><h3 class="trabajos__nombre">Cocina integrada con barra</h3><p class="trabajos__dato">Melamina blanca y nogal · 5 semanas</p></div>
+          </a>
+        </article>
+      </li>
+      <li data-aparecer data-categoria="placards">
+        <article class="tarjeta trabajos__tarjeta">
+          <a class="trabajos__enlace" href="#trabajo-placard-sanisidro">
+            <div class="trabajos__imagen"><img src="medios/cuadros/muestra-0092.webp" width="960" height="540" loading="lazy" alt="Placard de dormitorio con puertas corredizas y un panel de espejo"><span class="trabajos__ver">Ver <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg></span></div>
+            <div class="trabajos__pie"><span class="trabajos__tipo">Placards · San Isidro</span><h3 class="trabajos__nombre">Placard con puertas corredizas</h3><p class="trabajos__dato">Melamina y espejo · 2,8 m · 3 semanas</p></div>
+          </a>
+        </article>
+      </li>
+      <li data-aparecer data-categoria="oficina">
+        <article class="tarjeta trabajos__tarjeta">
+          <a class="trabajos__enlace" href="#trabajo-recepcion-colegiales">
+            <div class="trabajos__imagen"><img src="medios/cuadros/muestra-0106.webp" width="960" height="540" loading="lazy" alt="Mueble de recepción enchapado en roble para un consultorio"><span class="trabajos__ver">Ver <svg class="icono" aria-hidden="true"><use href="#i-flecha"/></svg></span></div>
+            <div class="trabajos__pie"><span class="trabajos__tipo">Oficinas · Colegiales</span><h3 class="trabajos__nombre">Recepción para consultorio</h3><p class="trabajos__dato">Enchapado de roble · un mueble · 2 semanas</p></div>
+          </a>
+        </article>
+      </li>
+      <!-- Tarjeta distinta: sin data-categoria, el filtro la deja siempre a la vista -->
+      <li class="trabajos__invitacion-item" data-aparecer>
+        <div class="trabajos__invitacion">
+          <svg class="icono" aria-hidden="true"><use href="#i-mas"/></svg>
+          <h3 class="titulo-m">¿Tenés algo en mente que no está acá?</h3>
+          <p>Mandanos una foto, un croquis hecho a mano o las medidas del rincón. Lo pasamos en limpio y te decimos qué se puede hacer.</p>
+          <a class="boton" href="#contacto">Pedir un trabajo a medida</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ f. SERVICIOS ============ -->
+<section class="banda servicios" id="servicios" aria-labelledby="servicios-titulo">
+  <div class="contenedor">
+    <div class="servicios__panel">
+      <div class="cabeza" data-aparecer>
+        <span class="etiqueta">Servicios</span>
+        <h2 class="titulo-l" id="servicios-titulo">Todo lo que se hace con madera en una casa</h2>
+        <p class="bajada">Cinco tipos de trabajo, un mismo criterio: medir bien, cortar una sola vez y dejar todo funcionando el día de la entrega.</p>
+      </div>
+
+      <ul class="servicios__bento">
+        <li class="servicios__item--ancho" data-aparecer>
+          <div class="servicios__tarjeta">
+            <svg class="servicios__dibujo" viewBox="0 0 200 120" aria-hidden="true" focusable="false">
+              <rect data-relleno x="10" y="8" width="78" height="38" rx="3"/>
+              <path d="M49 8v38M42 38v-8M56 38v-8"/>
+              <path data-relleno d="M104 32h52l-10-14h-32z"/>
+              <path d="M124 18V4h12v14"/>
+              <path d="M6 66h188"/>
+              <rect x="10" y="66" width="180" height="46" rx="2"/>
+              <path d="M70 66v46M130 66v46M30 80h20M90 80h20M150 80h20"/>
+              <rect data-relleno x="150" y="54" width="22" height="12" rx="2"/>
+            </svg>
+            <div class="servicios__texto">
+              <h3 class="titulo-m">Cocinas a medida</h3>
+              <p>Alacenas, bajomesadas e islas pensadas para cómo cocinás vos: dónde van las ollas, cuánto alcanza el brazo, de qué lado abre la heladera.</p>
+              <ul class="servicios__notas"><li>Mesadas</li><li>Alacenas</li><li>Isla</li><li>Despensero</li></ul>
+            </div>
+          </div>
+        </li>
+        <li class="servicios__item--alto" data-aparecer>
+          <div class="servicios__tarjeta">
+            <svg class="servicios__dibujo" viewBox="0 0 120 140" aria-hidden="true" focusable="false">
+              <rect data-relleno x="22" y="8" width="76" height="118" rx="3"/>
+              <path d="M60 8v118M22 26h76M52 66v18M68 66v18"/>
+              <path d="M30 108l14-26M38 108l14-26" opacity=".55"/>
+              <path d="M16 126h88v6H16z"/>
+            </svg>
+            <div class="servicios__texto">
+              <h3 class="titulo-m">Placards y vestidores</h3>
+              <p>Del placard de pasillo al vestidor completo. Barrales, cajoneras y zapateras donde las vas a usar de verdad, con puertas corredizas o batientes.</p>
+            </div>
+          </div>
+        </li>
+        <li class="servicios__item--chico" data-aparecer>
+          <div class="servicios__tarjeta">
+            <svg class="servicios__dibujo" viewBox="0 0 120 100" aria-hidden="true" focusable="false">
+              <rect x="14" y="8" width="92" height="84" rx="3"/>
+              <path d="M14 36h92M14 64h92M60 64v28M54 78h-4M66 78h4"/>
+              <rect data-relleno x="22" y="18" width="7" height="18"/><rect data-relleno x="31" y="23" width="7" height="13"/><rect data-relleno x="40" y="15" width="7" height="21"/>
+              <rect data-relleno x="24" y="50" width="24" height="14"/>
+              <rect x="76" y="56" width="16" height="8"/>
+              <path d="M84 56c-6-4-6-10-2-12 4 2 4 8 2 12zM84 56c6-4 8-8 6-12"/>
+            </svg>
+            <div class="servicios__texto">
+              <h3 class="titulo-m">Muebles de living</h3>
+              <p>Bibliotecas, racks de TV y aparadores. Medimos tus libros, tus plantas y el cable del decodificador.</p>
+            </div>
+          </div>
+        </li>
+        <li class="servicios__item--chico" data-aparecer>
+          <div class="servicios__tarjeta">
+            <svg class="servicios__dibujo" viewBox="0 0 120 100" aria-hidden="true" focusable="false">
+              <rect x="34" y="10" width="52" height="32" rx="3"/>
+              <rect data-relleno x="38" y="14" width="44" height="24" rx="1"/>
+              <path d="M60 42v12M48 54h24M8 56h104M106 56v38"/>
+              <rect x="14" y="56" width="30" height="38" rx="2"/>
+              <path d="M14 75h30M25 65h8M25 85h8"/>
+            </svg>
+            <div class="servicios__texto">
+              <h3 class="titulo-m">Oficinas y locales</h3>
+              <p>Escritorios, recepciones y góndolas para estudios y comercios. Instalamos en el horario que menos corte tu trabajo.</p>
+            </div>
+          </div>
+        </li>
+        <li class="servicios__item--tira" data-aparecer>
+          <div class="servicios__tarjeta">
+            <svg class="servicios__dibujo" viewBox="0 0 100 110" aria-hidden="true" focusable="false">
+              <path data-relleno d="M30 8h40a3 3 0 0 1 3 3v32H27V11a3 3 0 0 1 3-3z"/>
+              <path d="M42 8v35M58 8v35M31 43l-2 7M69 43l2 7"/>
+              <rect x="22" y="50" width="56" height="9" rx="2"/>
+              <path d="M28 59l-5 41M72 59l5 41M27 80h46"/>
+              <path d="M86 16v10M81 21h10M92 40v6M89 43h6"/>
+            </svg>
+            <div class="servicios__texto">
+              <h3 class="titulo-m">Restauración y arreglos</h3>
+              <p>¿Una mesa heredada con una pata floja, un aparador con el laqueado gastado? Reparamos, lijamos y volvemos a aceitar muebles de madera maciza. Te pasamos el presupuesto por foto.</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ g. PASOS ============ -->
+<section class="banda pasos" id="como" aria-labelledby="pasos-titulo">
+  <div class="contenedor">
+    <div class="cabeza" data-aparecer>
+      <span class="etiqueta">Cómo trabajamos</span>
+      <h2 class="titulo-l" id="pasos-titulo">Tres pasos, sin sorpresas</h2>
+      <p class="bajada">Sabés qué pasa y cuándo desde el primer mensaje hasta que cuelga la última puerta.</p>
+    </div>
+    <ol class="pasos__lista">
+      <li class="pasos__paso" data-aparecer>
+        <span class="pasos__numero" aria-hidden="true">01</span>
+        <div class="pasos__texto">
+          <span class="pasos__tiempo">Días 1 a 3</span>
+          <h3 class="titulo-m">Visita y medidas</h3>
+          <p>Vamos a tu casa, medimos con láser, miramos el estado de las paredes y charlamos cómo usás el espacio. La visita no tiene costo.</p>
+        </div>
+      </li>
+      <li class="pasos__paso" data-aparecer>
+        <span class="pasos__numero" aria-hidden="true">02</span>
+        <div class="pasos__texto">
+          <span class="pasos__tiempo">Días 3 a 7</span>
+          <h3 class="titulo-m">Diseño y presupuesto</h3>
+          <p>Te mandamos planos, un render en 3D y muestras de material, con el precio cerrado por escrito. Cambiamos lo que haga falta antes de cortar.</p>
+        </div>
+      </li>
+      <li class="pasos__paso" data-aparecer>
+        <span class="pasos__numero" aria-hidden="true">03</span>
+        <div class="pasos__texto">
+          <span class="pasos__tiempo">Semanas 3 a 7</span>
+          <h3 class="titulo-m">Fabricación e instalación</h3>
+          <p>Cortamos y armamos en el taller, llevamos todo terminado y lo colocamos en uno o dos días. Después de entregar, una visita de ajuste a los 30 días.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ h. CIFRAS ============ -->
+<section class="banda cifras" aria-label="El taller en números">
+  <div class="contenedor">
+    <ul class="cifras__grilla">
+      <li class="cifras__celda"><div data-aparecer><p class="cifras__numero" data-contar="180" data-prefijo="+">+180</p><p class="cifras__texto">muebles entregados</p></div></li>
+      <li class="cifras__celda"><div data-aparecer><p class="cifras__numero" data-contar="12">12</p><p class="cifras__texto">años trabajando la madera</p></div></li>
+      <li class="cifras__celda"><div data-aparecer><p class="cifras__numero" data-contar="3200">3.200</p><p class="cifras__texto">m² de madera cortados por año</p></div></li>
+      <li class="cifras__celda"><div data-aparecer><p class="cifras__numero" data-contar="98" data-sufijo="%">98%</p><p class="cifras__texto">de clientes que nos recomienda</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ i. VOCES ============ -->
+<section class="banda voces" id="voces" aria-labelledby="voces-titulo">
+  <div class="contenedor">
+    <div class="cabeza" data-aparecer>
+      <span class="etiqueta">Voces</span>
+      <h2 class="titulo-l" id="voces-titulo">Lo cuentan quienes ya lo usan</h2>
+    </div>
+    <ul class="voces__lista">
+      <li data-aparecer>
+        <figure class="tarjeta voces__tarjeta">
+          <svg class="icono voces__comillas" aria-hidden="true"><use href="#i-comillas"/></svg>
+          <blockquote class="voces__cita">Nos entregaron la cocina un viernes y el sábado ya estábamos cocinando. Vinieron dos veces a medir y no sobró ni un centímetro.</blockquote>
+          <figcaption class="voces__autor"><span class="voces__inicial" aria-hidden="true">MI</span><span class="voces__nombre">Marcela Ibáñez</span><span class="voces__dato">Villa Devoto · cocina en roble y laqueado</span></figcaption>
+        </figure>
+      </li>
+      <li data-aparecer>
+        <figure class="tarjeta voces__tarjeta">
+          <svg class="icono voces__comillas" aria-hidden="true"><use href="#i-comillas"/></svg>
+          <blockquote class="voces__cita">Pedí presupuesto en cuatro lugares. Fueron los únicos que me explicaron por qué una melamina de 18 y no de 15, y me terminaron ahorrando plata.</blockquote>
+          <figcaption class="voces__autor"><span class="voces__inicial" aria-hidden="true">SR</span><span class="voces__nombre">Sebastián Roldán</span><span class="voces__dato">Caballito · vestidor en melamina</span></figcaption>
+        </figure>
+      </li>
+      <li data-aparecer>
+        <figure class="tarjeta voces__tarjeta">
+          <svg class="icono voces__comillas" aria-hidden="true"><use href="#i-comillas"/></svg>
+          <blockquote class="voces__cita">La mesa es de guayubira, pesa una barbaridad y no se mueve un milímetro. Mis hijos ya la rayaron y vinieron a lijarla sin cargo.</blockquote>
+          <figcaption class="voces__autor"><span class="voces__inicial" aria-hidden="true">LF</span><span class="voces__nombre">Lucía Ferraro</span><span class="voces__dato">Olivos · mesa de comedor de 2,4 m</span></figcaption>
+        </figure>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ j. PRECIOS ============ -->
+<section class="banda precios" id="precios" aria-labelledby="precios-titulo">
+  <span class="precios__fantasma" aria-hidden="true">Desde</span>
+  <div class="contenedor">
+    <div class="cabeza cabeza--centro" data-aparecer>
+      <span class="etiqueta">Precios</span>
+      <h2 class="titulo-l" id="precios-titulo">Tres niveles, un precio cerrado</h2>
+      <p class="bajada">Elegís el material; el resto lo definimos juntos. Podés pagarlo en cuotas o al contado con descuento.</p>
+      <div class="precios__modo" role="group" aria-label="Modalidad de pago">
+        <button type="button" class="precios__lado es-activa" data-modalidad="mensual" aria-pressed="true">En 6 cuotas</button>
+        <button type="button" class="precios__lado" data-modalidad="anual" aria-pressed="false">Al contado <small>−12 %</small></button>
+      </div>
+    </div>
+
+    <ul class="precios__grilla">
+      <li data-aparecer>
+        <article class="tarjeta precios__tarjeta">
+          <div class="precios__encabezado"><h3 class="titulo-m precios__nivel">Melamina</h3></div>
+          <p class="precios__resumen">Para placards, bajomesadas y escritorios. Lo esencial bien hecho.</p>
+          <div class="precios__importe">
+            <span class="precios__desde">desde</span>
+            <p class="precios__cifra"><span class="precios__moneda">$</span><span data-mensual="125.000" data-anual="660.000">125.000</span></p>
+            <p class="precios__periodo" data-mensual="por cuota, 6 cuotas sin interés" data-anual="pago único, ya con el 12 % menos">por cuota, 6 cuotas sin interés</p>
+          </div>
+          <ul class="precios__lista">
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Melamina de 18 mm con canto grueso</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Herrajes de cierre suave</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Planos y diseño incluidos</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Colocación en 1 o 2 días</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>1 año de garantía</li>
+          </ul>
+          <a class="boton boton--fantasma" href="#contacto">Pedir este nivel</a>
+        </article>
+      </li>
+      <li data-aparecer>
+        <article class="tarjeta precios__tarjeta precios__tarjeta--destacada">
+          <div class="precios__encabezado"><h3 class="titulo-m precios__nivel">Enchapado</h3><span class="precios__sello">El más pedido</span></div>
+          <p class="precios__resumen">La veta de la madera real con el costo de un mueble mejor aprovechado.</p>
+          <div class="precios__importe">
+            <span class="precios__desde">desde</span>
+            <p class="precios__cifra"><span class="precios__moneda">$</span><span data-mensual="225.000" data-anual="1.188.000">225.000</span></p>
+            <p class="precios__periodo" data-mensual="por cuota, 6 cuotas sin interés" data-anual="pago único, ya con el 12 % menos">por cuota, 6 cuotas sin interés</p>
+          </div>
+          <ul class="precios__lista">
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Enchapado natural de roble o nogal</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Laqueado mate al agua, sin olor</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Render en 3D antes de cortar</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Luz LED interior si el mueble la pide</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>3 años de garantía</li>
+          </ul>
+          <a class="boton" href="#contacto">Pedir este nivel</a>
+        </article>
+      </li>
+      <li data-aparecer>
+        <article class="tarjeta precios__tarjeta">
+          <div class="precios__encabezado"><h3 class="titulo-m precios__nivel">Madera maciza</h3></div>
+          <p class="precios__resumen">Piezas únicas para toda la vida, con uniones a espiga y sin clavos a la vista.</p>
+          <div class="precios__importe">
+            <span class="precios__desde">desde</span>
+            <p class="precios__cifra"><span class="precios__moneda">$</span><span data-mensual="400.000" data-anual="2.112.000">400.000</span></p>
+            <p class="precios__periodo" data-mensual="por cuota, 6 cuotas sin interés" data-anual="pago único, ya con el 12 % menos">por cuota, 6 cuotas sin interés</p>
+          </div>
+          <ul class="precios__lista">
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Roble, nogal o lenga macizos</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Acabado en aceite o laca poliuretánica</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Visita al taller para elegir las tablas</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Lijado y reaceitado al año, sin cargo</li>
+            <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>5 años de garantía</li>
+          </ul>
+          <a class="boton boton--fantasma" href="#contacto">Pedir este nivel</a>
+        </article>
+      </li>
+    </ul>
+    <p class="nota precios__aclaracion" data-aparecer>Todos los importes son <strong>desde</strong>, para un mueble de referencia de 2 m de frente. El número final se cierra después de visitar y medir; si cambia, lo sabés antes de señar.</p>
+  </div>
+</section>
+
+<!-- ============ k. PREGUNTAS ============ -->
+<section class="banda preguntas" id="preguntas" aria-labelledby="preguntas-titulo">
+  <div class="contenedor">
+    <div class="preguntas__grilla">
+      <div class="preguntas__lado" data-aparecer>
+        <span class="etiqueta">Preguntas</span>
+        <h2 class="titulo-l" id="preguntas-titulo">Lo que más nos preguntan</h2>
+        <p class="bajada">Si tu duda no está acá, escribinos. Contestamos el mismo día.</p>
+        <a class="boton boton--fantasma" href="#contacto">Hacer otra pregunta</a>
+      </div>
+      <div class="preguntas__lista" data-aparecer>
+        <details class="preguntas__item" open>
+          <summary>¿Cuánto tarda un trabajo?<span class="preguntas__icono" aria-hidden="true"></span></summary>
+          <p class="preguntas__respuesta">Un placard o un escritorio, entre 3 y 4 semanas desde que aprobás el diseño. Una cocina completa, entre 5 y 7. Las piezas de madera maciza suman una semana más por el secado del acabado.</p>
+        </details>
+        <details class="preguntas__item">
+          <summary>¿Cómo se paga?<span class="preguntas__icono" aria-hidden="true"></span></summary>
+          <p class="preguntas__respuesta">Una seña del 40 % al aprobar el presupuesto, otro 40 % cuando el mueble está terminado en el taller y el saldo al finalizar la instalación. En 6 cuotas sin interés o al contado con 12 % menos.</p>
+        </details>
+        <details class="preguntas__item">
+          <summary>¿Trabajan solo en Capital?<span class="preguntas__icono" aria-hidden="true"></span></summary>
+          <p class="preguntas__respuesta">Capital y zona norte y oeste del Gran Buenos Aires, sin costo de traslado hasta 25 km del taller. Más lejos cotizamos el flete aparte, siempre antes de que decidas.</p>
+        </details>
+        <details class="preguntas__item">
+          <summary>¿Y si las paredes no están a escuadra?<span class="preguntas__icono" aria-hidden="true"></span></summary>
+          <p class="preguntas__respuesta">Casi nunca lo están. Medimos con láser en la visita, cortamos con una tolerancia de 1 mm y los remates contra la pared se terminan en obra, con zócalos y tapas hechos a medida.</p>
+        </details>
+        <details class="preguntas__item">
+          <summary>¿Tienen garantía?<span class="preguntas__icono" aria-hidden="true"></span></summary>
+          <p class="preguntas__respuesta">Sí, por escrito: 1, 3 o 5 años según el nivel. Cubre herrajes, uniones y acabado. No cubre golpes ni humedad por filtraciones, pero igual te decimos si se puede arreglar.</p>
+        </details>
+        <details class="preguntas__item">
+          <summary>¿Puedo traer un diseño propio o una foto?<span class="preguntas__icono" aria-hidden="true"></span></summary>
+          <p class="preguntas__respuesta">Claro. Traé la foto, un plano o un dibujo a mano. Lo pasamos a medidas reales y te decimos qué se puede hacer tal cual y qué conviene ajustar para que funcione y dure.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ l. CONTACTO ============ -->
+<section class="banda contacto" id="contacto" aria-labelledby="contacto-titulo">
+  <div class="contenedor">
+    <div class="contacto__grilla">
+      <div class="contacto__lado" data-aparecer>
+        <div class="cabeza" style="margin-bottom:0">
+          <span class="etiqueta">Contacto</span>
+          <h2 class="titulo-l" id="contacto-titulo">Contanos qué necesitás</h2>
+          <p class="bajada">Con unos pocos datos ya podemos orientarte. El resto lo vemos en la visita.</p>
+        </div>
+        <ul class="contacto__promesas">
+          <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Te respondemos el mismo día, de lunes a sábado.</li>
+          <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Presupuesto por escrito en 48 horas, con precio cerrado.</li>
+          <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>La visita para medir no tiene costo en Capital y zona norte.</li>
+          <li><svg class="icono" aria-hidden="true"><use href="#i-check"/></svg>Si no te cierra, no pasa nada: no hay compromiso.</li>
+        </ul>
+        <dl class="contacto__datos">
+          <div class="contacto__dato">
+            <svg class="icono" aria-hidden="true"><use href="#i-chat"/></svg>
+            <dt>WhatsApp</dt>
+            <!-- {completar}: número real del taller, el mismo que usa mensajeWhatsApp -->
+            <dd><a href="https://wa.me/5490000000000">+54 9 11 0000-0000</a></dd>
+          </div>
+          <div class="contacto__dato">
+            <svg class="icono" aria-hidden="true"><use href="#i-pin"/></svg>
+            <dt>Taller</dt>
+            <dd>Villa Urquiza, Buenos Aires · te pasamos la dirección al coordinar</dd>
+          </div>
+          <div class="contacto__dato">
+            <svg class="icono" aria-hidden="true"><use href="#i-reloj"/></svg>
+            <dt>Horario</dt>
+            <dd>Lunes a viernes, 8 a 17 h · sábados con cita</dd>
+          </div>
+        </dl>
+      </div>
+
+      <form class="tarjeta contacto__form" id="form-contacto" novalidate data-aparecer>
+        <h3 class="titulo-m">Armá tu mensaje</h3>
+        <div class="contacto__campo">
+          <label for="c-nombre">Tu nombre</label>
+          <input id="c-nombre" name="nombre" type="text" autocomplete="given-name" required placeholder="Ej.: Marcela">
+          <p class="contacto__error" data-error-de="nombre" id="c-nombre-error" hidden><svg class="icono" aria-hidden="true"><use href="#i-alerta"/></svg>Decinos tu nombre para saludarte.</p>
+        </div>
+        <div class="contacto__campo">
+          <label for="c-necesita">¿Qué necesitás?</label>
+          <textarea id="c-necesita" name="necesita" required placeholder="Ej.: una cocina en L con isla, en roble claro"></textarea>
+          <p class="contacto__error" data-error-de="necesita" id="c-necesita-error" hidden><svg class="icono" aria-hidden="true"><use href="#i-alerta"/></svg>Contanos qué mueble tenés en mente.</p>
+        </div>
+        <div class="contacto__fila">
+          <div class="contacto__campo">
+            <label for="c-medidas">Medidas aproximadas <small>(opcional)</small></label>
+            <input id="c-medidas" name="medidas" type="text" placeholder="Ej.: 2,40 × 2,60 m">
+          </div>
+          <div class="contacto__campo">
+            <label for="c-barrio">Barrio</label>
+            <input id="c-barrio" name="barrio" type="text" required placeholder="Ej.: Villa Urquiza">
+            <p class="contacto__error" data-error-de="barrio" id="c-barrio-error" hidden><svg class="icono" aria-hidden="true"><use href="#i-alerta"/></svg>Necesitamos el barrio para ver la visita.</p>
+          </div>
+        </div>
+        <button class="boton boton--grande contacto__enviar" type="submit"><svg class="icono" aria-hidden="true"><use href="#i-chat"/></svg>Enviar por WhatsApp</button>
+        <p class="contacto__estado" data-estado role="status"></p>
+        <p class="nota" style="margin:0">Se abre WhatsApp con el mensaje ya armado. Esta página no guarda ni envía tus datos a ningún servidor.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ m. CIERRE + PIE ============ -->
+<section class="cierre resplandor grano" aria-labelledby="cierre-titulo">
+  <div class="contenedor">
+    <div class="cierre__contenido">
+      <span class="etiqueta" data-aparecer>Empecemos</span>
+      <h2 class="titulo-xl" id="cierre-titulo" data-aparecer>Tu mueble ya existe. Falta medirlo.</h2>
+      <p class="bajada" data-aparecer>Contanos qué imaginás y en 48 horas tenés un presupuesto por escrito, con precio cerrado y sin compromiso.</p>
+      <div class="cierre__acciones" data-aparecer>
+        <a class="boton boton--grande" href="#contacto">Pedir presupuesto</a>
+        <a class="boton boton--grande boton--fantasma" href="https://wa.me/5490000000000">Escribir por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="pie">
+  <div class="contenedor">
+    <div class="pie__columnas">
+      <div class="pie__marca-texto">
+        <a class="pie__logo" href="#inicio"><svg class="icono" aria-hidden="true"><use href="#i-marca"/></svg>Taller Nogal</a>
+        <p>Muebles de madera a medida, hechos en Villa Urquiza desde 2014.</p>
+      </div>
+      <div>
+        <h2 class="pie__titulo">Taller</h2>
+        <ul class="pie__links">
+          <li><a href="#trabajos">Trabajos</a></li>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#como">Cómo trabajamos</a></li>
+          <li><a href="#precios">Precios</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="pie__titulo">Contacto</h2>
+        <ul class="pie__links">
+          <li><a href="https://wa.me/5490000000000">WhatsApp</a></li>
+          <li><a href="mailto:hola@tallernogal.example">Mail</a></li>
+          <li><a href="#contacto">Pedir presupuesto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="pie__titulo">Legal</h2>
+        <ul class="pie__links">
+          <li><a href="#garantia">Términos y garantía</a></li>
+          <li><a href="#privacidad">Política de privacidad</a></li>
+          <li><a href="#consumidor">Defensa del consumidor</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pie__final">
+      <p>© 2026 Taller Nogal. Todos los derechos reservados.</p>
+      <p class="pie__frase">Cortado a 1 mm. Armado a mano.</p>
+    </div>
+  </div>
+  <span class="pie__gigante" aria-hidden="true">Nogal</span>
+</footer>
+
+<script type="module">
+  import { navQueSeAsienta, contar, cuentaRegresiva, alternarPrecios, filtrar, mensajeWhatsApp } from "../kit/secciones.js";
+
+  const $ = (selector) => document.querySelector(selector);
+
+  navQueSeAsienta($("#nav"));
+  contar($(".cifras"));
+  filtrar($(".trabajos"));
+  alternarPrecios($(".precios"));
+  // Pasada la fecha, la cuenta dice "terminó" y la barra se esconde sola
+  cuentaRegresiva($("[data-cuenta]"), "2026-10-31T23:59:59-03:00", { alVencer: () => { $("#aviso").hidden = true; } });
+  mensajeWhatsApp($("#form-contacto"), {
+    numero: "5490000000000", // {completar}: número real, solo dígitos y con código de país
+    saludo: "Hola Taller Nogal, te escribo desde la web.",
+  });
+
+  // Las entradas: si el motor de scroll no carga, todo queda visible igual
+  try {
+    const { aparecer } = await import("../kit/motor-scroll.js");
+    aparecer();
+  } catch (_) {
+    document.querySelectorAll("[data-aparecer]").forEach((el) => el.classList.add("se-ve"));
+  }
+
+  // Fondo de la portada: si el shader no carga, queda el .resplandor de tokens.css
+  try {
+    const lienzo = $(".portada__fondo");
+    const { fondoShader } = await import("../kit/fondo-shader.js");
+    fondoShader(lienzo, { familia: "malla" });
+  } catch (_) {
+    $(".portada__fondo")?.remove();
+  }
+</script>
+</body>
+</html>

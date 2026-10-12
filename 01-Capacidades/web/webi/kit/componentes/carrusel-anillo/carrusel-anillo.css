@@ -1,0 +1,139 @@
+/* carrusel-anillo · ver carrusel-anillo.js para el truco y el uso.
+   Colores y curvas solo desde kit/tokens.css. */
+
+.carrusel-anillo {
+  --ancho-tarjeta: clamp(9rem, 30vw, 14rem);
+  --alto-tarjeta: calc(var(--ancho-tarjeta) * 1.25);
+  /* Los tres siguientes los calcula el JS según el ancho real y la cantidad de tarjetas */
+  --radio: 20rem;
+  --paso: 40deg;
+  --perspectiva: 1200px;
+
+  position: relative;
+  border-radius: var(--r-grande);
+}
+.carrusel-anillo:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* ---------- Escena: la cámara ---------- */
+.carrusel-anillo__escena {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: calc(var(--alto-tarjeta) + 6rem);
+  perspective: var(--perspectiva);
+  perspective-origin: 50% 32%; /* mirada apenas desde arriba: el lado lejano asoma por encima */
+  overflow: hidden;
+  overflow: clip; /* clip no deja que el foco desplace el contenido */
+  touch-action: pan-y; /* el dedo horizontal gira el anillo; el vertical sigue siendo scroll */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.carrusel-anillo.se-arrastra .carrusel-anillo__escena { cursor: grabbing; }
+
+/* ---------- Anillo: el cilindro que gira ---------- */
+.carrusel-anillo__anillo {
+  position: relative;
+  width: var(--ancho-tarjeta);
+  height: var(--alto-tarjeta);
+  transform-style: preserve-3d;
+  transform: translateZ(calc(var(--radio) * -1)); /* el JS le suma el giro */
+  will-change: transform;
+}
+
+/* Cada tarjeta se sienta una vez en el cilindro; no se vuelve a mover */
+.carrusel-anillo__tarjeta {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-medio);
+  background: var(--superficie);
+  transform: rotateY(calc(var(--paso) * var(--i, 0))) translateZ(var(--radio));
+  /* --prof: 1 al frente, 0 atrás (lo escribe el JS). Las lejanas pierden opacidad y nitidez */
+  opacity: calc(0.18 + 0.82 * var(--prof, 1));
+  filter: blur(calc((1 - var(--prof, 1)) * 3px));
+  transition: border-color var(--d-media) var(--curva-salida), box-shadow var(--d-media) var(--curva-salida);
+}
+.carrusel-anillo__tarjeta.es-activa {
+  border-color: color-mix(in srgb, var(--acento) 70%, transparent);
+  box-shadow: var(--sombra-acento);
+}
+.carrusel-anillo__tarjeta img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+.carrusel-anillo__tarjeta figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2.5rem 0.9rem 0.9rem;
+  background: linear-gradient(to top, color-mix(in srgb, var(--tinta) 88%, transparent), transparent);
+  font: 700 var(--t-chico)/1.15 var(--f-titulo);
+  letter-spacing: -0.01em;
+}
+.carrusel-anillo__tarjeta figcaption .etiqueta { display: block; margin-bottom: 0.3rem; }
+
+/* ---------- Controles ---------- */
+.carrusel-anillo__controles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+.carrusel-anillo__boton {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--linea);
+  border-radius: var(--r-pastilla);
+  background: color-mix(in srgb, var(--superficie) 60%, transparent);
+  color: var(--hueso);
+  cursor: pointer;
+  transition: transform var(--d-corta) var(--curva-salida), border-color var(--d-corta), background var(--d-corta);
+}
+.carrusel-anillo__boton:hover { border-color: var(--linea-fuerte); background: var(--superficie); transform: translateY(-2px); }
+.carrusel-anillo__boton:active { transform: scale(0.94); }
+.carrusel-anillo__boton svg { width: 1.1rem; height: 1.1rem; }
+.carrusel-anillo__cuenta {
+  min-width: 5rem;
+  text-align: center;
+  font: 500 var(--t-etiqueta)/1 var(--f-mono);
+  letter-spacing: 0.2em;
+  color: var(--bruma);
+}
+
+/* ---------- Antes de que arme el JS (o si no corre): fila que se desplaza a mano ---------- */
+.carrusel-anillo:not(.esta-lista) .carrusel-anillo__escena {
+  display: block;
+  height: auto;
+  perspective: none;
+  overflow-x: auto;
+  touch-action: auto;
+  cursor: auto;
+  padding-block: 1rem;
+}
+.carrusel-anillo:not(.esta-lista) .carrusel-anillo__anillo {
+  display: flex;
+  gap: 0.75rem;
+  width: max-content;
+  height: auto;
+  padding-inline: var(--margen);
+  transform: none;
+}
+.carrusel-anillo:not(.esta-lista) .carrusel-anillo__tarjeta {
+  position: relative;
+  inset: auto;
+  flex: none;
+  width: var(--ancho-tarjeta);
+  height: var(--alto-tarjeta);
+  transform: none;
+  opacity: 1;
+  filter: none;
+}
+.carrusel-anillo:not(.esta-lista) .carrusel-anillo__controles { display: none; }
