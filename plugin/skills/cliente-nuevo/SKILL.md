@@ -36,6 +36,10 @@ Antes de nada, mirá la carpeta de trabajo:
   (sumá `-DesdeProspecto "<carpeta>"` si ya había diagnóstico) y avisale a Gaby que abra Claude Code
   en `C:/Claude/Clientes/<cliente>/` para seguir ahí. **No trabajes a un cliente desde otra carpeta:
   se mezclaría con otros.**
+- **Si hay un `00-ARRANQUE.md` en la raíz, es el pedido de arranque:** lo que Gaby sabe del cliente (en
+  campos o pegado como vino) y lo que te pide. Leelo **entero** antes de seguir. Su sección "Lo que le pido a
+  Claude" manda sobre el alcance: **auditoría, `analisis.md`, UN prototipo propuesto, las preguntas que falten
+  y frenar** hasta que Gaby elija. Si existe la carpeta `prospecto/`, partí de su `diagnostico.md`.
 - Con lo que Gaby cuente, completá `identidad/marca.md` y el bloque "Quién es" del `CLAUDE.md`: solo
   hechos, y lo que falte, como `{completar: ...}`.
 

@@ -49,9 +49,12 @@ Para publicar, pedirlo: nada sale sin tu OK.
    powershell -ExecutionPolicy Bypass -File C:\Claude\Motor\02-Plantilla-cliente\nuevo-cliente.ps1 -Nombre "Casa Rossi" -Rubro "Gastronomía"
    ```
    Si viene de un prospecto, sumá `-DesdeProspecto "C:\Claude\Estudio\04-Prospectos\<empresa>"`.
-2. Abrir sesión en `C:\Claude\Clientes\casa-rossi`.
-3. Decir *"tengo un cliente nuevo"*: arma el mapa de oportunidades y propone el **primer prototipo para mostrar**.
-   Si hay interés: brief → propuesta → construcción → publicación.
+2. Abrir `00-ARRANQUE.md` (ya está con el nombre y el rubro) y completar **lo que sepas**: en campos, o pegando
+   el WhatsApp o las notas tal cual vinieron. Si venía de un prospecto, ya trae su diagnóstico.
+3. Abrir sesión en `C:\Claude\Clientes\casa-rossi` y decir: **"Leé 00-ARRANQUE.md y arrancá"**. Claude audita su
+   presencia, arma el mapa de oportunidades (`analisis.md`), propone **un primer prototipo para mostrar** y hace
+   las preguntas que falten, todas juntas. **Después frena: elegís vos.**
+4. Si hay interés: brief → propuesta → construcción → publicación.
 
 **Cambiar el Motor:** una rama y un PR que mira el otro. Los pasos (y cómo no romper tus clientes mientras
 tanto) están en [`CONTRIBUTING.md`](CONTRIBUTING.md).
@@ -92,6 +95,27 @@ Para cuando la web de un cliente tiene que moverse. El mapa completo y cómo ver
 | *"necesito el video / los cuadros"* | `motor:fabricar-recursos` | Cliente |
 | *"revisá la página antes de mostrarla"* | `motor:revisar-sitio` | Cliente |
 | *"analizá este sitio y sumá lo que sirva"* | `motor:estudiar-sitio` | **Motor** (por rama y PR) |
+
+## Para qué sirve cada skill
+
+**El camino de un cliente**
+- `cliente-nuevo`: la puerta de entrada. Junta el contexto, audita cómo está hoy, arma el mapa de oportunidades (web, app, 3D, diseño) y propone el primer prototipo.
+- `brief-cliente`: relevamiento a fondo, en 3 tandas de preguntas para el cliente. Deja un `brief.md`. Cuando el cliente ya mostró interés.
+- `propuesta-comercial`: 3 paquetes con los precios de la grilla, extras y mantenimiento mensual. La aprueba quien lleva el cliente.
+- `construir-web`: la web completa (textos, catálogo, formulario a WhatsApp), revisada.
+- `publicar-web`: la sube, conecta dominio, mail y formularios, y deja el documento de entrega.
+
+**Para salir a buscar clientes** (desde el Estudio)
+- `buscar-clientes`: empresas reales con presupuesto, puntuadas y anotadas en el embudo.
+- `diagnostico-digital`: cómo aparece una empresa en internet: una hoja para ella y otra interna con el mensaje de contacto.
+
+**Sitios con movimiento (kit webi).** Las llama `construir-web` o `dirigir-sitio` cuando el sitio lo necesita.
+- Método: `dirigir-sitio` (concepto y **una** pieza firma) · `fabricar-recursos` (video, imágenes y cuadros) · `revisar-sitio` (celular, "reducir movimiento", peso) · `estudiar-sitio` (aprender de un sitio ajeno).
+- Base: `sistema-visual` (la marca del cliente al sitio) · `motor-de-movimiento` (todo lo atado al scroll).
+- Pieza firma (se elige **una**): `pelicula-con-scroll` (un video que avanza con el scroll) · `skill-cookie` (un producto que se abre o cambia de color) · `video-de-portada` · `escena-con-puntero` (sigue al cursor, antes y después) · `profundidad-por-capas` · `escena-3d`.
+- El resto de la página: `fondos-shader` · `componentes-vivos` (carruseles, botones, textos) · `secciones-de-pagina` (precios, contacto, pie…) · `pantallas-de-app`.
+
+Cuando entra un cliente nuevo arrancan solo 3 o 4: `cliente-nuevo`, `diagnostico-digital` y, si hay interés, `brief-cliente` y `propuesta-comercial`. Las de movimiento las llaman esas.
 
 ## Reglas
 

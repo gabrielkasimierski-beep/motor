@@ -24,6 +24,8 @@
 
 ## Cómo se trabaja acá
 
+- Si hay un `00-ARRANQUE.md`, es el pedido de arranque: se lo lee entero y se sigue (ver la skill
+  `cliente-nuevo`).
 - Se arranca con la skill `cliente-nuevo` (*"tengo un cliente nuevo"*): deja `analisis.md` y propone
   el **primer prototipo** para mostrar. Después se profundiza.
 - Los archivos del cliente viven en la **raíz de esta carpeta**: `analisis.md`, `brief.md`,

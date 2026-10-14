@@ -160,7 +160,8 @@ por defecto, el 80 % de los casos) o **Carril B** (cuando el estático no alcanz
 **`cliente-nuevo` es la puerta de entrada**: ante un cliente nuevo se arranca por ahí. Cada skill lee
 este archivo primero. Si una skill contradice al MOTOR.md, manda el MOTOR.md.
 
-Un cliente nuevo se crea con `02-Plantilla-cliente/nuevo-cliente.ps1` (ver su README).
+Un cliente nuevo se crea con `02-Plantilla-cliente/nuevo-cliente.ps1` (ver su README): deja su carpeta con un
+`00-ARRANQUE.md` listo para completar, que es el pedido de arranque de `cliente-nuevo`.
 
 ---
 

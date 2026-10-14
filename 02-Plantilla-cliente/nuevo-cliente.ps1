@@ -8,8 +8,9 @@
     ... -Carpeta "casa-rossi"                                       (fija el nombre de la carpeta; por defecto sale del nombre)
     ... -SoloAislamiento                                            (regenera los permisos de todos los clientes)
 
-  Resultado: C:\Claude\Clientes\<slug>\ con CLAUDE.md, identidad\, .env.example, .gitignore y
-  .claude\settings.json (plugin del Motor activado + permisos que bloquean a los demas clientes).
+  Resultado: C:\Claude\Clientes\<slug>\ con CLAUDE.md, 00-ARRANQUE.md (el pedido de arranque, ya con
+  nombre y rubro), identidad\, .env.example, .gitignore y .claude\settings.json (plugin del Motor
+  activado + permisos que bloquean a los demas clientes).
 #>
 param(
   [string]$Nombre,
@@ -99,7 +100,7 @@ $gt = Join-Path $dest 'gitignore.plantilla'
 if (Test-Path $gt) { Move-Item $gt (Join-Path $dest '.gitignore') -Force }
 
 $fecha = Get-Date -Format 'yyyy-MM-dd'
-$plantillas = @(Join-Path $dest 'CLAUDE.md') + @(Get-ChildItem (Join-Path $dest 'identidad') -File | ForEach-Object { $_.FullName })
+$plantillas = @((Join-Path $dest 'CLAUDE.md'), (Join-Path $dest '00-ARRANQUE.md')) + @(Get-ChildItem (Join-Path $dest 'identidad') -File | ForEach-Object { $_.FullName })
 foreach ($f in $plantillas) {
   $t = [IO.File]::ReadAllText($f, [Text.Encoding]::UTF8)
   $t = $t.Replace('{{CLIENTE}}', $Nombre).Replace('{{RUBRO}}', $Rubro).Replace('{{FECHA}}', $fecha).Replace('{{SLUG}}', $slug)
@@ -130,5 +131,6 @@ if ($claude) {
 
 Write-Output ''
 Write-Output "Cliente creado: $dest"
-Write-Output 'Siguiente paso: abrir Claude Code en esa carpeta y decir "tengo un cliente nuevo".'
+Write-Output 'Siguiente paso: completar 00-ARRANQUE.md (con lo que sepas, o pegando el WhatsApp tal cual),'
+Write-Output 'abrir Claude Code en esa carpeta y decir: "Lee 00-ARRANQUE.md y arranca".'
 Write-Output '(La primera vez, aceptar el aviso de que el proyecto importa el MOTOR.md.)'
