@@ -88,6 +88,7 @@ Para cuando la web de un cliente tiene que moverse. El mapa completo y cómo ver
 | *"un carrusel"*, *"un botón con efecto"* | `motor:componentes-vivos` | Cliente |
 | *"armá la banda de precios / contacto / pie"* | `motor:secciones-de-pagina` | Cliente |
 | *"una pantalla de app o un panel"* | `motor:pantallas-de-app` | Cliente |
+| *"cómo debería moverse esto"*, *"qué timing y easing"*, *"animá este botón / transición"* | `motor:motion-design` (principios de animación de LottieFiles, MIT: timing, easing, coreografía) | Cliente |
 | *"pasá la marca al sitio"* | `motor:sistema-visual` y `motor:motor-de-movimiento` (la base) | Cliente |
 | *"necesito el video / los cuadros"* | `motor:fabricar-recursos` | Cliente |
 | *"revisá la página antes de mostrarla"* | `motor:revisar-sitio` | Cliente |
