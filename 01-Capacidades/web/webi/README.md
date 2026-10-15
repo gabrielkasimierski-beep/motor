@@ -37,6 +37,7 @@ Y abrir http://localhost:5190/banco/ (con la sesión abierta en el Motor, tambi�
 | **Base** | | |
 | Color, tipografía, espacios, curvas | `sistema-visual` | `tokens.css` |
 | Scroll, escenarios fijos, entradas | `motor-de-movimiento` | `motor-scroll.js` |
+| Principios de animación (timing, easing, coreografía, emoción) | `motion-design` (de LottieFiles, MIT) | solo guía, sin código |
 | **Escenas (la pieza firma)** | | |
 | Un video que avanza con el scroll | `pelicula-con-scroll` | `cuadros.js` |
 | Un producto que se abre o se parte, con variantes de color | `skill-cookie` | (trae su plantilla propia) |
