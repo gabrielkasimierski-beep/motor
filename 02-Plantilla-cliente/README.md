@@ -18,6 +18,7 @@ proyecto (`claude plugin install motor@motor-estudio --scope project`) y regener
 | Archivo | Para qué |
 |---|---|
 | `CLAUDE.md` | La identidad del cliente. Importa el `MOTOR.md` y los cuatro archivos de `identidad/` |
+| `00-ARRANQUE.md` | **El pedido de arranque**, ya con el nombre y el rubro: se completa con lo que se sepa (o se pega el WhatsApp tal cual) y se le dice a Claude *"Leé 00-ARRANQUE.md y arrancá"* |
 | `identidad/` | `marca.md` · `voz.md` · `visual.md` · `reglas-del-negocio.md`: lo propio de este cliente |
 | `.claude/settings.json` | Activa el plugin del Motor y **bloquea** el acceso a los demás clientes y a tus carpetas privadas (las de `bloqueos-locales.txt`) |
 | `.env.example` | Los tokens de ESTE cliente van en un `.env` (fuera de git), nunca en un `.md` |
