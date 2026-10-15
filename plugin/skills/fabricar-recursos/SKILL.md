@@ -20,6 +20,12 @@ referencia → imagen → sujeto aislado → video → tramo limpio → cuadros 
 > Generar con Higgsfield gasta créditos de la cuenta de quien lo pide: **se le consulta antes** (qué,
 > cuántas tomas y cuánto cuesta).
 > Si el cliente tiene material propio, va primero: fotos y videos reales ganan casi siempre.
+>
+> **Alternativa gratis: Vibes** (https://vibes.ai, de Meta, en beta). No tiene API ni MCP: se opera por el
+> navegador con Claude in Chrome, con la cuenta de quien lo pide ya logueada. Cuando no hace falta calidad de
+> paga, ofrecerla antes que Higgsfield. Flujo: Proyectos > "Crear nuevo" > escribir el prompt en "Describe un
+> vídeo…" > elegir Vídeo o imagen > flecha azul para generar > bajar el resultado desde "Contenido multimedia".
+> Lo descargado va a la carpeta del cliente, nunca al Motor.
 
 ## Reglas que no se negocian
 
