@@ -13,6 +13,7 @@ Los precios viven solo en [`03-Comercial/precios.md`](../03-Comercial/precios.md
 | **Apps** | Maduro técnicamente, precio por proyecto | [`apps/`](apps/) |
 | **3D y animación** | En formación | [`3d-animacion/`](3d-animacion/) |
 | **Diseño gráfico** | Sin proceso ni precio todavía | [`diseno-grafico/`](diseno-grafico/) |
+| **Publicación en redes** | Publicador por comando; puesta en marcha automática pendiente | [`redes/`](redes/) |
 
 ---
 
@@ -98,5 +99,11 @@ o la app salgan con identidad propia.
 aparezca el primer caso real (como se hizo con web). Ver [`diseno-grafico/README.md`](diseno-grafico/README.md).
 
 ---
+
+## Publicación en redes
+
+Herramientas para conectar una cuenta profesional de Instagram, verificar su acceso y publicar contenido aprobado por la API oficial. La plantilla se copia al proyecto local: sus credenciales, medios y registros quedan allí. No instala tareas automáticas ni configura alojamiento de archivos.
+
+La instalación y los comandos están en [`redes/README.md`](redes/README.md). Para retomar la conexión de las redes del estudio, leer [`redes/CONTINUAR-CONEXION-ESTUDIO.md`](redes/CONTINUAR-CONEXION-ESTUDIO.md).
 
 **Cómo elegir para un cliente:** primero [`00-Motor/decidir-trabajo.md`](../00-Motor/decidir-trabajo.md).

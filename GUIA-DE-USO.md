@@ -71,8 +71,15 @@ tanto) están en [`CONTRIBUTING.md`](CONTRIBUTING.md).
 | *"skill cookie"*, *"que el producto se abra / gire con el scroll"* | `motor:skill-cookie` | Cliente |
 | *"buscame clientes"* | `motor:buscar-clientes` | **Estudio** |
 | *"hacé el diagnóstico de X"* | `motor:diagnostico-digital` | **Estudio** |
+| *"conectar Instagram"*, *"retomar el publicador"*, *"publicar una pieza aprobada en redes"* | `motor:publicar-redes` | Proyecto local del cliente o **Estudio** |
 
 Las dos del Estudio guardan en `04-Prospectos\`, que los clientes no pueden ver.
+
+### Publicador de redes
+
+La entrada es `motor:publicar-redes`. Leé [`01-Capacidades/redes/README.md`](01-Capacidades/redes/README.md) para copiar las herramientas a un proyecto local y configurar su cuenta. Para continuar el trabajo de Instagram del estudio desde otra PC, el punto de partida es [`CONTINUAR-CONEXION-ESTUDIO.md`](01-Capacidades/redes/CONTINUAR-CONEXION-ESTUDIO.md).
+
+El repo lleva código y guías; el token se carga localmente mediante el asistente. La publicación por horario, el alojamiento de medios y el calendario aprobado todavía requieren puesta en marcha en el proyecto correspondiente.
 
 ### Sitios con movimiento (kit webi)
 

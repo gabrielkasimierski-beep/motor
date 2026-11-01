@@ -49,6 +49,7 @@ parado en la carpeta del cliente.
 | `00-Motor/` | El método: embudo, cómo decidir el tipo de trabajo, control de calidad, historial |
 | `01-Capacidades/` | **El menú** de lo que ofrecemos (web, apps, 3D/animación, diseño gráfico) y lo aprendido. Crece |
 | `01-Capacidades/web/webi/` | **Kit webi:** sitios con movimiento (código base, banco de pruebas y sitios estudiados) |
+| `01-Capacidades/redes/` | **Publicador de redes:** conexión local con Instagram, herramientas por comando y guía para continuar la puesta en marcha |
 | `02-Plantilla-cliente/` | El andamiaje de un cliente + el script que lo crea |
 | `03-Comercial/` | La grilla de precios, los datos del estudio y las condiciones |
 | `04-Accesos/` | Cómo se manejan los tokens y conectores (nombres y ubicaciones, nunca valores) |
