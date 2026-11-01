@@ -1,0 +1,12 @@
+# Credenciales y temporales locales. Solo el ejemplo sin valores se versiona.
+.env*
+!.env.ejemplo
+*.pem
+*.key
+
+# Estado de conexión y publicaciones de cada proyecto/PC.
+registro-meta/
+publicar/
+salidas/
+node_modules/
+*.log

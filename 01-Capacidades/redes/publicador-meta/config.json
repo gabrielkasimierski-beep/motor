@@ -1,0 +1,12 @@
+{
+  "redes": ["instagram"],
+  "zonaHoraria": "America/Argentina/Buenos_Aires",
+  "meta": {
+    "usuarioInstagram": "",
+    "paginaFacebook": ""
+  },
+  "medios": {
+    "carpetaDrive": "",
+    "baseUrl": ""
+  }
+}
