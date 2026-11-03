@@ -141,6 +141,10 @@ por defecto, el 80 % de los casos) o **Carril B** (cuando el estático no alcanz
 12. **Una demo se presenta como demo.** Nunca se muestra una demo como cliente real.
 13. **Primer prototipo antes que propuesta larga.** A un cliente nuevo se le muestra algo que se toca
     (aunque sea el quick win), no un PDF de 10 páginas.
+14. **Código de afuera, con guardián.** Ninguna skill, repo o kit de terceros entra al Motor ni a un
+    cliente sin pasar por el agente `motor-guardian` (`herramientas/repo_guard.py`): se audita en
+    cuarentena, Gaby aprueba el **hash exacto**, se vendoriza ese commit con su `PROVENANCE.json` y
+    nunca se ejecuta el repo. Se fija el commit, no la rama.
 
 ---
 

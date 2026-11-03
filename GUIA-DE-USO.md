@@ -59,6 +59,12 @@ Para publicar, pedirlo: nada sale sin tu OK.
 **Cambiar el Motor:** una rama y un PR que mira el otro. Los pasos (y cómo no romper tus clientes mientras
 tanto) están en [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
+**Traer una skill o un repo de afuera (de GitHub):** no lo copies a mano. Pedí *"auditá este repo: {link}"*
+y actúa el agente **`motor-guardian`**: lo clona a una cuarentena aislada, lo escanea (hooks, `curl | sh`,
+secretos, ofuscación, binarios) y te muestra el **hash** del commit. Vos revisás y, si te cierra, lo
+vendoriza **ese commit exacto** a donde vaya (una skill, a `plugin\skills\`), con un `PROVENANCE.json`.
+Nunca ejecuta el repo. La herramienta es `herramientas\repo_guard.py`.
+
 ## Skills (aparecen al escribir `/motor`)
 
 | Decís… | Skill | Dónde usarla |
