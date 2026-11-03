@@ -97,6 +97,8 @@ Para cuando la web de un cliente tiene que moverse. El mapa completo y cómo ver
 | *"un carrusel"*, *"un botón con efecto"* | `motor:componentes-vivos` | Cliente |
 | *"armá la banda de precios / contacto / pie"* | `motor:secciones-de-pagina` | Cliente |
 | *"una pantalla de app o un panel"* | `motor:pantallas-de-app` | Cliente |
+| *"una landing que vuele por un mundo 3D con el scroll"* | `motor:scroll-world` (pieza firma; genera escenas con Higgsfield/Monid, **paga**) | Cliente |
+| *"que no parezca hecha con molde / plantilla"*, *"dale diseño premium"*, *"revisá el diseño"* | `motor:design-taste-frontend` (dirección de arte + inspector en navegador real) | Cliente |
 | *"cómo debería moverse esto"*, *"qué timing y easing"*, *"animá este botón / transición"* | `motor:motion-design` (principios de animación de LottieFiles, MIT: timing, easing, coreografía) | Cliente |
 | *"pasá la marca al sitio"* | `motor:sistema-visual` y `motor:motor-de-movimiento` (la base) | Cliente |
 | *"necesito el video / los cuadros"* | `motor:fabricar-recursos` | Cliente |
@@ -121,6 +123,11 @@ Para cuando la web de un cliente tiene que moverse. El mapa completo y cómo ver
 - Base: `sistema-visual` (la marca del cliente al sitio) · `motor-de-movimiento` (todo lo atado al scroll).
 - Pieza firma (se elige **una**): `pelicula-con-scroll` (un video que avanza con el scroll) · `skill-cookie` (un producto que se abre o cambia de color) · `video-de-portada` · `escena-con-puntero` (sigue al cursor, antes y después) · `profundidad-por-capas` · `escena-3d`.
 - El resto de la página: `fondos-shader` · `componentes-vivos` (carruseles, botones, textos) · `secciones-de-pagina` (precios, contacto, pie…) · `pantallas-de-app`.
+
+**De afuera, vendorizadas por el guardián** (congeladas en un commit, con su `PROVENANCE.json`; terceros, revisadas):
+- `scroll-world` (oso95, MIT): landing que "vuela" por un mundo 3D con el scroll, sin cortes. Pieza firma. Genera las escenas con Higgsfield/Monid, que **cuesta plata** (se consulta antes).
+- `design-taste-frontend` (taste-skill v2): dirección de arte contra lo "genérico" — ideas, composición, tipografía, paleta — con un inspector que **abre un navegador real** para revisar y corregir la página. Para que un sitio no parezca plantilla.
+- `motion-design` (LottieFiles): los principios (timing, easing, coreografía).
 
 Cuando entra un cliente nuevo arrancan solo 3 o 4: `cliente-nuevo`, `diagnostico-digital` y, si hay interés, `brief-cliente` y `propuesta-comercial`. Las de movimiento las llaman esas.
 
