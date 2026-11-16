@@ -31,6 +31,7 @@ Y abrir http://localhost:5190/banco/ (con la sesión abierta en el Motor, tambi�
 |---|---|---|
 | **Método** | | |
 | Hay un sitio que queremos aprender | `estudiar-sitio` | — |
+| Clonar un sitio entero como base para modificar (regla 5) | `clone-website` (de JCodesMore, MIT) | plantilla Next.js propia del clon |
 | El sitio lleva movimiento: concepto, pieza firma, guion y fichas | `dirigir-sitio` | — |
 | Hace falta una imagen, un video o cuadros | `fabricar-recursos` | `herramientas/video-a-cuadros.js` |
 | Antes de mostrar o publicar | `revisar-sitio` | `herramientas/archivos-del-sitio.js` |
@@ -78,8 +79,11 @@ Valen todas las del [`MOTOR.md`](../../../MOTOR.md). Las propias de esta capacid
    digna para esos dos casos, no está terminada.
 4. **El peso se cuenta.** Cada pieza declara cuánto baja y cuándo. Lo pesado llega tarde y solo si
    hace falta.
-5. **Se aprende la técnica, no se copia la obra.** De un sitio ajeno se toman mecanismos y
-   medidas; nunca sus textos, imágenes, videos, código ni material de pago.
+5. **Se puede clonar un sitio entero como punto de partida** (skill `clone-website`): estructura,
+   layout, estilos, animaciones y comportamiento, para después modificarlo. Lo que es **obra del otro**
+   —sus textos, fotos, videos, logos y marca— sirve solo mientras se trabaja: **antes de mostrárselo a
+   un cliente o publicarlo se reemplaza** por material propio o del cliente. Nunca se clona lo que está
+   detrás de un pago o de un inicio de sesión, ni se presenta un clon como si fuera el sitio original.
 6. **El movimiento no demora el contacto.** El botón que genera la consulta está visible y responde
    antes de que termine de cargar la escena (Norte 1 del Motor).
 7. **Generar recursos con una cuenta paga se consulta antes** (qué, cuántas tomas, cuánto cuesta).

@@ -12,9 +12,12 @@ Flujo en 3 pasos (auditar → fijar hash → vendorizar):
     2) (revisás el reporte a ojo)
 
     3) VENDORIZAR repo_guard.py vendor <url> --commit <hash> --into <ruta>
+                  [--subpath <carpeta/del/repo>]
        Vuelve a clonar, hace checkout del hash EXACTO que vos pasaste,
        copia los archivos (sin .git) a tu proyecto y deja un archivo
-       PROVENANCE.json con origen, hash y fecha.
+       PROVENANCE.json con origen, hash y fecha. Con --subpath copia solo
+       esa subcarpeta del commit (su contenido queda en la raíz de --into)
+       y el PROVENANCE.json registra qué subcarpeta fue.
 
     Extra:
        repo_guard.py verify <ruta-vendorizada>
@@ -141,10 +144,20 @@ def cmd_vendor(args):
     if now_at != args.commit:
         sys.exit(f"✗ El hash no coincide. Esperado {args.commit}, quedó {now_at}")
 
+    subpath = None
+    src_dir = repo_dir
+    if args.subpath:
+        subpath, src_dir = _resolve_subpath(repo_dir, args.subpath)
+        print(f"→ Solo la subcarpeta: {subpath}")
+
+    _reject_symlinks(src_dir)
+
     print(f"→ Copiando a {into} (sin .git)")
     into.mkdir(parents=True, exist_ok=True)
-    for item in repo_dir.iterdir():
-        if item.name in SKIP_COPY:
+    for item in src_dir.iterdir():
+        # SKIP_COPY se aplica a la raíz del repo; dentro de una subcarpeta
+        # solo se descarta .git.
+        if item.name == ".git" or (subpath is None and item.name in SKIP_COPY):
             continue
         target = into / item.name
         if item.is_dir():
@@ -158,6 +171,7 @@ def cmd_vendor(args):
     provenance = {
         "source_url": args.url,
         "pinned_commit": args.commit,
+        "subpath": subpath,  # None = repo entero
         "vendored_at": datetime.now(timezone.utc).isoformat(),
         "content_sha256": content_hash,
         "note": "Copia congelada. No se actualiza salvo que repitas el flujo.",
@@ -168,6 +182,8 @@ def cmd_vendor(args):
     print("✓ Vendorizado.")
     print(f"  Origen:  {args.url}")
     print(f"  Commit:  {args.commit}")
+    if subpath:
+        print(f"  Subcarpeta: {subpath}")
     print(f"  Destino: {into}")
     print(f"  Registro: {into / 'PROVENANCE.json'}")
 
@@ -183,11 +199,44 @@ def cmd_verify(args):
     if current == prov["content_sha256"]:
         print(f"✓ Intacto. Coincide con lo vendorizado el {prov['vendored_at']}.")
         print(f"  Commit fijado: {prov['pinned_commit']}")
+        if prov.get("subpath"):
+            print(f"  Subcarpeta del repo: {prov['subpath']}")
     else:
         print("⚠ ¡CAMBIÓ! El contenido no coincide con el hash registrado.")
         print(f"  Registrado: {prov['content_sha256']}")
         print(f"  Ahora:      {current}")
         print("  Alguien (o algo) modificó los archivos después de vendorizar.")
+        sys.exit(1)
+
+
+def _resolve_subpath(repo_dir: Path, raw: str):
+    """Valida --subpath: relativo, sin '..', dentro del repo y carpeta
+    existente. Devuelve (subpath normalizado con '/', ruta absoluta)."""
+    norm = raw.replace("\\", "/").strip("/")
+    parts = [p for p in norm.split("/") if p not in ("", ".")]
+    if (not parts or any(p == ".." for p in parts) or Path(raw).is_absolute()
+            or raw[:1] in ("/", "\\") or ":" in raw):
+        sys.exit(f"✗ --subpath inválido: {raw!r} (tiene que ser una ruta relativa dentro del repo)")
+    if parts[0] == ".git":
+        sys.exit("✗ --subpath no puede apuntar a .git")
+    src = repo_dir.joinpath(*parts)
+    root = repo_dir.resolve()
+    real = src.resolve()
+    if real != root and root not in real.parents:
+        sys.exit(f"✗ --subpath se sale del repo: {raw!r}")
+    if not src.is_dir():
+        sys.exit(f"✗ --subpath no existe en ese commit o no es una carpeta: {raw!r}")
+    return "/".join(parts), src
+
+
+def _reject_symlinks(src_dir: Path):
+    """Aborta si hay enlaces simbólicos: copytree los sigue y podría
+    traer archivos de afuera del repo (por ejemplo de tu home)."""
+    links = [p for p in src_dir.rglob("*")
+             if p.is_symlink() and ".git" not in p.relative_to(src_dir).parts]
+    if links:
+        listado = "\n  ".join(str(p.relative_to(src_dir)) for p in links[:20])
+        sys.exit(f"✗ Hay enlaces simbólicos en lo que se iba a copiar; no copio nada:\n  {listado}")
 
 
 def _dir_hash(root: Path):
@@ -218,6 +267,8 @@ def main():
     v.add_argument("url")
     v.add_argument("--commit", required=True, help="Hash COMPLETO del commit revisado")
     v.add_argument("--into", required=True, help="Carpeta destino en tu proyecto")
+    v.add_argument("--subpath",
+                   help="Copiar solo esta subcarpeta del repo (ruta relativa, ej. .agents/skills/x)")
     v.set_defaults(func=cmd_vendor)
 
     ve = sub.add_parser("verify", help="Verificar que una copia no cambió")
