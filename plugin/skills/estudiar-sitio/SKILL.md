@@ -21,7 +21,12 @@ termina cuando la técnica quedó en una skill, la pieza en `kit/` y la prueba e
 Se toma **cómo funciona**: el mecanismo, la estructura, las medidas que se ven (largos, tiempos,
 curvas, cantidad de cuadros), el stack y el método de trabajo que el sitio cuente en público.
 
-No se toma **la obra**: textos, imágenes, videos, código fuente, ni nada que esté detrás de un
+> Si lo que se quiere es **el sitio entero como base para modificar**, no es este trabajo: es la skill
+> `clone-website` (regla 5 del kit webi, en `01-Capacidades/web/webi/README.md`). Este estudio deja
+> técnica en el Motor; el clon deja una copia de trabajo cuyo contenido ajeno se reemplaza antes de
+> mostrarla.
+
+En el estudio no se toma **la obra**: textos, imágenes, videos, código fuente, ni nada que esté detrás de un
 pago o de un inicio de sesión. No se inicia sesión, no se aprietan botones de "copiar" de material
 de pago, no se descargan sus archivos. Si la única forma de aprender algo es saltar esa barrera, se
 anota como "no disponible" y se resuelve con conocimiento propio.

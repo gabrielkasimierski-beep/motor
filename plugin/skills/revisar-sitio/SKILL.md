@@ -28,6 +28,8 @@ Tamaños: **375** (celular), **768** y **1280**. El celular se revisa primero.
 - [ ] El botón principal responde antes de que termine de cargar la pieza firma
 - [ ] Ningún texto queda encima del sujeto ni cortado en ningún tamaño
 - [ ] Los datos del negocio están verificados o marcados `{completar}`; una demo dice que es demo
+- [ ] Si el sitio salió de un clon (`clone-website`): no queda texto, foto, video, logo ni marca del sitio
+      original (regla 5 del kit webi, `01-Capacidades/web/clonar-sitio.md`)
 
 ### El movimiento
 - [ ] Con rueda de mouse y con trackpad el recorrido se siente parecido (son muy distintos)

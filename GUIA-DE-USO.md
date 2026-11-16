@@ -104,6 +104,7 @@ Para cuando la web de un cliente tiene que moverse. El mapa completo y cómo ver
 | *"necesito el video / los cuadros"* | `motor:fabricar-recursos` | Cliente |
 | *"revisá la página antes de mostrarla"* | `motor:revisar-sitio` | Cliente |
 | *"analizá este sitio y sumá lo que sirva"* | `motor:estudiar-sitio` | **Motor** (por rama y PR) |
+| *"cloná este sitio"*, *"quiero este sitio como base"* | `motor:clone-website` (JCodesMore, MIT) — ver `01-Capacidades/web/clonar-sitio.md` | Cliente o carpeta aparte |
 
 ## Para qué sirve cada skill
 
@@ -128,6 +129,9 @@ Para cuando la web de un cliente tiene que moverse. El mapa completo y cómo ver
 - `scroll-world` (oso95, MIT): landing que "vuela" por un mundo 3D con el scroll, sin cortes. Pieza firma. Genera las escenas con Higgsfield/Monid, que **cuesta plata** (se consulta antes).
 - `design-taste-frontend` (taste-skill v2): dirección de arte contra lo "genérico" — ideas, composición, tipografía, paleta — con un inspector que **abre un navegador real** para revisar y corregir la página. Para que un sitio no parezca plantilla.
 - `motion-design` (LottieFiles): los principios (timing, easing, coreografía).
+- `clone-website` (JCodesMore, MIT): clona un sitio entero (estructura, estilos, animaciones) como base para
+  modificar. El contenido ajeno (textos, fotos, logos, marca) se reemplaza antes de mostrarlo. Cómo se usa en el
+  Motor: `01-Capacidades/web/clonar-sitio.md`.
 
 Cuando entra un cliente nuevo arrancan solo 3 o 4: `cliente-nuevo`, `diagnostico-digital` y, si hay interés, `brief-cliente` y `propuesta-comercial`. Las de movimiento las llaman esas.
 
