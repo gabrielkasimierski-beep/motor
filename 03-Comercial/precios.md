@@ -78,6 +78,23 @@ Qué incluye cada uno: tabla de `plugin/skills/propuesta-comercial/SKILL.md`.
 
 ---
 
+## 3b. Carta Viva (producto propio · gastronomía)
+
+Carta digital con QR por mesa y el **3D real de cada plato** (el diferencial). Es un producto
+replicable: la misma base se adapta al menú de cada local. El 3D de cada plato lo produce el
+Motor (`fabricar-recursos`; alternativa gratis: Vibes). Se vende con la landing
+`web-ia-ruddy.vercel.app/carta-viva`.
+
+| Concepto | Precio | Nota |
+|---|---|---|
+| **Armado** (una vez) | **desde $200.000** | Carta con QR por mesa + 3D de los platos principales. Más platos en 3D, según cantidad. |
+| **Mensual** | **$40.000 por mes** | Hosting, cambios de carta y precios, soporte. Por adelantado, mes a mes. |
+
+- **Vigente desde:** 30-oct-2026 · aprobado por Gaby. El "desde" del armado se ajusta por la
+  cantidad de platos que van en 3D (cada plato es trabajo de producción).
+
+---
+
 ## 4. Qué paquete según lo que necesita el cliente
 
 Se lee de arriba abajo. **Primero se prueba el extra que lo resuelve en Carril A**; A medida
